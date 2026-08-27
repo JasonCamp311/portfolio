@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F1F4F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D141C" media="(prefers-color-scheme: dark)">
+<title>Jason Camp · Systems Portfolio</title>
+<!-- ================================================================
+  HOW TO UPDATE THIS PORTFOLIO
+  ================================================================
+  Everything on this page is generated from the PROJECTS array in the
+  <script> block near the bottom of this file. You should never need
+  to touch the HTML or CSS to keep it current.
+
+  TO ADD OR EDIT A PROJECT:
+    Find "const PROJECTS" below and add/edit an object. Fields:
+      id       unique slug, e.g. "ticketing"
+      name     project title
+      category "district" or "personal"
+      status   "live" | "build" | "design"
+      period   e.g. "2025 - present"
+      tagline  one line shown on the card
+      summary  2-4 sentences for the detail view
+      stack    array of tech tags
+      impact   array of short bullet strings (real numbers > adjectives)
+      media    array of { type: "img" | "video", src: "assets/x.png",
+               caption: "..." } - if the file is missing, a labeled
+               placeholder tile renders instead, so you can list media
+               you plan to capture later.
+      code     optional { lang: "js"|"python"|..., label: "...",
+               source: "..." } - personal projects only, and only REAL
+               code pasted from your repo. Leave it out entirely
+               otherwise; the page renders fine without it.
+      links    optional array of { label, href }
+
+  TO ADD SCREENSHOTS / CLIPS:
+    Make an "assets" folder next to this file and drop images (.png/.jpg)
+    or short clips (.mp4, keep them under ~15s, screen-recorded) in it.
+    Then point the media src at them. Nothing else to do.
+
+  TO CHANGE THE HERO METRICS OR SYSTEM BOARD:
+    Edit the METRICS and BOARD arrays, right above PROJECTS.
+
+  LAST_UPDATED near the top of the script stamps the footer.
+================================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<style>
+  :root{
+    color-scheme:light;
+    --paper:#F1F4F3;
+    --panel:#FFFFFF;
+    --ink:#15222E;
+    --slate:#5B6B79;
+    --line:#D8DFE2;
+    --terminal:#0C1520;
+    --terminal-ink:#C7D3DE;
+    --accent:#2354C7;
+    --accent-soft:#E7EDFB;
+    --ok:#1E9E6A;
+    --ok-soft:#E2F3EB;
+    --build:#C08417;
+    --build-soft:#F8EFDC;
+    --design:#6B7A89;
+    --design-soft:#E9EDF0;
+    --shadow:rgba(21,34,46,.08);
+    --radius:10px;
+    --maxw:1120px;
+  }
+  /* Dark palette: applied for the OS "dark" preference (unless the visitor has
+     explicitly chosen light) and whenever the toggle sets data-theme="dark". */
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --paper:#0D141C;
+      --panel:#161F29;
+      --ink:#E8EEF3;
+      --slate:#93A3B2;
+      --line:#28323D;
+      --terminal:#080D14;
+      --terminal-ink:#C7D3DE;
+      --accent:#6E9BFF;
+      --accent-soft:#1A2740;
+      --ok:#3FBE86;
+      --ok-soft:#12271D;
+      --build:#E0A63A;
+      --build-soft:#2C2412;
+      --design:#8A98A6;
+      --design-soft:#202B35;
+      --shadow:rgba(0,0,0,.45);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --paper:#0D141C;
+    --panel:#161F29;
+    --ink:#E8EEF3;
+    --slate:#93A3B2;
+    --line:#28323D;
+    --terminal:#080D14;
+    --terminal-ink:#C7D3DE;
+    --accent:#6E9BFF;
+    --accent-soft:#1A2740;
+    --ok:#3FBE86;
+    --ok-soft:#12271D;
+    --build:#E0A63A;
+    --build-soft:#2C2412;
+    --design:#8A98A6;
+    --design-soft:#202B35;
+    --shadow:rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;background:var(--paper)}
+  body{
+    background:var(--paper) !important;
+    color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    font-size:16px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent);color:#fff}
+  a{color:var(--accent)}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .mono{font-family:"IBM Plex Mono",monospace}
+
+  /* ---------- header ---------- */
+  header.top{
+    border-bottom:1px solid var(--line);
+    background:var(--panel);
+  }
+  .top-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 0;gap:16px;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--ok);
+    box-shadow:0 0 0 4px var(--ok-soft);animation:pulse 2.6s ease-in-out infinite}
+  .brand .name{font-family:"Archivo",sans-serif;font-weight:700;letter-spacing:.01em}
+  .top-links{display:flex;gap:18px;font-size:13px;align-items:center}
+  .top-links a{color:var(--slate);text-decoration:none}
+  .top-links a:hover{color:var(--accent)}
+  .theme-toggle{
+    display:inline-flex;align-items:center;gap:7px;
+    font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.02em;
+    padding:6px 11px;border:1px solid var(--line);border-radius:999px;
+    background:var(--panel);color:var(--slate);cursor:pointer;
+    transition:border-color .15s ease,color .15s ease;
+  }
+  .theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+  .theme-toggle .tt-icon{font-size:13px;line-height:1}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 4px var(--ok-soft)}50%{box-shadow:0 0 0 7px rgba(30,158,106,.12)}}
+
+  /* ---------- hero ---------- */
+  .hero{padding:64px 0 40px}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.14em;
+    color:var(--slate);text-transform:uppercase;margin-bottom:18px;
+  }
+  .eyebrow b{color:var(--ink);font-weight:600}
+  h1{
+    font-family:"Archivo",sans-serif;
+    font-weight:800;
+    font-size:clamp(34px,5.4vw,58px);
+    line-height:1.04;
+    letter-spacing:-0.015em;
+    max-width:15ch;
+  }
+  h1 .accent{color:var(--accent)}
+  .hero p.lede{
+    margin-top:20px;max-width:56ch;color:var(--slate);font-size:17px;
+  }
+  .metrics{
+    margin-top:34px;display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:1px;background:var(--line);border:1px solid var(--line);
+    border-radius:var(--radius);overflow:hidden;
+  }
+  .metric{background:var(--panel);padding:16px 18px}
+  .metric .num{font-family:"Archivo",sans-serif;font-weight:700;font-size:24px;letter-spacing:-.01em}
+  .metric .lbl{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--slate);
+    text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+
+  /* ---------- system board (signature) ---------- */
+  .board{margin:44px 0 8px}
+  .board-head{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+    text-transform:uppercase;letter-spacing:.12em;color:var(--slate);
+    margin-bottom:10px;
+  }
+  .board-panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .board-row{
+    display:grid;grid-template-columns:14px 1fr auto;gap:14px;align-items:center;
+    padding:13px 18px;border-bottom:1px solid var(--line);
+    text-decoration:none;color:inherit;
+    opacity:0;transform:translateY(6px);
+    animation:rise .5s ease forwards;
+    animation-delay:calc(var(--i) * 90ms);
+  }
+  .board-row:last-child{border-bottom:none}
+  .board-row:hover{background:var(--accent-soft)}
+  .board-row .sname{font-weight:600}
+  .board-row .sdesc{color:var(--slate);font-size:14px}
+  .board-row .smetric{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--slate);text-align:right;white-space:nowrap}
+  .sdot{width:9px;height:9px;border-radius:50%}
+  .sdot.live{background:var(--ok)}
+  .sdot.build{background:var(--build)}
+  .sdot.design{background:transparent;border:2px solid var(--design);width:7px;height:7px}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  /* ---------- filters ---------- */
+  .filters{
+    display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+    margin:52px 0 22px;
+  }
+  .filters .flabel{font-family:"IBM Plex Mono",monospace;font-size:12px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-right:8px}
+  .fbtn{
+    font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.04em;
+    padding:7px 14px;border-radius:999px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink);cursor:pointer;
+  }
+  .fbtn:hover{border-color:var(--accent)}
+  .fbtn[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .fbtn .cnt{color:var(--slate)}
+  .fbtn[aria-pressed="true"] .cnt{color:#9FB4C6}
+
+  /* ---------- cards ---------- */
+  .grid{
+    display:grid;gap:16px;
+    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+    padding-bottom:64px;
+  }
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 20px 18px;display:flex;flex-direction:column;gap:12px;
+    cursor:pointer;text-align:left;font:inherit;color:inherit;
+    transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  }
+  .card:hover{transform:translateY(-2px);box-shadow:0 8px 24px var(--shadow);border-color:var(--slate)}
+  .card:focus-visible,.fbtn:focus-visible,a:focus-visible,button:focus-visible{
+    outline:2px solid var(--accent);outline-offset:2px;
+  }
+  .card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .badge{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;
+    text-transform:uppercase;padding:4px 9px;border-radius:999px;
+  }
+  .badge.live{background:var(--ok-soft);color:var(--ok)}
+  .badge.build{background:var(--build-soft);color:var(--build)}
+  .badge.design{background:var(--design-soft);color:var(--design)}
+  .badge .bdot{width:6px;height:6px;border-radius:50%;background:currentColor}
+  .cat{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--slate);
+    text-transform:uppercase;letter-spacing:.1em}
+  .card h3{font-family:"Archivo",sans-serif;font-weight:700;font-size:19px;letter-spacing:-.01em}
+  .card .tag{color:var(--slate);font-size:14.5px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+  .chip{
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--slate);
+    border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:var(--paper);
+  }
+  .card .kmetric{
+    font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);
+    border-top:1px dashed var(--line);padding-top:10px;
+  }
+
+  /* ---------- detail dialog ---------- */
+  dialog{
+    border:none;border-radius:14px;padding:0;
+    width:min(880px,calc(100vw - 32px));
+    max-height:calc(100vh - 48px);
+    background:var(--panel);color:var(--ink);
+  }
+  dialog::backdrop{background:rgba(12,21,32,.55);backdrop-filter:blur(2px)}
+  .d-inner{padding:30px clamp(20px,4vw,40px) 36px;overflow-y:auto;max-height:calc(100vh - 48px)}
+  .d-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+  .d-head h2{font-family:"Archivo",sans-serif;font-weight:800;font-size:clamp(24px,3.4vw,32px);letter-spacing:-.015em}
+  .d-meta{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--slate);
+    text-transform:uppercase;letter-spacing:.1em;margin:8px 0 4px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .d-close{
+    border:1px solid var(--line);background:var(--paper);border-radius:8px;
+    font-family:"IBM Plex Mono",monospace;font-size:12px;padding:8px 12px;cursor:pointer;flex-shrink:0;
+  }
+  .d-close:hover{border-color:var(--accent);color:var(--accent)}
+  .d-summary{margin-top:14px;max-width:64ch}
+  .d-section{margin-top:26px}
+  .d-section > .sec-label{
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--slate);margin-bottom:10px;
+  }
+  .impact li{margin:6px 0 6px 18px}
+  .impact li::marker{color:var(--accent)}
+  .d-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .media-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .shot{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--paper)}
+  .shot img,.shot video{display:block;width:100%;height:auto}
+  .shot figcaption{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--slate);padding:8px 10px;border-top:1px solid var(--line)}
+  .shot.placeholder .ph{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    min-height:150px;border:2px dashed var(--line);border-radius:8px;margin:8px;
+    color:var(--slate);font-family:"IBM Plex Mono",monospace;font-size:12px;text-align:center;padding:12px;
+  }
+  .shot.placeholder .ph .big{font-size:20px}
+  pre.codeblock{
+    background:var(--terminal);border-radius:8px;overflow:auto;
+    font-size:13px;line-height:1.5;
+  }
+  pre.codeblock code{font-family:"IBM Plex Mono",monospace;padding:16px 18px;display:block;background:transparent}
+  .code-label{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--slate);margin-bottom:8px}
+  .d-links{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}
+
+  /* ---------- footer ---------- */
+  footer{
+    background:var(--terminal);color:var(--terminal-ink);
+    padding:34px 0;margin-top:20px;
+  }
+  footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+  footer .mono{font-size:12.5px;color:#7E93A6}
+  footer a{color:#9FC0F2;text-decoration:none}
+  footer a:hover{text-decoration:underline}
+
+  @media (max-width:640px){
+    .board-row{grid-template-columns:12px 1fr}
+    .board-row .smetric{display:none}
+    .hero{padding-top:44px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important}
+    .board-row{opacity:1;transform:none}
+  }
+  @media print{
+    .filters,.top-links,footer,.d-close{display:none}
+    body{background:#fff}
+    .card{break-inside:avoid;box-shadow:none}
+    .hero{padding:20px 0}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-inner">
+    <div class="brand">
+      <span class="dot" aria-hidden="true"></span>
+      <span class="name mono">jason.camp</span>
+    </div>
+    <nav class="top-links mono">
+      <a href="#systems">System board</a>
+      <a href="#projects">Projects</a>
+      <a href="https://github.com/JasonCamp311" target="_blank" rel="noopener">GitHub ↗</a>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" aria-pressed="false">
+        <span class="tt-icon" aria-hidden="true">🌙</span><span class="tt-label">Dark</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <p class="eyebrow"><b>Jason Camp</b> · Technology Supervisor · Acture Solutions</p>
+    <h1>Systems that ship, <span class="accent">and stay running.</span></h1>
+    <p class="lede">
+      I build and operate production software and infrastructure for a K-12 school district:
+      replacing legacy vendor systems with modern serverless apps, automating manual workflows,
+      and running self-hosted AI and media infrastructure after hours. Everything below is real,
+      in use, and maintained by me.
+    </p>
+    <div class="metrics" id="metrics"></div>
+  </section>
+
+  <section class="board" id="systems" aria-label="System status board">
+    <div class="board-head">
+      <span>System board</span>
+      <span id="board-count"></span>
+    </div>
+    <div class="board-panel" id="board"></div>
+  </section>
+
+  <section id="projects" aria-label="Projects">
+    <div class="filters" id="filters" role="group" aria-label="Filter projects">
+      <span class="flabel">Filter</span>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+</main>
+
+<dialog id="detail" aria-label="Project details">
+  <div class="d-inner" id="d-inner"></div>
+</dialog>
+
+<footer>
+  <div class="wrap">
+    <span class="mono">jason.camp / systems portfolio · last updated <span id="stamp"></span></span>
+    <span class="mono"><a href="https://github.com/JasonCamp311" target="_blank" rel="noopener">github.com/JasonCamp311</a></span>
+  </div>
+</footer>
+
+<script>
+/* ================================================================
+   EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
+   ================================================================ */
+
+const LAST_UPDATED = "2026-08-25";
+
+/* Hero metrics strip. Keep numbers honest and current. */
+const METRICS = [
+  { num: "50-75", lbl: "tickets / week processed" },
+  { num: "300+",  lbl: "legacy records migrated" },
+  { num: "15",    lbl: "staff onboarded to new tools" },
+  { num: "9",     lbl: "systems built and operated" },
+  { num: "4-node",lbl: "TB5 inference cluster" },
+];
+
+/* System board rows. id must match a project id below. */
+const BOARD = [
+  { id: "ticketing",    metric: "50-75 tickets/wk" },
+  { id: "registration", metric: "rolling out" },
+  { id: "discord-bot",  metric: "24/7 uptime" },
+  { id: "homelab",      metric: "self-hosted" },
+  { id: "mac-cluster",  metric: "multi-model serving" },
+];
+
+const PROJECTS = [
+  {
+    id: "ticketing",
+    name: "Maintenance Ticketing System",
+    category: "district",
+    status: "live",
+    period: "2025 - present",
+    tagline: "Full replacement for SchoolDude, built from scratch on Cloudflare Workers.",
+    summary: "The district was paying for a legacy ticketing product (SchoolDude) that staff disliked and that trapped our data. I designed and built a complete replacement on Cloudflare Workers, D1, and R2, with Microsoft SSO and role-based access for requesters, technicians, the head groundskeeper, and IT admin. It launched to the maintenance department and now handles all facilities requests for the district.",
+    stack: ["Cloudflare Workers", "D1 (SQLite)", "R2", "Microsoft SSO", "Graph API"],
+    impact: [
+      "Handles 50-75 tickets per week in production",
+      "Imported 300 legacy tickets so no history was lost in the cutover",
+      "Onboarded 15 users across maintenance, grounds, and IT",
+      "Role-based routing: requests reach the right technician automatically",
+      "Photo attachments and recurring scheduled tasks, which the old system handled poorly",
+      "SharePoint archival via Graph API in progress; security audit pass underway"
+    ],
+    media: [
+      { type: "img", src: "assets/ticketing-dashboard.png", caption: "Technician dashboard, open tickets by building" },
+      { type: "img", src: "assets/ticketing-mobile.png", caption: "Mobile request form with photo attachment" }
+    ]
+  },
+  {
+    id: "registration",
+    name: "Digital Student Registration",
+    category: "district",
+    status: "build",
+    period: "2026",
+    tagline: "Jotform to SharePoint pipeline that routes enrollments to the right building automatically.",
+    summary: "Student registration was a paper-and-email process. I built a digital intake on Jotform and an automated pipeline in Power Automate that files each submission into building-specific SharePoint folders based on grade level (BRS PreK-4, Middle School 5-8, High School 9-12). Families get an autoresponder with a document checklist and the correct building's submission instructions, so the front office stops answering the same questions.",
+    stack: ["Jotform", "Power Automate", "SharePoint Online", "Microsoft 365"],
+    impact: [
+      "Removes manual sorting of every enrollment packet by office staff",
+      "Grade-level logic routes documents to the correct building automatically",
+      "Autoresponder gives families a checklist and instructions the moment they submit",
+      "Single source of truth in SharePoint instead of inbox attachments"
+    ],
+    media: []
+  },
+  {
+    id: "mac-cluster",
+    name: "Mac mini Compute Cluster",
+    category: "district",
+    status: "build",
+    period: "2026",
+    tagline: "Four Mac minis pooled over Thunderbolt 5 to serve multiple AI models concurrently.",
+    summary: "Repurposed four Mac minis into a pooled compute cluster networked over Thunderbolt 5, serving multiple models at once: one strong reasoning model plus Llama 3.1 8B as the fast everyday model. Includes a custom web frontend with routing logic so users get sent to the right model for the task. This is on-prem AI capability the district gets from hardware it already owned.",
+    stack: ["Apple Silicon", "Thunderbolt 5 networking", "Distributed inference", "Llama 3.1"],
+    impact: [
+      "Pools compute from 4 machines the district already owned",
+      "Serves a strong model and a fast model concurrently with routing between them",
+      "Custom frontend built and iterated with an agentic CLI workflow",
+      "On-prem inference: no per-token vendor costs, data stays in-district"
+    ],
+    media: [
+      { type: "img", src: "assets/cluster-frontend.png", caption: "Chat frontend answering live from the on-prem exo cluster" },
+      { type: "video", src: "assets/cluster-demo.mp4", caption: "Prompt answered by the resident Qwen3.6 model on the cluster" }
+    ]
+  },
+  {
+    id: "discord-bot",
+    name: "AI Community Bot",
+    category: "personal",
+    status: "live",
+    period: "2024 - present",
+    tagline: "Production discord.py bot with an AI assistant, per-user memory, and a full voice pipeline.",
+    summary: "A production Discord bot serving my community 24/7, built on discord.py with a modular cog architecture: economy, games, music, and an AI assistant. The assistant runs Hermes 3 locally via Ollama with per-user long-term memory (Mem0 + Chroma), so it remembers context across conversations, and users can wipe their own memory with a single command. A voice pipeline adds Kokoro TTS and RVC voice conversion. It runs on Fedora under rootless Podman with SELinux enforcing.",
+    stack: ["Python", "discord.py", "Ollama / Hermes 3", "Mem0 + Chroma", "Kokoro TTS", "RVC", "Podman"],
+    impact: [
+      "24/7 production uptime on self-managed infrastructure",
+      "Per-user AI memory with user-controlled deletion (!forgetme)",
+      "Modular cog architecture: features ship independently without downtime",
+      "Local inference: zero API spend, full data ownership",
+      "Rootless containers with SELinux enforcing, security as a default not an afterthought"
+    ],
+    media: []
+  },
+  {
+    id: "discord-activity",
+    name: "Discord Activity: Game Platform",
+    category: "personal",
+    status: "build",
+    period: "2026",
+    tagline: "Multi-game embedded platform with a 3D cinema watch-party scene in Three.js.",
+    summary: "An embedded Discord Activity hosting multiple games (Dogbowl, Orbital Golf, Liar's Dice) plus a 3D cinema: a shared virtual theater with seated avatars and server-authoritative playback sync, modeled on the old Xbox 360 Netflix Party. Built with react-three-fiber on top of Discord's embedded app SDK.",
+    stack: ["React", "Three.js / react-three-fiber", "Discord Embedded App SDK", "WebSockets"],
+    impact: [
+      "Server-authoritative sync keeps every viewer frame-aligned",
+      "Multiple games shipped inside a single Activity shell",
+      "Real-time 3D rendered inside Discord's embedded iframe constraints"
+    ],
+    media: [
+      { type: "img", src: "assets/activity-games.png", caption: "Game select screen" }
+    ]
+  },
+  {
+    id: "party-theater",
+    name: "Party Theater",
+    category: "personal",
+    status: "build",
+    period: "2026",
+    tagline: "Self-hostable watch-party web app anyone can run with Docker Compose.",
+    summary: "A standalone, self-hostable watch-party app: React, Vite, TypeScript, and Three.js on the front, deployed with Docker Compose on Fedora, with coturn providing TURN so it works across real-world NATs. Same problem space as the Discord cinema, but packaged so anyone can run their own instance.",
+    stack: ["React", "Vite", "TypeScript", "Three.js", "Docker Compose", "coturn / WebRTC"],
+    impact: [
+      "One-command self-hosted deployment via Docker Compose",
+      "Own TURN infrastructure for reliable connectivity behind NAT",
+      "Clean separation from the Discord version: same domain, different distribution model"
+    ],
+    media: [
+      { type: "img", src: "assets/party-theater.png", caption: "Theater room view" }
+    ]
+  },
+  {
+    id: "homelab",
+    name: "Self-Hosted Homelab",
+    category: "personal",
+    status: "live",
+    period: "ongoing",
+    tagline: "Fedora + Podman infrastructure: media server, local AI, managed network, remote access.",
+    summary: "A production homelab I run the way I'd run a small company's infrastructure. Fedora with rootless Podman and SELinux enforcing, CDI GPU passthrough to an RTX 4090 Mobile, Jellyfin with Intel QSV hardware transcode, Ollama + Open WebUI for local AI, and Tailscale for zero-config secure remote access. The network side is a managed UniFi setup with VLANs, a MoCA 2.5 backhaul over existing coax, and a self-hosted UniFi controller in Podman.",
+    stack: ["Fedora", "Podman + SELinux", "CDI GPU passthrough", "Jellyfin", "Ollama", "UniFi VLANs", "MoCA 2.5", "Tailscale"],
+    impact: [
+      "Every service containerized, rootless, SELinux enforcing",
+      "GPU passthrough serving local LLM inference and hardware transcode",
+      "Designed a 2.5GbE backhaul over existing coax after cable runs were ruled out",
+      "Secure remote access via Tailscale, nothing exposed to the open internet"
+    ],
+    media: []
+  },
+  {
+    id: "inference-platform",
+    name: "Hybrid Inference Platform",
+    category: "personal",
+    status: "design",
+    period: "2026 - planned",
+    tagline: "Local GPU serving with an AWS burst plane, the flagship AI infrastructure build.",
+    summary: "In design: a hybrid inference platform that serves models from local GPU hardware and bursts to AWS when demand exceeds local capacity. The goal is to demonstrate real AI infrastructure engineering: model serving, autoscaling across a cost boundary, observability, and the economics of local-vs-cloud inference. Built alongside AWS Solutions Architect certification work.",
+    stack: ["AWS", "GPU serving", "Autoscaling", "Observability"],
+    impact: [
+      "Designed to answer a real question: when is local inference cheaper than cloud?",
+      "Deliberately separated from work infrastructure to keep IP clean",
+      "Targets the AI infrastructure roles this portfolio is aimed at"
+    ],
+    media: []
+  }
+];
+
+/* ================================================================
+   RENDERING - no need to edit below here
+   ================================================================ */
+
+const STATUS = {
+  live:   { label: "In production" },
+  build:  { label: "In development" },
+  design: { label: "Design phase" },
+};
+const CATS = { district: "District / Work", personal: "Personal Lab" };
+
+const $ = (s, el=document) => el.querySelector(s);
+const esc = (t) => { const d=document.createElement("div"); d.textContent=t; return d.innerHTML; };
+
+/* hero metrics */
+$("#metrics").innerHTML = METRICS.map(m =>
+  `<div class="metric"><div class="num">${esc(m.num)}</div><div class="lbl">${esc(m.lbl)}</div></div>`
+).join("");
+
+/* system board */
+const byId = Object.fromEntries(PROJECTS.map(p => [p.id, p]));
+$("#board").innerHTML = BOARD.map((row, i) => {
+  const p = byId[row.id]; if (!p) return "";
+  return `<a class="board-row" style="--i:${i}" href="#" data-open="${p.id}">
+    <span class="sdot ${p.status}" aria-hidden="true"></span>
+    <span><span class="sname">${esc(p.name)}</span>
+      <span class="sdesc"> · ${esc(p.tagline)}</span></span>
+    <span class="smetric">${esc(row.metric)}</span>
+  </a>`;
+}).join("");
+const liveCount = PROJECTS.filter(p => p.status === "live").length;
+$("#board-count").textContent = `${PROJECTS.length} systems · ${liveCount} in production`;
+
+/* filters */
+const FILTERS = [
+  { key: "all", label: "All" },
+  { key: "district", label: "District / Work" },
+  { key: "personal", label: "Personal Lab" },
+  { key: "live", label: "In production" },
+];
+let active = "all";
+const filterWrap = $("#filters");
+FILTERS.forEach(f => {
+  const count = f.key === "all" ? PROJECTS.length
+    : PROJECTS.filter(p => p.category === f.key || p.status === f.key).length;
+  const b = document.createElement("button");
+  b.className = "fbtn";
+  b.setAttribute("aria-pressed", f.key === active);
+  b.innerHTML = `${esc(f.label)} <span class="cnt">${count}</span>`;
+  b.addEventListener("click", () => {
+    active = f.key;
+    filterWrap.querySelectorAll(".fbtn").forEach(x => x.setAttribute("aria-pressed","false"));
+    b.setAttribute("aria-pressed","true");
+    renderGrid();
+  });
+  filterWrap.appendChild(b);
+});
+
+/* cards */
+function keyMetric(p){ return p.impact && p.impact.length ? p.impact[0] : ""; }
+function renderGrid(){
+  const list = PROJECTS.filter(p =>
+    active === "all" || p.category === active || p.status === active
+  );
+  $("#grid").innerHTML = list.map(p => `
+    <button class="card" data-open="${p.id}">
+      <div class="card-top">
+        <span class="badge ${p.status}"><span class="bdot"></span>${STATUS[p.status].label}</span>
+        <span class="cat">${esc(CATS[p.category])}</span>
+      </div>
+      <h3>${esc(p.name)}</h3>
+      <p class="tag">${esc(p.tagline)}</p>
+      <div class="chips">${p.stack.slice(0,4).map(s=>`<span class="chip">${esc(s)}</span>`).join("")}</div>
+      <div class="kmetric">▸ ${esc(keyMetric(p))}</div>
+    </button>
+  `).join("");
+}
+renderGrid();
+
+/* detail dialog */
+const dlg = $("#detail");
+function mediaHTML(m){
+  if (m.type === "video"){
+    return `<figure class="shot" data-src="${esc(m.src)}">
+      <video controls muted playsinline preload="metadata" src="${esc(m.src)}"></video>
+      <figcaption>${esc(m.caption)}</figcaption></figure>`;
+  }
+  return `<figure class="shot" data-src="${esc(m.src)}">
+    <img src="${esc(m.src)}" alt="${esc(m.caption)}" loading="lazy">
+    <figcaption>${esc(m.caption)}</figcaption></figure>`;
+}
+function placeholderize(fig){
+  const src = fig.dataset.src;
+  fig.classList.add("placeholder");
+  fig.innerHTML = `<div class="ph"><span class="big">⬚</span>
+    <span>media slot</span><span>${esc(src)}</span>
+    <span style="opacity:.7">drop the file in /assets to fill this in</span></div>`;
+}
+function openDetail(id){
+  const p = byId[id]; if (!p) return;
+  $("#d-inner").innerHTML = `
+    <div class="d-head">
+      <div>
+        <h2>${esc(p.name)}</h2>
+        <div class="d-meta">
+          <span class="badge ${p.status}"><span class="bdot"></span>${STATUS[p.status].label}</span>
+          <span>${esc(CATS[p.category])}</span><span>${esc(p.period)}</span>
+        </div>
+      </div>
+      <button class="d-close" data-close>ESC / close</button>
+    </div>
+    <p class="d-summary">${esc(p.summary)}</p>
+    <div class="d-section">
+      <div class="sec-label">Stack</div>
+      <div class="d-chips">${p.stack.map(s=>`<span class="chip">${esc(s)}</span>`).join("")}</div>
+    </div>
+    ${p.media && p.media.length ? `
+    <div class="d-section">
+      <div class="sec-label">Screens and demos</div>
+      <div class="media-grid">${p.media.map(mediaHTML).join("")}</div>
+    </div>` : ""}
+    <div class="d-section">
+      <div class="sec-label">What it delivers</div>
+      <ul class="impact">${p.impact.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>
+    </div>
+    ${p.code ? `
+    <div class="d-section">
+      <div class="sec-label">From the code</div>
+      <div class="code-label">${esc(p.code.label)}</div>
+      <pre class="codeblock"><code class="language-${esc(p.code.lang)}"></code></pre>
+    </div>` : ""}
+    ${p.links && p.links.length ? `
+    <div class="d-section">
+      <div class="sec-label">Links</div>
+      <div class="d-links">${p.links.map(l=>`<a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join("")}</div>
+    </div>` : ""}
+  `;
+  if (p.code){
+    const codeEl = $("#d-inner code");
+    codeEl.textContent = p.code.source;
+    if (window.hljs) hljs.highlightElement(codeEl);
+  }
+  // swap missing media for labeled placeholders
+  $("#d-inner").querySelectorAll(".shot").forEach(fig => {
+    const el = fig.querySelector("img,video");
+    if (!el) return;
+    el.addEventListener("error", () => placeholderize(fig), { once:true });
+    if (el.tagName === "IMG" && el.complete && el.naturalWidth === 0) placeholderize(fig);
+  });
+  dlg.showModal();
+  $("#d-inner").scrollTop = 0;
+}
+document.addEventListener("click", e => {
+  const opener = e.target.closest("[data-open]");
+  if (opener){ e.preventDefault(); openDetail(opener.dataset.open); return; }
+  if (e.target.closest("[data-close]")) dlg.close();
+  if (e.target === dlg) dlg.close(); // click on backdrop
+});
+
+$("#stamp").textContent = LAST_UPDATED;
+
+/* Theme toggle. No stored choice = follow the OS setting (via CSS media query);
+   the toggle writes an explicit choice to localStorage that overrides it. */
+(function themeToggle(){
+  const root = document.documentElement;
+  const btn = $("#theme-toggle");
+  const KEY = "jc-portfolio-theme";
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  const stored = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
+  const isDark = () => { const s = stored(); return s ? s === "dark" : mq.matches; };
+  function apply(){
+    const s = stored();
+    if (s === "dark" || s === "light") root.setAttribute("data-theme", s);
+    else root.removeAttribute("data-theme");
+    const dark = isDark();
+    if (btn){
+      btn.setAttribute("aria-pressed", String(dark));
+      btn.querySelector(".tt-icon").textContent = dark ? "☀️" : "🌙";
+      btn.querySelector(".tt-label").textContent = dark ? "Light" : "Dark";
+    }
+  }
+  apply();
+  if (btn) btn.addEventListener("click", () => {
+    try { localStorage.setItem(KEY, isDark() ? "light" : "dark"); } catch {}
+    apply();
+  });
+  if (mq.addEventListener) mq.addEventListener("change", () => { if (!stored()) apply(); });
+})();
+</script>
+</body>
+</html>
