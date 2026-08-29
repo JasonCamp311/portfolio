@@ -408,14 +408,14 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-08-25";
+const LAST_UPDATED = "2026-08-29";
 
 /* Hero metrics strip. Keep numbers honest and current. */
 const METRICS = [
   { num: "50-75", lbl: "tickets / week processed" },
   { num: "300+",  lbl: "legacy records migrated" },
   { num: "15",    lbl: "staff onboarded to new tools" },
-  { num: "9",     lbl: "systems built and operated" },
+  { num: "13",    lbl: "systems built and operated" },
   { num: "4-node",lbl: "TB5 inference cluster" },
 ];
 
@@ -424,6 +424,7 @@ const BOARD = [
   { id: "ticketing",    metric: "50-75 tickets/wk" },
   { id: "registration", metric: "rolling out" },
   { id: "discord-bot",  metric: "24/7 uptime" },
+  { id: "jellyfin-push", metric: "unattended" },
   { id: "homelab",      metric: "self-hosted" },
   { id: "mac-cluster",  metric: "multi-model serving" },
 ];
@@ -504,7 +505,25 @@ const PROJECTS = [
       "Local inference: zero API spend, full data ownership",
       "Rootless containers with SELinux enforcing, security as a default not an afterthought"
     ],
-    media: []
+    media: [],
+    code: {
+      lang: "python",
+      label: "cogs/jeffprady.py — the forgiving answer matcher behind multiplayer Jeopardy",
+      source: `def _normalize_answer(text: str) -> str:
+    """Lowercase, strip Jeopardy question phrasing, remove punctuation."""
+    t = text.lower().strip()
+    t = re.sub(r"^(what|who|where|when)\\s+(is|are|was|were|did)\\s+(a\\s+|an\\s+|the\\s+)?", "", t)
+    t = re.sub(r"[^\\w\\s]", "", t)
+    return " ".join(t.split())
+
+
+def _answers_match(user: str, correct: str) -> bool:
+    u = _normalize_answer(user)
+    c = _normalize_answer(correct)
+    if not u or not c:
+        return False
+    return u == c or c in u or u in c`
+    }
   },
   {
     id: "discord-activity",
@@ -539,8 +558,235 @@ const PROJECTS = [
       "Clean separation from the Discord version: same domain, different distribution model"
     ],
     media: [
-      { type: "img", src: "assets/party-theater.png", caption: "Theater room view" }
-    ]
+      { type: "img", src: "assets/party-theater.png", caption: "Theater room view" },
+      { type: "img", src: "assets/party-theater-lobby.png", caption: "Lobby with the avatar customizer, captured live from the dev server" }
+    ],
+    code: {
+      lang: "typescript",
+      label: "server/src/room.ts — drift-free playback sync with no server clock",
+      source: `setPlayback(playing: boolean, time: number, source: PlaybackState["source"]): PlaybackState {
+  this.playback = {
+    playing,
+    time,
+    source,
+    serverTs: Date.now(),
+    seq: this.playback.seq + 1,
+  };
+  return this.playback;
+}
+
+/** Playback state with \`time\` advanced to "now" if playing. */
+currentPlayback(): PlaybackState {
+  if (!this.playback.playing) return this.playback;
+  const now = Date.now();
+  return {
+    ...this.playback,
+    time: this.playback.time + (now - this.playback.serverTs) / 1000,
+    serverTs: now,
+  };
+}`
+    }
+  },
+  {
+    id: "feral",
+    name: "FERAL",
+    category: "personal",
+    status: "build",
+    period: "2026",
+    tagline: "Hotline Miami as an FPS: one hit kills everything — including you.",
+    summary: "A Unity 6 prototype where you pick one of three beasts — panther, chameleon, boar — and clear a building of armed humans. The repo contains zero image or audio files: every level object and material is generated from code, and the intensity-layered synthwave soundtrack is synthesized note by note. Restarts never reload the scene: everything resets in place through an IResettable contract, and enemy fire uses deterministic alternating spread, so a restarted run is exactly reproducible.",
+    stack: ["Unity 6", "C#", "URP", "NavMesh", "Procedural audio"],
+    impact: [
+      "72 C# scripts (~8,800 lines) and a shipped Windows standalone build",
+      "Fair one-hit kills: every attack resolves through one swept-cast query — closest live hurtbox before any blocker wins",
+      "Survivable because readable: a 0.4s aim-line telegraph thickens before every dodgeable shot",
+      "10 test files cover restart determinism, scoring, weapons, and audio"
+    ],
+    media: [
+      { type: "img", src: "assets/feral-beast-select.png", caption: "Beast select, captured from the standalone build" }
+    ],
+    code: {
+      lang: "csharp",
+      label: "EnemyBrain.cs — the telegraph that makes a one-hit-kill game survivable",
+      source: `// Telegraph: the dodge window. Aim line points at where we will shoot, and thickens
+// as the shot approaches — the window has to be readable, not merely present.
+_telegraphTimer -= dt;
+Vector3 muzzle = Muzzle;
+Vector3 aim = (_seenPos - muzzle).normalized;
+float charge01 = telegraphTime > 0f
+    ? Mathf.Clamp01(1f - _telegraphTimer / telegraphTime) : 1f;
+SetAimLine(true, muzzle, muzzle + aim * 40f, charge01);
+
+if (_telegraphTimer <= 0f)
+{
+    // Deterministic spread: alternate sides instead of Random (restart safety).
+    _strafeSign = -_strafeSign;
+    Quaternion spread = Quaternion.AngleAxis(spreadDegrees * _strafeSign, Vector3.up);
+    projectiles.Fire(muzzle + aim * 0.7f, spread * aim);
+    if (audioDirector != null) audioDirector.Play(AudioCue.EnemyShoot, muzzle);
+    _refireTimer = refireTime;
+    StrafeStep();
+}`
+    }
+  },
+  {
+    id: "onewheel",
+    name: "Onewheel Friendslop",
+    category: "personal",
+    status: "build",
+    period: "2026",
+    tagline: "A rideable physics sandbox where the nosedive is real math, not a scripted event.",
+    summary: "A Godot 4 sandbox where you ride a self-balancing board down a procedurally built test hill. The board is a real rigid body balancing a virtual rider on a sphere-cast wheel, and failure states are emergent: lean too hard at speed and the motor's back-EMF-shrunk torque budget saturates against the rider's weight moment — the nose drops because the math says it must. Carving works the same way: the commanded turn rate is derived from what the edge angle can physically hold.",
+    stack: ["Godot 4.7", "Jolt physics", "GDScript", "Hot-reload tuning"],
+    impact: [
+      "Nosedives and low-sides emerge from the physics model — nothing is scripted",
+      "All 72 tuning values hot-reload from tuning.json in ~0.5s for live feel-tuning",
+      "Headless autotest plus a CLI screenshot harness for repeatable captures",
+      "Phase 1 (graybox course, ragdoll bail, respawn) complete and awaiting playtest"
+    ],
+    media: [
+      { type: "img", src: "assets/onewheel-carve.png", caption: "Mid-bail on the carve rings — the debug HUD tracks edge angle, grip, and motor load" }
+    ],
+    code: {
+      lang: "gdscript",
+      label: "board_physics.gd — the nosedive: the motor's torque budget saturating",
+      source: `# --- virtual rider load: the heart of the speed model ---
+# Leaning forward loads the nose; the load self-limits as the board
+# accelerates (inverted pendulum). Applied as a real external torque,
+# then cancelled by motor feed-forward — so when the speed-shrunk
+# budget can't cover it anymore, the nose drops.
+var th := deg_to_rad(virtual_lean_deg)
+var a_fwd := accel_smoothed.dot(fwd)
+var load_tau := Tuning.g("rider_mass_kg", 70.0) * Tuning.g("rider_com_height_m", 0.9) \\
+    * (9.8 * sin(th) - a_fwd * cos(th))   # positive = nose-down demand
+apply_torque(axle * -load_tau)
+
+# budget: accelerating torque falls off with speed (back-EMF);
+# braking (regen) keeps the full budget
+var accel_avail := tau_max * clampf((v_zero - absf(speed_signed)) / maxf(0.01, v_zero - v_falloff), 0.0, 1.0)
+var is_accelerating := tau_demand * speed_signed > 0.0 or absf(speed_signed) < 0.5
+torque_avail = accel_avail if is_accelerating else tau_max
+torque_applied = clampf(tau_demand, -torque_avail, torque_avail)
+motor_load = absf(tau_demand) / maxf(torque_avail, 1.0)`
+    }
+  },
+  {
+    id: "bakey-nights",
+    name: "Bakey Nights at Dylan's",
+    category: "personal",
+    status: "build",
+    period: "2026",
+    tagline: "Horror Overcooked: bake to fill tickets while Dylan advances toward your shoulder.",
+    summary: "A Godot 4 kitchen game with a horror layer: your only defense is a rationed deck light that freezes Dylan but blacks out the kitchen while it burns, and delivering dishes is the only real source of pushback. Balance is treated as math, not authoring — a dish's horror-layer worth is derived from its kitchen-layer work cost, so every new recipe self-balances. The simulation is strictly separated from the view and never touches the physics server, so entire nights run headless.",
+    stack: ["Godot 4", "GDScript", "Sim/view split", "Headless autotest"],
+    impact: [
+      "Kitchen sim (M1) and horror layer (M2) complete; one playable night",
+      "Autotest plays full shifts headless and asserts the balance invariants hold",
+      "Fractional pushback is banked: four deliveries worth 1.29 each must pay out 5 stages, not 4",
+      "The whole 3D kitchen is built procedurally — the scene file is six lines"
+    ],
+    media: [
+      { type: "img", src: "assets/bakey-kitchen.png", caption: "The kitchen at shift start, captured by the game's bot-play screenshot mode" }
+    ],
+    code: {
+      lang: "gdscript",
+      label: "sim/dylan.gd — recipes that balance themselves",
+      source: `# Both of these answer "how many of this dish is a clean shift worth?" once, so a
+# new recipe self-balances on the horror layer the same way its ticket clock already
+# self-balances on the kitchen layer. Authoring these per recipe is what made Milk
+# Bread unwinnable in the prototype.
+
+static func fills_per_shift(dish: StringName) -> float:
+    var cost := Recipes.total_work(dish) + Tuning.g("dylan_fill_gap", 1.8)
+    return Tuning.g("shift_seconds", 180.0) / maxf(0.1, cost)
+
+## Stages of pushback one of these is worth. Tuned so a full clean shift of any one
+## recipe delivers ~\`dylan_push_target\` stages in total.
+static func relief_for(dish: StringName) -> float:
+    return clampf(Tuning.g("dylan_push_target", 17.0) / maxf(0.5, fills_per_shift(dish)),
+                  0.5, 3.0)
+
+## Lamp one of these buys back. Tuned so a full clean shift regenerates exactly one
+## full lamp, whatever you are baking.
+static func lamp_fill_for(dish: StringName) -> float:
+    return clampf(Tuning.g("lamp_total", 1.0) / maxf(0.5, fills_per_shift(dish)),
+                  0.04, 0.40)`
+    }
+  },
+  {
+    id: "draft-war-room",
+    name: "Draft War Room",
+    category: "personal",
+    status: "live",
+    period: "2026",
+    tagline: "Sleeper fantasy-draft assistant: the code computes, the model judges.",
+    summary: "A zero-dependency Node app — one server file, a single-file vanilla-JS UI, no npm, no build step — that polls the Sleeper draft API every 2 seconds and recomputes survival odds, VORP, roster needs, and snake-order math after every pick. All arithmetic happens in code; the model only receives finished numbers and renders judgment. In its default mode there is no API key at all: a Claude Code session running in the folder is the advisor, woken by a watcher process whose exit signals that advice is wanted.",
+    stack: ["Node (zero deps)", "Vanilla JS", "Server-sent events", "Sleeper API", "Claude Code"],
+    impact: [
+      "Built for draft day: recommendations with alternatives land inside the pick clock",
+      "The poll loop never dies: exponential backoff (1s to 15s) with degraded-state broadcast to the UI",
+      "A deterministic top-5 fallback board ships with every update, so the screen always has an answer",
+      "Replay mode re-serves a real completed draft for end-to-end testing without the live API"
+    ],
+    media: [
+      { type: "img", src: "assets/draft-war-room-board.png", caption: "Pick #124 of a replayed draft: survival odds, VORP, and a live recommendation" }
+    ],
+    code: {
+      lang: "javascript",
+      label: "server.js — the Sleeper poll loop that must not die",
+      source: `// recovered?
+if (ST.poll.failures > 0) { log(\`Sleeper poll recovered after \${ST.poll.failures} failure(s)\`); broadcast('status', pollStatus()); }
+ST.poll.failures = 0; ST.poll.degraded = false; ST.poll.lastOkAt = Date.now();
+if (ST.draft.status === 'complete') delay = 30000;   // draft over: idle slowly
+} catch (e) {
+  ST.poll.failures++;
+  ST.poll.degraded = ST.poll.failures >= 2;
+  delay = Math.min(15000, 1000 * 2 ** Math.min(ST.poll.failures - 1, 4));   // 1,2,4,8,15s
+  warn(\`Sleeper poll failure #\${ST.poll.failures}: \${e.message}; retry in \${delay}ms\`);
+  if (ST.board) { ST.board.degraded = ST.poll.degraded; ST.board.lastSyncAt = ST.poll.lastOkAt; }
+  broadcast('status', pollStatus());
+}
+scheduleNextPoll(delay);`
+    }
+  },
+  {
+    id: "jellyfin-push",
+    name: "Jellyfin Push Pipeline",
+    category: "personal",
+    status: "live",
+    period: "2026 - present",
+    tagline: "Drop a video on Windows; it lands correctly named in the Jellyfin library on Fedora.",
+    summary: "An unattended PowerShell pipeline between the Windows tower and the Fedora server. A hidden scheduled task waits for dropped files to settle, parses scene-release names into Jellyfin's Movies/Title (Year) layout, transfers via rclone into a hidden staging directory, verifies MD5 checksums end to end, moves atomically into the btrfs-backed library, and triggers a rescan. The local copy is recycled only after a final checksum pass proves the server copy is byte-identical.",
+    stack: ["PowerShell", "rclone", "SSH", "btrfs", "Jellyfin"],
+    impact: [
+      "Zero-interaction: drop a file, and it appears in Jellyfin correctly named",
+      "Checksum-verified at three points; nothing local is deleted unless the server copy matches",
+      "Handles scene-release naming, including titles that contain years ('Blade Runner 2049 2017')",
+      "Atomic moves into the library, so Jellyfin never scans a half-copied file"
+    ],
+    media: [],
+    code: {
+      lang: "powershell",
+      label: "Push-Movies.ps1 — parsing 'Blade Runner 2049 2017' correctly",
+      source: `# --- Movie. Take the LAST standalone year: handles "Blade Runner 2049 2017". ---
+$years = [regex]::Matches($work, '\\b(19|20)\\d{2}\\b')
+if ($years.Count -eq 0) {
+    # No year at all: fall back to cleaning up whatever we have.
+    $titleRaw = $work -replace '(?i)\\b(1080p|720p|2160p|4k|bluray|web[- ]?rip|...).*$', ''
+    $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Trim().ToLower()))
+    if ([string]::IsNullOrWhiteSpace($title)) { return $null }
+    return @{
+        Kind = 'Movie'; Title = $title; Year = $null
+        LibraryPath = "Movies/$title"
+        FileName    = "$title$Extension"
+    }
+}
+
+$lastYear = $years[$years.Count - 1]
+$year     = [int]$lastYear.Value
+$titleRaw = $work.Substring(0, $lastYear.Index)
+$title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Trim().ToLower()))`
+    }
   },
   {
     id: "homelab",
