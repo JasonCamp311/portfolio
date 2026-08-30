@@ -18,7 +18,7 @@
     Find "const PROJECTS" below and add/edit an object. Fields:
       id       unique slug, e.g. "ticketing"
       name     project title
-      category "district" or "personal"
+      category "district", "personal", or "games"
       status   "live" | "build" | "design"
       period   e.g. "2025 - present"
       tagline  one line shown on the card
@@ -528,7 +528,7 @@ def _answers_match(user: str, correct: str) -> bool:
   {
     id: "discord-activity",
     name: "Discord Activity: Game Platform",
-    category: "personal",
+    category: "games",
     status: "build",
     period: "2026",
     tagline: "Multi-game embedded platform with a 3D cinema watch-party scene in Three.js.",
@@ -590,7 +590,7 @@ currentPlayback(): PlaybackState {
   {
     id: "feral",
     name: "FERAL",
-    category: "personal",
+    category: "games",
     status: "build",
     period: "2026",
     tagline: "A first-person action prototype built around a one-hit-resolution combat model.",
@@ -632,7 +632,7 @@ if (_telegraphTimer <= 0f)
   {
     id: "onewheel",
     name: "Onewheel Physics Sandbox",
-    category: "personal",
+    category: "games",
     status: "build",
     period: "2026",
     tagline: "A rideable physics sandbox where the nosedive is real math, not a scripted event.",
@@ -673,7 +673,7 @@ motor_load = absf(tau_demand) / maxf(torque_avail, 1.0)`
   {
     id: "bakey-nights",
     name: "Bakey Nights (working title)",
-    category: "personal",
+    category: "games",
     status: "build",
     period: "2026",
     tagline: "A kitchen-management game with a horror layer: fill orders while the antagonist closes in.",
@@ -832,7 +832,7 @@ const STATUS = {
   build:  { label: "In development" },
   design: { label: "Design phase" },
 };
-const CATS = { district: "District / Work", personal: "Personal Lab" };
+const CATS = { district: "District / Work", personal: "Personal Lab", games: "Game Dev" };
 
 const $ = (s, el=document) => el.querySelector(s);
 const esc = (t) => { const d=document.createElement("div"); d.textContent=t; return d.innerHTML; };
@@ -861,6 +861,7 @@ const FILTERS = [
   { key: "all", label: "All" },
   { key: "district", label: "District / Work" },
   { key: "personal", label: "Personal Lab" },
+  { key: "games", label: "Games" },
   { key: "live", label: "In production" },
 ];
 let active = "all";
