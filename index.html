@@ -408,7 +408,7 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-08-29";
+const LAST_UPDATED = "2026-08-30";
 
 /* Hero metrics strip. Keep numbers honest and current. */
 const METRICS = [
@@ -593,8 +593,8 @@ currentPlayback(): PlaybackState {
     category: "personal",
     status: "build",
     period: "2026",
-    tagline: "Hotline Miami as an FPS: one hit kills everything — including you.",
-    summary: "A Unity 6 prototype where you pick one of three beasts — panther, chameleon, boar — and clear a building of armed humans. The repo contains zero image or audio files: every level object and material is generated from code, and the intensity-layered synthwave soundtrack is synthesized note by note. Restarts never reload the scene: everything resets in place through an IResettable contract, and enemy fire uses deterministic alternating spread, so a restarted run is exactly reproducible.",
+    tagline: "A first-person action prototype built around a one-hit-resolution combat model.",
+    summary: "A Unity 6 prototype where you play as one of three animals — panther, chameleon, boar — navigating a level of AI opponents, where every encounter resolves in a single hit for either side. The repo contains zero image or audio files: every level object and material is generated from code, and the intensity-layered synthwave soundtrack is synthesized note by note. Restarts never reload the scene: everything resets in place through an IResettable contract, and enemy fire uses deterministic alternating spread, so a restarted run is exactly reproducible.",
     stack: ["Unity 6", "C#", "URP", "NavMesh", "Procedural audio"],
     impact: [
       "72 C# scripts (~8,800 lines) and a shipped Windows standalone build",
@@ -631,7 +631,7 @@ if (_telegraphTimer <= 0f)
   },
   {
     id: "onewheel",
-    name: "Onewheel Friendslop",
+    name: "Onewheel Physics Sandbox",
     category: "personal",
     status: "build",
     period: "2026",
@@ -672,12 +672,12 @@ motor_load = absf(tau_demand) / maxf(torque_avail, 1.0)`
   },
   {
     id: "bakey-nights",
-    name: "Bakey Nights at Dylan's",
+    name: "Bakey Nights (working title)",
     category: "personal",
     status: "build",
     period: "2026",
-    tagline: "Horror Overcooked: bake to fill tickets while Dylan advances toward your shoulder.",
-    summary: "A Godot 4 kitchen game with a horror layer: your only defense is a rationed deck light that freezes Dylan but blacks out the kitchen while it burns, and delivering dishes is the only real source of pushback. Balance is treated as math, not authoring — a dish's horror-layer worth is derived from its kitchen-layer work cost, so every new recipe self-balances. The simulation is strictly separated from the view and never touches the physics server, so entire nights run headless.",
+    tagline: "A kitchen-management game with a horror layer: fill orders while the antagonist closes in.",
+    summary: "A Godot 4 kitchen-management game with a horror layer: your only defense is a rationed deck light that freezes the antagonist but blacks out the kitchen while it burns, and delivering dishes is the only real source of pushback. Balance is treated as math, not authoring — a dish's horror-layer worth is derived from its kitchen-layer work cost, so every new recipe self-balances. The simulation is strictly separated from the view and never touches the physics server, so entire nights run headless.",
     stack: ["Godot 4", "GDScript", "Sim/view split", "Headless autotest"],
     impact: [
       "Kitchen sim (M1) and horror layer (M2) complete; one playable night",
@@ -756,12 +756,12 @@ scheduleNextPoll(delay);`
     status: "live",
     period: "2026 - present",
     tagline: "Drop a video on Windows; it lands correctly named in the Jellyfin library on Fedora.",
-    summary: "An unattended PowerShell pipeline between the Windows tower and the Fedora server. A hidden scheduled task waits for dropped files to settle, parses scene-release names into Jellyfin's Movies/Title (Year) layout, transfers via rclone into a hidden staging directory, verifies MD5 checksums end to end, moves atomically into the btrfs-backed library, and triggers a rescan. The local copy is recycled only after a final checksum pass proves the server copy is byte-identical.",
+    summary: "An unattended PowerShell pipeline between the Windows tower and the Fedora server. A hidden scheduled task waits for dropped files to settle, parses inconsistent real-world file names into Jellyfin's Movies/Title (Year) layout, transfers via rclone into a hidden staging directory, verifies MD5 checksums end to end, moves atomically into the btrfs-backed library, and triggers a rescan. The local copy is recycled only after a final checksum pass proves the server copy is byte-identical.",
     stack: ["PowerShell", "rclone", "SSH", "btrfs", "Jellyfin"],
     impact: [
       "Zero-interaction: drop a file, and it appears in Jellyfin correctly named",
       "Checksum-verified at three points; nothing local is deleted unless the server copy matches",
-      "Handles scene-release naming, including titles that contain years ('Blade Runner 2049 2017')",
+      "Handles messy real-world naming, including titles that contain years ('Blade Runner 2049 2017')",
       "Atomic moves into the library, so Jellyfin never scans a half-copied file"
     ],
     media: [],
