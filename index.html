@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#F1F4F3" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0D141C" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F0E9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121310" media="(prefers-color-scheme: dark)">
 <title>Jason Camp · Systems Portfolio</title>
 <!-- ================================================================
   HOW TO UPDATE THIS PORTFOLIO
@@ -53,23 +53,24 @@
 <style>
   :root{
     color-scheme:light;
-    --paper:#F1F4F3;
-    --panel:#FFFFFF;
-    --ink:#15222E;
-    --slate:#5B6B79;
-    --line:#D8DFE2;
-    --terminal:#0C1520;
-    --terminal-ink:#C7D3DE;
+    --paper:#F2F0E9;
+    --panel:#FBFAF5;
+    --ink:#1A1D1B;
+    --slate:#5C5F58;
+    --line:#CFCBBC;
+    --rule:#1A1D1B;
+    --terminal:#151713;
+    --terminal-ink:#D5D2C6;
     --accent:#2354C7;
-    --accent-soft:#E7EDFB;
-    --ok:#1E9E6A;
-    --ok-soft:#E2F3EB;
-    --build:#C08417;
-    --build-soft:#F8EFDC;
-    --design:#6B7A89;
-    --design-soft:#E9EDF0;
-    --shadow:rgba(21,34,46,.08);
-    --radius:10px;
+    --accent-soft:#E8ECF8;
+    --ok:#1E6E52;
+    --ok-soft:#E4EFE7;
+    --build:#B07C14;
+    --build-soft:#F5EDD8;
+    --design:#6E7267;
+    --design-soft:#EAE8DD;
+    --shadow:rgba(26,29,27,.08);
+    --radius:0px;
     --maxw:1120px;
   }
   /* Dark palette: applied for the OS "dark" preference (unless the visitor has
@@ -77,42 +78,44 @@
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
       color-scheme:dark;
-      --paper:#0D141C;
-      --panel:#161F29;
-      --ink:#E8EEF3;
-      --slate:#93A3B2;
-      --line:#28323D;
-      --terminal:#080D14;
-      --terminal-ink:#C7D3DE;
-      --accent:#6E9BFF;
-      --accent-soft:#1A2740;
-      --ok:#3FBE86;
-      --ok-soft:#12271D;
-      --build:#E0A63A;
-      --build-soft:#2C2412;
-      --design:#8A98A6;
-      --design-soft:#202B35;
-      --shadow:rgba(0,0,0,.45);
+      --paper:#121310;
+      --panel:#1A1B16;
+      --ink:#EBE9DD;
+      --slate:#A09E8F;
+      --line:#34352C;
+      --rule:#EBE9DD;
+      --terminal:#0C0D0A;
+      --terminal-ink:#C9C7B8;
+      --accent:#7FA1F2;
+      --accent-soft:#1D2436;
+      --ok:#4CB98A;
+      --ok-soft:#17281F;
+      --build:#D9A63E;
+      --build-soft:#2B2413;
+      --design:#8E9186;
+      --design-soft:#22231C;
+      --shadow:rgba(0,0,0,.5);
     }
   }
   :root[data-theme="dark"]{
     color-scheme:dark;
-    --paper:#0D141C;
-    --panel:#161F29;
-    --ink:#E8EEF3;
-    --slate:#93A3B2;
-    --line:#28323D;
-    --terminal:#080D14;
-    --terminal-ink:#C7D3DE;
-    --accent:#6E9BFF;
-    --accent-soft:#1A2740;
-    --ok:#3FBE86;
-    --ok-soft:#12271D;
-    --build:#E0A63A;
-    --build-soft:#2C2412;
-    --design:#8A98A6;
-    --design-soft:#202B35;
-    --shadow:rgba(0,0,0,.45);
+    --paper:#121310;
+    --panel:#1A1B16;
+    --ink:#EBE9DD;
+    --slate:#A09E8F;
+    --line:#34352C;
+    --rule:#EBE9DD;
+    --terminal:#0C0D0A;
+    --terminal-ink:#C9C7B8;
+    --accent:#7FA1F2;
+    --accent-soft:#1D2436;
+    --ok:#4CB98A;
+    --ok-soft:#17281F;
+    --build:#D9A63E;
+    --build-soft:#2B2413;
+    --design:#8E9186;
+    --design-soft:#22231C;
+    --shadow:rgba(0,0,0,.5);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth;background:var(--paper)}
@@ -130,30 +133,29 @@
 
   /* ---------- header ---------- */
   header.top{
-    border-bottom:1px solid var(--line);
-    background:var(--panel);
+    border-bottom:2px solid var(--rule);
+    background:var(--paper);
   }
   .top-inner{
     display:flex;align-items:center;justify-content:space-between;
-    padding:14px 0;gap:16px;flex-wrap:wrap;
+    padding:16px 0;gap:16px;flex-wrap:wrap;
   }
   .brand{display:flex;align-items:center;gap:10px}
-  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--ok);
-    box-shadow:0 0 0 4px var(--ok-soft);animation:pulse 2.6s ease-in-out infinite}
-  .brand .name{font-family:"Archivo",sans-serif;font-weight:700;letter-spacing:.01em}
-  .top-links{display:flex;gap:18px;font-size:13px;align-items:center}
+  .brand .name{font-family:"Archivo",sans-serif;font-weight:800;font-size:16px;
+    letter-spacing:.02em;text-transform:uppercase}
+  .top-links{display:flex;gap:22px;font-size:12px;align-items:center;
+    letter-spacing:.08em;text-transform:uppercase}
   .top-links a{color:var(--slate);text-decoration:none}
   .top-links a:hover{color:var(--accent)}
   .theme-toggle{
     display:inline-flex;align-items:center;gap:7px;
-    font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.02em;
-    padding:6px 11px;border:1px solid var(--line);border-radius:999px;
-    background:var(--panel);color:var(--slate);cursor:pointer;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;
+    text-transform:uppercase;
+    padding:6px 12px;border:1px solid var(--line);border-radius:0;
+    background:transparent;color:var(--slate);cursor:pointer;
     transition:border-color .15s ease,color .15s ease;
   }
   .theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
-  .theme-toggle .tt-icon{font-size:13px;line-height:1}
-  @keyframes pulse{0%,100%{box-shadow:0 0 0 4px var(--ok-soft)}50%{box-shadow:0 0 0 7px rgba(30,158,106,.12)}}
 
   /* ---------- hero ---------- */
   .hero{padding:64px 0 40px}
@@ -164,26 +166,27 @@
   .eyebrow b{color:var(--ink);font-weight:600}
   h1{
     font-family:"Archivo",sans-serif;
-    font-weight:800;
-    font-size:clamp(34px,5.4vw,58px);
-    line-height:1.04;
-    letter-spacing:-0.015em;
-    max-width:15ch;
+    font-weight:900;
+    font-size:clamp(38px,6vw,68px);
+    line-height:0.99;
+    letter-spacing:-0.02em;
+    max-width:16ch;
   }
   h1 .accent{color:var(--accent)}
   .hero p.lede{
     margin-top:20px;max-width:56ch;color:var(--slate);font-size:17px;
   }
   .metrics{
-    margin-top:34px;display:grid;
+    margin-top:38px;display:grid;
     grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:1px;background:var(--line);border:1px solid var(--line);
-    border-radius:var(--radius);overflow:hidden;
+    border-top:1px solid var(--rule);border-bottom:1px solid var(--line);
   }
-  .metric{background:var(--panel);padding:16px 18px}
-  .metric .num{font-family:"Archivo",sans-serif;font-weight:700;font-size:24px;letter-spacing:-.01em}
-  .metric .lbl{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--slate);
-    text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+  .metric{padding:20px 18px 20px 0;border-right:1px solid var(--line)}
+  .metric:last-child{border-right:none}
+  .metric:not(:first-child){padding-left:18px}
+  .metric .num{font-family:"Archivo",sans-serif;font-weight:800;font-size:28px;letter-spacing:-.01em}
+  .metric .lbl{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--slate);
+    text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
 
   /* ---------- system board (signature) ---------- */
   .board{margin:44px 0 8px}
@@ -194,20 +197,19 @@
     margin-bottom:10px;
   }
   .board-panel{
-    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-    overflow:hidden;
+    border-top:2px solid var(--rule);
   }
   .board-row{
-    display:grid;grid-template-columns:14px 1fr auto;gap:14px;align-items:center;
-    padding:13px 18px;border-bottom:1px solid var(--line);
+    display:grid;grid-template-columns:36px 14px 1fr auto;gap:14px;align-items:center;
+    padding:15px 4px;border-bottom:1px solid var(--line);
     text-decoration:none;color:inherit;
     opacity:0;transform:translateY(6px);
     animation:rise .5s ease forwards;
     animation-delay:calc(var(--i) * 90ms);
   }
-  .board-row:last-child{border-bottom:none}
+  .board-row .idx{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--slate);opacity:.6}
   .board-row:hover{background:var(--accent-soft)}
-  .board-row .sname{font-weight:600}
+  .board-row .sname{font-weight:700}
   .board-row .sdesc{color:var(--slate);font-size:14px}
   .board-row .smetric{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--slate);text-align:right;white-space:nowrap}
   .sdot{width:9px;height:9px;border-radius:50%}
@@ -224,14 +226,15 @@
   .filters .flabel{font-family:"IBM Plex Mono",monospace;font-size:12px;
     letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-right:8px}
   .fbtn{
-    font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.04em;
-    padding:7px 14px;border-radius:999px;border:1px solid var(--line);
-    background:var(--panel);color:var(--ink);cursor:pointer;
+    font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:7px 14px;border-radius:0;border:1px solid var(--line);
+    background:transparent;color:var(--ink);cursor:pointer;
   }
-  .fbtn:hover{border-color:var(--accent)}
-  .fbtn[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .fbtn:hover{border-color:var(--accent);color:var(--accent)}
+  .fbtn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
   .fbtn .cnt{color:var(--slate)}
-  .fbtn[aria-pressed="true"] .cnt{color:#9FB4C6}
+  .fbtn[aria-pressed="true"] .cnt{color:var(--paper);opacity:.55}
 
   /* ---------- cards ---------- */
   .grid{
@@ -240,12 +243,13 @@
     padding-bottom:64px;
   }
   .card{
-    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--rule);
+    border-radius:0;
     padding:20px 20px 18px;display:flex;flex-direction:column;gap:12px;
     cursor:pointer;text-align:left;font:inherit;color:inherit;
     transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
   }
-  .card:hover{transform:translateY(-2px);box-shadow:0 8px 24px var(--shadow);border-color:var(--slate)}
+  .card:hover{transform:translateY(-2px);box-shadow:0 8px 24px var(--shadow);border-color:var(--slate);border-top-color:var(--accent)}
   .card:focus-visible,.fbtn:focus-visible,a:focus-visible,button:focus-visible{
     outline:2px solid var(--accent);outline-offset:2px;
   }
@@ -253,7 +257,7 @@
   .badge{
     display:inline-flex;align-items:center;gap:6px;
     font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;
-    text-transform:uppercase;padding:4px 9px;border-radius:999px;
+    text-transform:uppercase;padding:4px 9px;border-radius:0;
   }
   .badge.live{background:var(--ok-soft);color:var(--ok)}
   .badge.build{background:var(--build-soft);color:var(--build)}
@@ -266,7 +270,7 @@
   .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
   .chip{
     font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--slate);
-    border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:var(--paper);
+    border:1px solid var(--line);border-radius:0;padding:3px 8px;background:transparent;
   }
   .card .kmetric{
     font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);
@@ -275,7 +279,7 @@
 
   /* ---------- detail dialog ---------- */
   dialog{
-    border:none;border-radius:14px;padding:0;
+    border:1px solid var(--line);border-top:3px solid var(--rule);border-radius:0;padding:0;
     width:min(880px,calc(100vw - 32px));
     max-height:calc(100vh - 48px);
     background:var(--panel);color:var(--ink);
@@ -287,7 +291,7 @@
   .d-meta{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--slate);
     text-transform:uppercase;letter-spacing:.1em;margin:8px 0 4px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
   .d-close{
-    border:1px solid var(--line);background:var(--paper);border-radius:8px;
+    border:1px solid var(--line);background:var(--paper);border-radius:0;
     font-family:"IBM Plex Mono",monospace;font-size:12px;padding:8px 12px;cursor:pointer;flex-shrink:0;
   }
   .d-close:hover{border-color:var(--accent);color:var(--accent)}
@@ -301,17 +305,17 @@
   .impact li::marker{color:var(--accent)}
   .d-chips{display:flex;flex-wrap:wrap;gap:6px}
   .media-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-  .shot{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--paper)}
+  .shot{border:1px solid var(--line);border-radius:0;overflow:hidden;background:var(--paper)}
   .shot img,.shot video{display:block;width:100%;height:auto}
   .shot figcaption{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--slate);padding:8px 10px;border-top:1px solid var(--line)}
   .shot.placeholder .ph{
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-    min-height:150px;border:2px dashed var(--line);border-radius:8px;margin:8px;
+    min-height:150px;border:2px dashed var(--line);border-radius:0;margin:8px;
     color:var(--slate);font-family:"IBM Plex Mono",monospace;font-size:12px;text-align:center;padding:12px;
   }
   .shot.placeholder .ph .big{font-size:20px}
   pre.codeblock{
-    background:var(--terminal);border-radius:8px;overflow:auto;
+    background:var(--terminal);border-radius:0;overflow:auto;
     font-size:13px;line-height:1.5;
   }
   pre.codeblock code{font-family:"IBM Plex Mono",monospace;padding:16px 18px;display:block;background:transparent}
@@ -324,12 +328,17 @@
     padding:34px 0;margin-top:20px;
   }
   footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
-  footer .mono{font-size:12.5px;color:#7E93A6}
-  footer a{color:#9FC0F2;text-decoration:none}
+  footer .mono{font-size:12.5px;color:#8F8D7E}
+  footer a{color:#A9BFF0;text-decoration:none}
   footer a:hover{text-decoration:underline}
 
+  @media (max-width:700px){
+    .metrics{grid-template-columns:repeat(2,1fr)}
+    .metric{border-right:none;padding-left:0}
+    .metric:not(:first-child){padding-left:0}
+  }
   @media (max-width:640px){
-    .board-row{grid-template-columns:12px 1fr}
+    .board-row{grid-template-columns:28px 12px 1fr}
     .board-row .smetric{display:none}
     .hero{padding-top:44px}
   }
@@ -349,15 +358,14 @@
 <header class="top">
   <div class="wrap top-inner">
     <div class="brand">
-      <span class="dot" aria-hidden="true"></span>
-      <span class="name mono">jason.camp</span>
+      <span class="name">Jason Camp</span>
     </div>
     <nav class="top-links mono">
       <a href="#systems">System board</a>
       <a href="#projects">Projects</a>
       <a href="https://github.com/JasonCamp311" target="_blank" rel="noopener">GitHub ↗</a>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" aria-pressed="false">
-        <span class="tt-icon" aria-hidden="true">🌙</span><span class="tt-label">Dark</span>
+        <span class="tt-label">Dark</span>
       </button>
     </nav>
   </div>
@@ -847,6 +855,7 @@ const byId = Object.fromEntries(PROJECTS.map(p => [p.id, p]));
 $("#board").innerHTML = BOARD.map((row, i) => {
   const p = byId[row.id]; if (!p) return "";
   return `<a class="board-row" style="--i:${i}" href="#" data-open="${p.id}">
+    <span class="idx" aria-hidden="true">${String(i+1).padStart(2,"0")}</span>
     <span class="sdot ${p.status}" aria-hidden="true"></span>
     <span><span class="sname">${esc(p.name)}</span>
       <span class="sdesc"> · ${esc(p.tagline)}</span></span>
@@ -1001,7 +1010,6 @@ $("#stamp").textContent = LAST_UPDATED;
     const dark = isDark();
     if (btn){
       btn.setAttribute("aria-pressed", String(dark));
-      btn.querySelector(".tt-icon").textContent = dark ? "☀️" : "🌙";
       btn.querySelector(".tt-label").textContent = dark ? "Light" : "Dark";
     }
   }
