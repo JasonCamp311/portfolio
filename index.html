@@ -34,14 +34,28 @@
                code pasted from your repo. Leave it out entirely
                otherwise; the page renders fine without it.
       links    optional array of { label, href }
+      operations optional array of short strings: where the source lives,
+               backups, who else has admin, runbook. Renders as "How it
+               runs" in the detail view and in the printed handout.
 
   TO ADD SCREENSHOTS / CLIPS:
     Make an "assets" folder next to this file and drop images (.png/.jpg)
     or short clips (.mp4, keep them under ~15s, screen-recorded) in it.
     Then point the media src at them. Nothing else to do.
 
-  TO CHANGE THE HERO METRICS OR SYSTEM BOARD:
-    Edit the METRICS and BOARD arrays, right above PROJECTS.
+  TO CHANGE THE HERO METRICS, SYSTEM BOARD, OR "PROPOSED NEXT":
+    Edit the METRICS, BOARD, and ROADMAP arrays, right above PROJECTS.
+
+  DISTRICT VIEW:
+    Open the page with ?view=district to start on the District filter,
+    hide the Game Dev filter, and scope the system board and its count
+    line to district projects only. No param = the full page.
+
+  PRINT / PDF HANDOUT:
+    File > Print (or Save as PDF) prints the hero, every district
+    project as a flat section (name, status, period, summary, stack,
+    impact, operations), and the "Proposed next" list. Nav, filters,
+    footer, the detail dialog, and media are not printed.
 
   LAST_UPDATED near the top of the script stamps the footer.
 ================================================================ -->
@@ -218,6 +232,22 @@
   .sdot.design{background:transparent;border:2px solid var(--design);width:7px;height:7px}
   @keyframes rise{to{opacity:1;transform:none}}
 
+  /* ---------- proposed next (roadmap) ---------- */
+  .roadmap{margin:36px 0 8px}
+  .roadmap-row{
+    display:grid;grid-template-columns:36px 1fr;gap:3px 14px;align-items:baseline;
+    padding:13px 4px;border-bottom:1px solid var(--line);
+    opacity:0;transform:translateY(6px);
+    animation:rise .5s ease forwards;
+    animation-delay:calc(var(--i) * 90ms);
+  }
+  .roadmap-row .idx{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--slate);opacity:.6;grid-row:span 2}
+  .roadmap-row .rtitle{font-weight:700}
+  .roadmap-row .rnote{color:var(--slate);font-size:14px;grid-column:2}
+
+  /* ---------- print sheet (only rendered on paper) ---------- */
+  .print-sheet{display:none}
+
   /* ---------- filters ---------- */
   .filters{
     display:flex;gap:8px;flex-wrap:wrap;align-items:center;
@@ -347,10 +377,52 @@
     .board-row{opacity:1;transform:none}
   }
   @media print{
-    .filters,.top-links,footer,.d-close{display:none}
-    body{background:#fff}
-    .card{break-inside:avoid;box-shadow:none}
-    .hero{padding:20px 0}
+    /* Force the light palette on paper regardless of the on-screen theme. */
+    :root,:root[data-theme="dark"],:root:not([data-theme="light"]){
+      color-scheme:light;
+      --paper:#fff;--panel:#fff;--ink:#000;--slate:#444;--line:#bbb;--rule:#000;
+      --accent:#1a3f9c;--accent-soft:#fff;--shadow:none;
+      --ok:#1E6E52;--ok-soft:#fff;--build:#9a6a0e;--build-soft:#fff;--design:#555;--design-soft:#fff;
+    }
+    html,body{background:#fff !important;color:#000}
+    body{font-size:10.5pt;line-height:1.35}
+    .wrap{max-width:none;padding:0}
+    header.top{border-bottom:1px solid #000;background:#fff}
+    .top-inner{padding:6px 0}
+    /* hidden on paper */
+    .top-links,.theme-toggle,.filters,footer,dialog,
+    .board,.grid,.shot,.media-grid{display:none !important}
+    .hero{padding:14px 0 8px}
+    h1{font-size:24pt;max-width:none}
+    .hero p.lede{font-size:10.5pt;max-width:none;margin-top:6px}
+    .metrics{margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));break-inside:avoid}
+    .metric{padding:8px 10px 8px 0}
+    .metric:not(:first-child){padding-left:10px}
+    .metric .num{font-size:15pt}
+    .metric .lbl{font-size:8.5pt}
+    /* district handout */
+    .print-sheet{display:block;margin-top:14px}
+    .print-sheet .sec-label,.roadmap .board-head{
+      break-after:avoid;
+      font-family:"IBM Plex Mono",monospace;font-size:9pt;letter-spacing:.14em;
+      text-transform:uppercase;color:#444;margin:0 0 6px;border-bottom:1px solid #bbb;padding-bottom:4px;
+    }
+    .p-proj{padding:8px 0 9px;border-bottom:1px solid #ddd}
+    .p-proj:last-child{border-bottom:none}
+    .p-proj h2,.p-meta,.p-label{break-after:avoid}
+    .p-proj li,.p-summary{break-inside:avoid}
+    .p-proj h2{font-family:"Archivo",sans-serif;font-size:15pt;letter-spacing:-.01em;margin:0 0 2px}
+    .p-meta{font-family:"IBM Plex Mono",monospace;font-size:9pt;text-transform:uppercase;letter-spacing:.08em;color:#444;margin:0 0 6px}
+    .p-summary{margin:0 0 6px}
+    .p-stack{font-family:"IBM Plex Mono",monospace;font-size:9.5pt;color:#333;margin:0 0 6px}
+    .p-label{font-family:"IBM Plex Mono",monospace;font-size:8.5pt;letter-spacing:.12em;text-transform:uppercase;color:#444;margin:6px 0 2px}
+    .p-proj ul{margin:0 0 0 18px}
+    .p-proj li{margin:1px 0}
+    .roadmap{margin:12px 0 0}
+    .roadmap .board-panel{border:none}
+    .roadmap-row{padding:5px 0;border-bottom:1px dotted #bbb;opacity:1;transform:none;animation:none}
+    .roadmap-row .rnote{color:#333;font-size:10pt}
+    a{color:inherit;text-decoration:none}
   }
 </style>
 </head>
@@ -374,7 +446,7 @@
 <main class="wrap">
   <section class="hero">
     <p class="eyebrow"><b>Jason Camp</b> · Technology Supervisor · Acture Solutions</p>
-    <h1>Systems that ship, <span class="accent">and stay running.</span></h1>
+    <h1>Systems that ship <span class="accent">and stay running.</span></h1>
     <p class="lede">
       I build and operate production software and infrastructure for a K-12 school district:
       replacing legacy vendor systems with modern serverless apps, automating manual workflows,
@@ -390,6 +462,16 @@
       <span id="board-count"></span>
     </div>
     <div class="board-panel" id="board"></div>
+  </section>
+
+  <!-- District handout: rendered from PROJECTS, shown only when printing. -->
+  <section class="print-sheet" id="print-sheet" aria-hidden="true"></section>
+
+  <section class="roadmap" id="roadmap" aria-label="Proposed next">
+    <div class="board-head">
+      <span>Proposed next</span>
+    </div>
+    <div class="board-panel" id="roadmap-list"></div>
   </section>
 
   <section id="projects" aria-label="Projects">
@@ -416,13 +498,13 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-08-30";
+const LAST_UPDATED = "2026-08-31";
 
 /* Hero metrics strip. Keep numbers honest and current. */
 const METRICS = [
   { num: "50-75", lbl: "tickets / week processed" },
   { num: "300+",  lbl: "legacy records migrated" },
-  { num: "15",    lbl: "staff onboarded to new tools" },
+  { num: "$10k/yr", lbl: "SchoolDude license eliminated" },
   { num: "13",    lbl: "systems built and operated" },
   { num: "4-node",lbl: "TB5 inference cluster" },
 ];
@@ -430,11 +512,24 @@ const METRICS = [
 /* System board rows. id must match a project id below. */
 const BOARD = [
   { id: "ticketing",    metric: "50-75 tickets/wk" },
-  { id: "registration", metric: "rolling out" },
+  { id: "registration", metric: "live for 2026-27 intake" },
   { id: "discord-bot",  metric: "24/7 uptime" },
   { id: "jellyfin-push", metric: "unattended" },
   { id: "homelab",      metric: "self-hosted" },
   { id: "mac-cluster",  metric: "multi-model serving" },
+];
+
+/* "Proposed next" list, rendered between the system board and the project
+   grid (and on the printed handout). Keep each note to one or two sentences. */
+const ROADMAP = [
+  {
+    title: "Confidential student data sharing with outside districts",
+    note: "A Microsoft-native method for sending confidential student records to other districts, replacing the current OneDrive external-share flow, which is failing for outside recipients."
+  },
+  {
+    title: "RMM evaluation",
+    note: "Evaluate a remote monitoring and management platform scoped to staff and admin devices only. Student devices are out of scope."
+  },
 ];
 
 const PROJECTS = [
@@ -453,7 +548,14 @@ const PROJECTS = [
       "Onboarded 15 users across maintenance, grounds, and IT",
       "Role-based routing: requests reach the right technician automatically",
       "Photo attachments and recurring scheduled tasks, which the old system handled poorly",
-      "SharePoint archival via Graph API in progress; security audit pass underway"
+      "Security review (July 2026) covered CORS, rate limiting, security headers, sessions, uploads, CSV export, and the webhook: 16 findings, 15 fixed, 1 dev-only dependency item deferred",
+      "SharePoint archival of closed tickets via Graph API: scoped, not yet built"
+    ],
+    operations: [
+      "Source: GitHub, campj-pville/maintenance_ticket_board; CI runs typecheck and tests on every push",
+      "Data: Cloudflare D1, attachments in R2; export and point-in-time restore steps are in RUNBOOK.md",
+      "Sole admin today; bringing the team in for shared ownership is planned",
+      "Runbook: RUNBOOK.md in the repo (deploy, rollback, secrets, backups, triage)"
     ],
     media: [
       { type: "img", src: "assets/ticketing-dashboard.png", caption: "Technician dashboard, open tickets by building" },
@@ -464,7 +566,7 @@ const PROJECTS = [
     id: "registration",
     name: "Digital Student Registration",
     category: "district",
-    status: "build",
+    status: "live",
     period: "2026",
     tagline: "Jotform to SharePoint pipeline that routes enrollments to the right building automatically.",
     summary: "Student registration was a paper-and-email process. I built a digital intake on Jotform and an automated pipeline in Power Automate that files each submission into building-specific SharePoint folders based on grade level (BRS PreK-4, Middle School 5-8, High School 9-12). Families get an autoresponder with a document checklist and the correct building's submission instructions, so the front office stops answering the same questions.",
@@ -475,6 +577,12 @@ const PROJECTS = [
       "Autoresponder gives families a checklist and instructions the moment they submit",
       "Single source of truth in SharePoint instead of inbox attachments"
     ],
+    operations: [
+      "Source: the Jotform form and Power Automate flow live in the district Microsoft 365 tenant; no code repo",
+      "Data: submissions and documents stored in SharePoint Online under the building folders",
+      "Sole admin today; bringing the team in for shared ownership is planned",
+      "Runbook: not yet written"
+    ],
     media: []
   },
   {
@@ -484,17 +592,23 @@ const PROJECTS = [
     status: "build",
     period: "2026",
     tagline: "Four Mac minis pooled over Thunderbolt 5 to serve multiple AI models concurrently.",
-    summary: "Repurposed four Mac minis into a pooled compute cluster networked over Thunderbolt 5, serving multiple models at once: one strong reasoning model plus Llama 3.1 8B as the fast everyday model. Includes a custom web frontend with routing logic so users get sent to the right model for the task. This is on-prem AI capability the district gets from hardware it already owned.",
-    stack: ["Apple Silicon", "Thunderbolt 5 networking", "Distributed inference", "Llama 3.1"],
+    summary: "Repurposed four Mac minis into a pooled compute cluster networked over Thunderbolt 5 and running exo for distributed inference. The resident model is currently a Qwen release, and the lineup is updated as new models are released. Includes a custom web frontend with routing logic so users get sent to the right model for the task. This is on-prem AI capability the district gets from hardware it already owned.",
+    stack: ["Apple Silicon", "Thunderbolt 5 networking", "exo", "Distributed inference", "Qwen"],
     impact: [
       "Pools compute from 4 machines the district already owned",
-      "Serves a strong model and a fast model concurrently with routing between them",
+      "Multi-model serving with routing in the frontend; the resident lineup is updated as new models are released",
       "Custom frontend built and iterated with an agentic CLI workflow",
       "On-prem inference: no per-token vendor costs, data stays in-district"
     ],
     media: [
       { type: "img", src: "assets/cluster-frontend.png", caption: "Chat frontend answering live from the on-prem exo cluster" },
-      { type: "video", src: "assets/cluster-demo.mp4", caption: "Prompt answered by the resident Qwen3.6 model on the cluster" }
+      { type: "video", src: "assets/cluster-demo.mp4", caption: "Prompt answered by the resident Qwen model on the cluster" }
+    ],
+    operations: [
+      "Source: GitHub, campj-pville/Pville-Chat; deployed to the head node by git push, where the deploy hook runs typecheck, lint, and tests and rolls back on failure",
+      "Data: conversations in Postgres on the head node",
+      "Sole admin today; bringing the team in for shared ownership is planned",
+      "Runbook: docs/HEAD_NODE_DEPLOYMENT.md in the repo"
     ]
   },
   {
@@ -820,12 +934,11 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
     status: "design",
     period: "2026 - planned",
     tagline: "Local GPU serving with an AWS burst plane, the flagship AI infrastructure build.",
-    summary: "In design: a hybrid inference platform that serves models from local GPU hardware and bursts to AWS when demand exceeds local capacity. The goal is to demonstrate real AI infrastructure engineering: model serving, autoscaling across a cost boundary, observability, and the economics of local-vs-cloud inference. Built alongside AWS Solutions Architect certification work.",
+    summary: "In design: a hybrid inference platform that serves models from local GPU hardware and bursts to AWS when demand exceeds local capacity. The Mac mini cluster proves that on-prem inference works for the district; this project answers the follow-up question of when on-prem stops being cheaper than cloud: model serving, autoscaling across a cost boundary, observability, and the actual economics of local-vs-cloud inference.",
     stack: ["AWS", "GPU serving", "Autoscaling", "Observability"],
     impact: [
-      "Designed to answer a real question: when is local inference cheaper than cloud?",
-      "Deliberately separated from work infrastructure to keep IP clean",
-      "Targets the AI infrastructure roles this portfolio is aimed at"
+      "Designed to answer a real question: when does on-prem inference stop being cheaper than cloud?",
+      "Personal infrastructure, kept separate from district systems."
     ],
     media: []
   }
@@ -850,20 +963,36 @@ $("#metrics").innerHTML = METRICS.map(m =>
   `<div class="metric"><div class="num">${esc(m.num)}</div><div class="lbl">${esc(m.lbl)}</div></div>`
 ).join("");
 
+/* ?view=district: district-only board, District filter preselected, Game Dev filter hidden. */
+const DISTRICT_VIEW = new URLSearchParams(location.search).get("view") === "district";
+const isDistrict = (p) => p.category === "district";
+
 /* system board */
 const byId = Object.fromEntries(PROJECTS.map(p => [p.id, p]));
-$("#board").innerHTML = BOARD.map((row, i) => {
-  const p = byId[row.id]; if (!p) return "";
-  return `<a class="board-row" style="--i:${i}" href="#" data-open="${p.id}">
+const boardRows = BOARD
+  .map(row => ({ row, p: byId[row.id] }))
+  .filter(({ p }) => p && (!DISTRICT_VIEW || isDistrict(p)));
+$("#board").innerHTML = boardRows.map(({ row, p }, i) => `<a class="board-row" style="--i:${i}" href="#" data-open="${p.id}">
     <span class="idx" aria-hidden="true">${String(i+1).padStart(2,"0")}</span>
     <span class="sdot ${p.status}" aria-hidden="true"></span>
     <span><span class="sname">${esc(p.name)}</span>
       <span class="sdesc"> · ${esc(p.tagline)}</span></span>
     <span class="smetric">${esc(row.metric)}</span>
-  </a>`;
-}).join("");
-const liveCount = PROJECTS.filter(p => p.status === "live").length;
-$("#board-count").textContent = `${PROJECTS.length} systems · ${liveCount} in production`;
+  </a>`).join("");
+const countPool = DISTRICT_VIEW ? PROJECTS.filter(isDistrict) : PROJECTS;
+const liveCount = countPool.filter(p => p.status === "live").length;
+$("#board-count").textContent = `${countPool.length} systems · ${liveCount} in production`;
+
+/* proposed next */
+if (ROADMAP.length){
+  $("#roadmap-list").innerHTML = ROADMAP.map((r, i) => `<div class="roadmap-row" style="--i:${i}">
+    <span class="idx" aria-hidden="true">${String(i+1).padStart(2,"0")}</span>
+    <span class="rtitle">${esc(r.title)}</span>
+    <span class="rnote">${esc(r.note)}</span>
+  </div>`).join("");
+} else {
+  $("#roadmap").hidden = true;
+}
 
 /* filters */
 const FILTERS = [
@@ -873,9 +1002,9 @@ const FILTERS = [
   { key: "games", label: "Games" },
   { key: "live", label: "In production" },
 ];
-let active = "all";
+let active = DISTRICT_VIEW ? "district" : "all";
 const filterWrap = $("#filters");
-FILTERS.forEach(f => {
+FILTERS.filter(f => !(DISTRICT_VIEW && f.key === "games")).forEach(f => {
   const count = f.key === "all" ? PROJECTS.length
     : PROJECTS.filter(p => p.category === f.key || p.status === f.key).length;
   const b = document.createElement("button");
@@ -958,6 +1087,11 @@ function openDetail(id){
       <div class="sec-label">What it delivers</div>
       <ul class="impact">${p.impact.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>
     </div>
+    ${p.operations && p.operations.length ? `
+    <div class="d-section">
+      <div class="sec-label">How it runs</div>
+      <ul class="impact">${p.operations.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>
+    </div>` : ""}
     ${p.code ? `
     <div class="d-section">
       <div class="sec-label">From the code</div>
@@ -993,6 +1127,19 @@ document.addEventListener("click", e => {
 });
 
 $("#stamp").textContent = LAST_UPDATED;
+
+/* Printed handout: district projects only, flat single column, no media. */
+$("#print-sheet").innerHTML = `<div class="sec-label">District systems</div>` +
+  PROJECTS.filter(isDistrict).map(p => `<article class="p-proj">
+    <h2>${esc(p.name)}</h2>
+    <p class="p-meta">${STATUS[p.status].label} · ${esc(p.period)}</p>
+    <p class="p-summary">${esc(p.summary)}</p>
+    ${p.stack.length ? `<p class="p-stack">Stack: ${p.stack.map(esc).join(" · ")}</p>` : ""}
+    ${p.impact.length ? `<div class="p-label">What it delivers</div>
+    <ul>${p.impact.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>` : ""}
+    ${p.operations && p.operations.length ? `<div class="p-label">How it runs</div>
+    <ul>${p.operations.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>` : ""}
+  </article>`).join("");
 
 /* Theme toggle. No stored choice = follow the OS setting (via CSS media query);
    the toggle writes an explicit choice to localStorage that overrides it. */
