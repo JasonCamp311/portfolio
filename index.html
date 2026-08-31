@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#F2F0E9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#121310" media="(prefers-color-scheme: dark)">
 <title>Jason Camp · Systems Portfolio</title>
@@ -500,12 +501,14 @@
 
 const LAST_UPDATED = "2026-08-31";
 
-/* Hero metrics strip. Keep numbers honest and current. */
+/* Hero metrics strip. Keep numbers honest and current.
+   num may be a string, or a function of the project pool the board is
+   counting (all projects, or district-only under ?view=district). */
 const METRICS = [
   { num: "50-75", lbl: "tickets / week processed" },
   { num: "300+",  lbl: "legacy records migrated" },
   { num: "$10k/yr", lbl: "SchoolDude license eliminated" },
-  { num: "13",    lbl: "systems built and operated" },
+  { num: (pool) => String(pool.length), lbl: "systems built and operated" },
   { num: "4-node",lbl: "TB5 inference cluster" },
 ];
 
@@ -516,7 +519,7 @@ const BOARD = [
   { id: "discord-bot",  metric: "24/7 uptime" },
   { id: "jellyfin-push", metric: "unattended" },
   { id: "homelab",      metric: "self-hosted" },
-  { id: "mac-cluster",  metric: "multi-model serving" },
+  { id: "mac-cluster",  metric: "on-prem inference" },
 ];
 
 /* "Proposed next" list, rendered between the system board and the project
@@ -524,7 +527,11 @@ const BOARD = [
 const ROADMAP = [
   {
     title: "Confidential student data sharing with outside districts",
-    note: "A Microsoft-native method for sending confidential student records to other districts, replacing the current OneDrive external-share flow, which is failing for outside recipients."
+    note: "A Microsoft-native, auditable method for sending confidential student records to other districts, replacing ad hoc OneDrive external sharing."
+  },
+  {
+    title: "Specialized assistants on the cluster",
+    note: "Expand from one general model to purpose-built agents for specific groups and skills as capacity and model releases allow."
   },
   {
     title: "RMM evaluation",
@@ -552,9 +559,9 @@ const PROJECTS = [
       "SharePoint archival of closed tickets via Graph API: scoped, not yet built"
     ],
     operations: [
-      "Source: GitHub, campj-pville/maintenance_ticket_board; CI runs typecheck and tests on every push",
+      "Source: district GitHub org; CI runs typecheck and tests on every push",
       "Data: Cloudflare D1, attachments in R2; export and point-in-time restore steps are in RUNBOOK.md",
-      "Sole admin today; bringing the team in for shared ownership is planned",
+      "Sole admin today; team onboarding planned",
       "Runbook: RUNBOOK.md in the repo (deploy, rollback, secrets, backups, triage)"
     ],
     media: [
@@ -578,9 +585,10 @@ const PROJECTS = [
       "Single source of truth in SharePoint instead of inbox attachments"
     ],
     operations: [
-      "Source: the Jotform form and Power Automate flow live in the district Microsoft 365 tenant; no code repo",
+      "Source: Jotform form and Power Automate flow live in the district Microsoft 365 tenant; export to the district GitHub org planned",
       "Data: submissions and documents stored in SharePoint Online under the building folders",
-      "Sole admin today; bringing the team in for shared ownership is planned",
+      "Retention: submissions stay in Jotform behind SSO under the district's Jotform DPA; no purge schedule yet",
+      "Admin access shared with Marcos on the Jotform side",
       "Runbook: not yet written"
     ],
     media: []
@@ -591,23 +599,23 @@ const PROJECTS = [
     category: "district",
     status: "build",
     period: "2026",
-    tagline: "Four Mac minis pooled over Thunderbolt 5 to serve multiple AI models concurrently.",
-    summary: "Repurposed four Mac minis into a pooled compute cluster networked over Thunderbolt 5 and running exo for distributed inference. The resident model is currently a Qwen release, and the lineup is updated as new models are released. Includes a custom web frontend with routing logic so users get sent to the right model for the task. This is on-prem AI capability the district gets from hardware it already owned.",
-    stack: ["Apple Silicon", "Thunderbolt 5 networking", "exo", "Distributed inference", "Qwen"],
+    tagline: "Four Mac minis pooled over Thunderbolt 5 for on-prem AI inference.",
+    summary: "Repurposed four Mac minis into a pooled compute cluster networked over Thunderbolt 5 and running exo for distributed inference. The resident model is Qwen3.6 35B-A3B (5-bit); the lineup is updated as new models are released. A custom web frontend puts it in front of staff: Microsoft sign-in for a pilot group, per-user conversation history, and an admin view. This is on-prem AI capability the district gets from hardware it already owned.",
+    stack: ["Apple Silicon", "Thunderbolt 5 networking", "exo", "Distributed inference", "Qwen3.6 35B-A3B (5-bit)"],
     impact: [
       "Pools compute from 4 machines the district already owned",
-      "Multi-model serving with routing in the frontend; the resident lineup is updated as new models are released",
+      "Serves Qwen3.6 35B-A3B (5-bit) through exo across the pooled nodes",
       "Custom frontend built and iterated with an agentic CLI workflow",
       "On-prem inference: no per-token vendor costs, data stays in-district"
     ],
     media: [
       { type: "img", src: "assets/cluster-frontend.png", caption: "Chat frontend answering live from the on-prem exo cluster" },
-      { type: "video", src: "assets/cluster-demo.mp4", caption: "Prompt answered by the resident Qwen model on the cluster" }
+      { type: "video", src: "assets/cluster-demo.mp4", caption: "Prompt answered by the resident Qwen3.6 35B-A3B (5-bit) model on the cluster" }
     ],
     operations: [
-      "Source: GitHub, campj-pville/Pville-Chat; deployed to the head node by git push, where the deploy hook runs typecheck, lint, and tests and rolls back on failure",
+      "Source: district GitHub org; deployed to the head node by git push, where the deploy hook runs typecheck, lint, and tests and rolls back on failure",
       "Data: conversations in Postgres on the head node",
-      "Sole admin today; bringing the team in for shared ownership is planned",
+      "Single operator so far; shared ownership planned as the team comes on",
       "Runbook: docs/HEAD_NODE_DEPLOYMENT.md in the repo"
     ]
   },
@@ -933,12 +941,12 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
     category: "personal",
     status: "design",
     period: "2026 - planned",
-    tagline: "Local GPU serving with an AWS burst plane, the flagship AI infrastructure build.",
+    tagline: "Local GPU serving with an AWS burst plane.",
     summary: "In design: a hybrid inference platform that serves models from local GPU hardware and bursts to AWS when demand exceeds local capacity. The Mac mini cluster proves that on-prem inference works for the district; this project answers the follow-up question of when on-prem stops being cheaper than cloud: model serving, autoscaling across a cost boundary, observability, and the actual economics of local-vs-cloud inference.",
     stack: ["AWS", "GPU serving", "Autoscaling", "Observability"],
     impact: [
       "Designed to answer a real question: when does on-prem inference stop being cheaper than cloud?",
-      "Personal infrastructure, kept separate from district systems."
+      "Personal infrastructure, kept separate from district systems"
     ],
     media: []
   }
@@ -958,14 +966,16 @@ const CATS = { district: "District / Work", personal: "Personal Lab", games: "Ga
 const $ = (s, el=document) => el.querySelector(s);
 const esc = (t) => { const d=document.createElement("div"); d.textContent=t; return d.innerHTML; };
 
-/* hero metrics */
-$("#metrics").innerHTML = METRICS.map(m =>
-  `<div class="metric"><div class="num">${esc(m.num)}</div><div class="lbl">${esc(m.lbl)}</div></div>`
-).join("");
-
 /* ?view=district: district-only board, District filter preselected, Game Dev filter hidden. */
 const DISTRICT_VIEW = new URLSearchParams(location.search).get("view") === "district";
 const isDistrict = (p) => p.category === "district";
+const countPool = DISTRICT_VIEW ? PROJECTS.filter(isDistrict) : PROJECTS;
+
+/* hero metrics */
+$("#metrics").innerHTML = METRICS.map(m => {
+  const num = typeof m.num === "function" ? m.num(countPool) : m.num;
+  return `<div class="metric"><div class="num">${esc(num)}</div><div class="lbl">${esc(m.lbl)}</div></div>`;
+}).join("");
 
 /* system board */
 const byId = Object.fromEntries(PROJECTS.map(p => [p.id, p]));
@@ -979,7 +989,6 @@ $("#board").innerHTML = boardRows.map(({ row, p }, i) => `<a class="board-row" s
       <span class="sdesc"> · ${esc(p.tagline)}</span></span>
     <span class="smetric">${esc(row.metric)}</span>
   </a>`).join("");
-const countPool = DISTRICT_VIEW ? PROJECTS.filter(isDistrict) : PROJECTS;
 const liveCount = countPool.filter(p => p.status === "live").length;
 $("#board-count").textContent = `${countPool.length} systems · ${liveCount} in production`;
 
