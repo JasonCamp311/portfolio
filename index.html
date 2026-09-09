@@ -499,7 +499,7 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-08-31";
+const LAST_UPDATED = "2026-09-08";
 
 /* Hero metrics strip. Keep numbers honest and current.
    num may be a string, or a function of the project pool the board is
@@ -939,14 +939,16 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
     id: "inference-platform",
     name: "Hybrid Inference Platform",
     category: "personal",
-    status: "design",
-    period: "2026 - planned",
+    status: "build",
+    period: "2026",
     tagline: "Local GPU serving with an AWS burst plane.",
     summary: "In design: a hybrid inference platform that serves models from local GPU hardware and bursts to AWS when demand exceeds local capacity. The Mac mini cluster proves that on-prem inference works for the district; this project answers the follow-up question of when on-prem stops being cheaper than cloud: model serving, autoscaling across a cost boundary, observability, and the actual economics of local-vs-cloud inference.",
     stack: ["AWS", "GPU serving", "Autoscaling", "Observability"],
     impact: [
       "Designed to answer a real question: when does on-prem inference stop being cheaper than cloud?",
-      "Personal infrastructure, kept separate from district systems"
+      "Personal infrastructure, kept separate from district systems",
+      "Week 1 done 2026-09-08: Pick the local server",
+      "Week 2 done 2026-09-08: Gateway skeleton"
     ],
     media: []
   }
