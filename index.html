@@ -499,7 +499,7 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-08-31";
+const LAST_UPDATED = "2026-09-15";
 
 /* Hero metrics strip. Keep numbers honest and current.
    num may be a string, or a function of the project pool the board is
@@ -516,6 +516,7 @@ const METRICS = [
 const BOARD = [
   { id: "ticketing",    metric: "50-75 tickets/wk" },
   { id: "registration", metric: "live for 2026-27 intake" },
+  { id: "app-gallery",  metric: "reviewed before publish" },
   { id: "discord-bot",  metric: "24/7 uptime" },
   { id: "jellyfin-push", metric: "unattended" },
   { id: "homelab",      metric: "self-hosted" },
@@ -592,6 +593,38 @@ const PROJECTS = [
       "Runbook: not yet written"
     ],
     media: []
+  },
+  {
+    id: "app-gallery",
+    name: "Teacher App Gallery",
+    category: "district",
+    status: "live",
+    period: "2026",
+    tagline: "A reviewed, on-prem home for the classroom HTML apps staff build, each isolated on its own web address.",
+    summary: "The district wanted one safe place for staff to share the interactive HTML apps they build for class. I built an on-prem gallery from a design mockup: staff sign in with Microsoft, upload an app, and a reviewer approves it before it publishes. Every upload gets an automatic safety report, and every published app runs on its own web address, so uploaded code can't reach another app's data or a teacher's signed-in session. It runs on a repurposed Mac mini, is reachable only on the district network, and starts staff-only: teachers present apps in class and share individual app links with students.",
+    stack: ["Node.js", "Express", "SQLite", "Caddy", "Apache (built into macOS)", "Microsoft Entra ID", "Let's Encrypt (DNS-01)", "launchd"],
+    impact: [
+      "Review queue: nothing reaches students until a reviewer approves it, and a reviewer can unpublish an app immediately",
+      "Automatic report on every upload flags secret keys, direct AI API calls, password boxes, forms that post off-site, trackers, and outside scripts; it informs the reviewer and never blocks the upload",
+      "Uploads are validated before anything is written: 50 MB cap, allowlisted file types, and checks for path traversal, symlinks, and zip bombs",
+      "Each app is its own web origin, so one app can't read another's saved data or the gallery's session",
+      "Microsoft sign-in with Staff and Reviewer app roles, checked by the app itself as well as by Entra",
+      "Worked within the MDM-managed firewall, which only admits Apple-signed listeners, by fronting the service with the web server built into macOS",
+      "Traced an intermittent Chrome certificate error to handshake ordering in the server's TLS library, and fixed it with one certificate covering the gallery and every app address"
+    ],
+    operations: [
+      "Source: district GitHub org; the deploy script runs the test suite before shipping to the server",
+      "Services start at boot with nobody signed in, restart on their own, and the server powers back on after an outage",
+      "Data: SQLite database and uploaded files on the server; automated backups not yet set up",
+      "Certificates renew automatically through a daily job",
+      "Runbook: README.md in the repo (deploy, first install, health checks, emergency unpublish)"
+    ],
+    media: [
+      { type: "img", src: "assets/app-gallery-home.png", caption: "Staff gallery with the app menu open (local copy with sample apps)" },
+      { type: "img", src: "assets/app-gallery-upload.png", caption: "Upload form with a live preview of the gallery card" },
+      { type: "img", src: "assets/app-gallery-review.png", caption: "Review queue: the automatic report flags a password box and an off-site form" },
+      { type: "img", src: "assets/app-gallery-signin.png", caption: "Sign-in page for anyone not signed in as staff" }
+    ]
   },
   {
     id: "mac-cluster",
