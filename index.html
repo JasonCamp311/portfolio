@@ -499,7 +499,7 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-09-15";
+const LAST_UPDATED = "2026-09-23";
 
 /* Hero metrics strip. Keep numbers honest and current.
    num may be a string, or a function of the project pool the board is
@@ -517,6 +517,8 @@ const BOARD = [
   { id: "ticketing",    metric: "50-75 tickets/wk" },
   { id: "registration", metric: "live for 2026-27 intake" },
   { id: "app-gallery",  metric: "reviewed before publish" },
+  { id: "video-library", metric: "reviewed before students" },
+  { id: "distribution-groups", metric: "0 students on staff lists" },
   { id: "discord-bot",  metric: "24/7 uptime" },
   { id: "jellyfin-push", metric: "unattended" },
   { id: "homelab",      metric: "self-hosted" },
@@ -610,7 +612,9 @@ const PROJECTS = [
       "Each app is its own web origin, so one app can't read another's saved data or the gallery's session",
       "Microsoft sign-in with Staff and Reviewer app roles, checked by the app itself as well as by Entra",
       "Worked within the MDM-managed firewall, which only admits Apple-signed listeners, by fronting the service with the web server built into macOS",
-      "Traced an intermittent Chrome certificate error to handshake ordering in the server's TLS library, and fixed it with one certificate covering the gallery and every app address"
+      "Traced an intermittent Chrome certificate error to handshake ordering in the server's TLS library, and fixed it with one certificate covering the gallery and every app address",
+      "Every upload posts a card to the IT Teams channel with the app, the teacher, and the automatic report's findings, linking straight to the review queue",
+      "Now also hosts the Classroom Video Library, sharing its sign-in, review queue, and deploy"
     ],
     operations: [
       "Source: district GitHub org; the deploy script runs the test suite before shipping to the server",
@@ -625,6 +629,33 @@ const PROJECTS = [
       { type: "img", src: "assets/app-gallery-review.png", caption: "Review queue: the automatic report flags a password box and an off-site form" },
       { type: "img", src: "assets/app-gallery-signin.png", caption: "Sign-in page for anyone not signed in as staff" }
     ]
+  },
+  {
+    id: "video-library",
+    name: "Classroom Video Library",
+    category: "district",
+    status: "live",
+    period: "2026",
+    tagline: "Teachers paste a YouTube or Vimeo link; students watch a reviewed copy served from our own network.",
+    summary: "With YouTube headed toward being blocked for students, teachers still need to show classroom videos. I built a library inside the Teacher App Gallery: a teacher pastes a YouTube or Vimeo link and confirms its classroom use, a background worker downloads a copy to the server, and a reviewer approves it before any student can see it. Teachers group videos into collections and share one link; students open it without signing in and watch from a district-hosted address. Built in five staged releases, each deployed and verified before the next.",
+    stack: ["Node.js", "SQLite", "yt-dlp", "ffmpeg", "Caddy", "launchd", "Microsoft Teams (Power Automate)"],
+    impact: [
+      "Every request records who submitted it and their stated classroom use",
+      "Reviewer approval required before students see a video, in the same queue as app uploads, with a Teams card when one is waiting",
+      "Background worker downloads one video at a time with caps on resolution, file size, and length; retries temporary failures on a backoff and alerts Teams when a download gives up",
+      "Collections: teachers order videos by hand and share one link; students see only approved videos, and re-sharing retires the old link",
+      "Videos stream from their own address with seeking; only the video and its poster image are served, never the stored metadata",
+      "The downloader updates itself daily and runs a test download, so a change on YouTube's side raises a Teams alert before a teacher notices",
+      "Reviewer health page: disk used and free, counts by status, failed downloads with reasons, bulk retry, and cleanup of removed videos after 30 days"
+    ],
+    operations: [
+      "Source: same district GitHub repo as the App Gallery; the test suite runs before every deploy",
+      "The download worker and downloader updater run as their own boot services and restart on their own",
+      "Data: video files on the server disk alongside the gallery database; automated backups not yet set up",
+      "Student rollout waits on district sign-off for downloading and a web-filter allow rule for the video address",
+      "Runbook: README.md in the repo"
+    ],
+    media: []
   },
   {
     id: "mac-cluster",
@@ -651,6 +682,75 @@ const PROJECTS = [
       "Single operator so far; shared ownership planned as the team comes on",
       "Runbook: docs/HEAD_NODE_DEPLOYMENT.md in the repo"
     ]
+  },
+  {
+    id: "distribution-groups",
+    name: "Dynamic Staff Distribution Groups",
+    category: "district",
+    status: "live",
+    period: "2026",
+    tagline: "Rule-based staff mailing lists in Exchange Online that keep themselves current, with no students on them.",
+    summary: "The existing rule-based staff groups were reaching only a fraction of staff, because the directory fields they filtered on are free text with many spellings. I audited every mailbox with read-only PowerShell, then built new dynamic groups that match every spelling in use rather than editing the source data, which other systems depend on. The result is a district-wide staff list and one per building, followed by building-by-role lists for faculty, clerical, and operations staff.",
+    stack: ["Exchange Online", "PowerShell", "Microsoft Graph", "Active Directory"],
+    impact: [
+      "Audit first, change nothing: every audit script is read-only",
+      "Found the old district staff group was reaching roughly one in ten staff",
+      "Verified zero student accounts on any new staff list before creating it",
+      "District-wide and building lists are hidden from the address book, require sign-in to send, and accept mail only from a short list of approved senders",
+      "Caught that Exchange accepts some filters in preview but rejects them at creation, and moved to validating every filter with a dry-run create",
+      "Surfaced disabled accounts still holding licenses, for a separate cleanup",
+      "Next: badge-access security groups for each building, built from directory OUs and ready for review"
+    ],
+    operations: [
+      "Scripts: PowerShell audit, creation, and verification scripts with dry run on by default",
+      "A check script confirms no student addresses on staff lists; run it before any district-wide send",
+      "Old groups left untouched until the replacements are tested",
+      "Runbook: not yet written"
+    ],
+    media: []
+  },
+  {
+    id: "content-caching",
+    name: "Apple Content Caching Recovery",
+    category: "district",
+    status: "live",
+    period: "2026",
+    tagline: "Got the district's Mac caching servers back to being clients' preferred source during a macOS update slowdown.",
+    summary: "When a macOS update was slowing the district network, I checked whether our three Apple caching servers were keeping that traffic local. Clients rated all three as unfavored, two of the three disks were full and evicting content, and one server had silently lost its MDM caching profile. I measured throughput on each server, added the DNS records Apple uses for cache discovery, and traced the missing profile to the MDM side. After the profile assignment was reset, clients found all three caches as favored.",
+    stack: ["macOS Content Caching", "Mosyle MDM", "DNS", "Bash"],
+    impact: [
+      "Each cache serves 13-15x the data it pulls from Apple",
+      "Measured per-server throughput during the slowdown, ruling the caches out as the main internet consumer",
+      "Added Apple's DNS discovery records for the district's public addresses and cache servers",
+      "Traced a missing profile to the MDM never sending the install, although the server checked in normally",
+      "Documented Apple's caching settings, including those that can only be set locally, ahead of a custom caching profile"
+    ],
+    operations: [
+      "Settings come from an MDM profile, never changed locally on the servers",
+      "A reusable script pings and port-checks all three caches",
+      "Next: per-building cache preference once each building's client subnets are mapped"
+    ],
+    media: []
+  },
+  {
+    id: "teacher-games",
+    name: "Teacher Game Hosting",
+    category: "district",
+    status: "live",
+    period: "2026",
+    tagline: "Teacher-built escape room games published on district web addresses.",
+    summary: "Two teachers built self-contained HTML escape rooms for their classes. I published each as its own Cloudflare Pages site on a district subdomain, with the teacher's file left exactly as they wrote it. The games run entirely in the browser, so no student answers are collected or stored anywhere.",
+    stack: ["Cloudflare Pages", "Pages Functions", "DNS"],
+    impact: [
+      "Each game gets its own district web address with an automatic certificate",
+      "The default Cloudflare address redirects to the district one, so students only ever see the district name",
+      "Checked each file before publishing: no forms, network calls, or saved data"
+    ],
+    operations: [
+      "Hosting: district Cloudflare account, one Pages project per game",
+      "Redeploy is a single command per game"
+    ],
+    media: []
   },
   {
     id: "discord-bot",
