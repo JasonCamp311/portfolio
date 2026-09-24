@@ -522,6 +522,7 @@ const BOARD = [
   { id: "discord-bot",  metric: "24/7 uptime" },
   { id: "jellyfin-push", metric: "unattended" },
   { id: "homelab",      metric: "self-hosted" },
+  { id: "adguard-dns",  metric: "encrypted DNS, 2 resolvers" },
   { id: "mac-cluster",  metric: "on-prem inference" },
 ];
 
@@ -1067,6 +1068,62 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
       "Secure remote access via Tailscale, nothing exposed to the open internet"
     ],
     media: []
+  },
+  {
+    id: "adguard-dns",
+    name: "Encrypted DNS + Ad Blocking",
+    category: "personal",
+    status: "live",
+    period: "2026 - present",
+    tagline: "Every device in the house (and every one of my devices anywhere) resolves through AdGuard Home over DNS-over-HTTPS, with ~650k ad and tracker rules.",
+    summary: "AdGuard Home runs as a rootless Podman quadlet on the Fedora server and is the resolver for the LAN and for my Tailscale devices. Upstream lookups go to Quad9 and Cloudflare over DNS-over-HTTPS, so the ISP no longer sees or resolves any query. Three blocklists (AdGuard DNS, OISD Big, HaGeZi Pro) remove ad and tracking domains for every phone, TV and laptop with zero client setup. A second instance on the Synology NAS, kept in sync every ten minutes, is the failover so a server reboot never takes the house offline. The whole thing was configured through AdGuard's REST API rather than the setup wizard, so it is reproducible.",
+    stack: ["AdGuard Home", "Podman quadlet", "DNS-over-HTTPS", "Quad9 / Cloudflare", "firewalld", "Tailscale", "Synology"],
+    impact: [
+      "ISP-visible DNS logs eliminated: every upstream query is encrypted",
+      "~650k blocked domains across three curated lists, 4-5 ms average resolution",
+      "Rootless container binding port 53 via a scoped sysctl, not a root container",
+      "Real client IPs in the query log (host networking), so per-device visibility is intact",
+      "Two resolvers handed out by DHCP so a single-box reboot is not an outage"
+    ],
+    media: [],
+    code: {
+      lang: "ini",
+      label: "adguard.container — the whole service is one quadlet, configured afterward via the API",
+      source: `[Unit]
+Description=AdGuard Home (LAN + tailnet DNS, ad/tracker blocking, DoH upstream)
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Container]
+Image=docker.io/adguard/adguardhome:latest
+ContainerName=adguard
+AutoUpdate=registry
+# host network: binds the LAN, Tailscale and loopback addresses itself
+# (a wildcard :53 collides with systemd-resolved) and sees real client IPs
+Network=host
+Volume=%h/adguard/work:/opt/adguardhome/work:Z
+Volume=%h/adguard/conf:/opt/adguardhome/conf:Z
+Exec=--no-check-update -c /opt/adguardhome/conf/AdGuardHome.yaml -w /opt/adguardhome/work --web-addr 0.0.0.0:3053
+Environment=TZ=America/New_York
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
+
+# Rootless, yet it owns port 53:
+#   /etc/sysctl.d/70-adguard-unprivileged-dns.conf -> net.ipv4.ip_unprivileged_port_start = 53
+# Upstreams, lists and retention were then set with curl against /control/dns_config,
+# /control/filtering/add_url and /control/querylog/config/update, so the build is a script, not clicks.`
+    },
+    operations: [
+      "Primary on the Fedora server (rootless quadlet, auto-updated nightly); replica on the Synology NAS via Container Manager, synced with adguardhome-sync every 10 minutes",
+      "Router DHCP hands out both resolvers; Tailscale's global nameserver points my own devices at the Fedora instance when away from home",
+      "firewalld: port 53 opened only on the LAN and Tailscale zones; the admin UI is LAN-only",
+      "Upstreams: Quad9 + Cloudflare DoH, bootstrap by IP, TLS fallback; query log 7 days, stats 30 days"
+    ]
   },
   {
     id: "inference-platform",
