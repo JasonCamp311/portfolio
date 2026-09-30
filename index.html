@@ -153,7 +153,7 @@
   }
   .top-inner{
     display:flex;align-items:center;justify-content:space-between;
-    padding:16px 0;gap:16px;flex-wrap:wrap;
+    padding:16px 24px;gap:16px;flex-wrap:wrap;
   }
   .brand{display:flex;align-items:center;gap:10px}
   .brand .name{font-family:"Archivo",sans-serif;font-weight:800;font-size:16px;
@@ -206,7 +206,7 @@
   /* ---------- system board (signature) ---------- */
   .board{margin:44px 0 8px}
   .board-head{
-    display:flex;justify-content:space-between;align-items:baseline;
+    display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px 16px;
     font-family:"IBM Plex Mono",monospace;font-size:12.5px;
     text-transform:uppercase;letter-spacing:.12em;color:var(--slate);
     margin-bottom:10px;
@@ -214,24 +214,70 @@
   .board-panel{
     border-top:2px solid var(--rule);
   }
-  .board-row{
-    display:grid;grid-template-columns:36px 14px 1fr auto;gap:14px;align-items:center;
-    padding:15px 4px;border-bottom:1px solid var(--line);
-    text-decoration:none;color:inherit;
-    opacity:0;transform:translateY(6px);
-    animation:rise .5s ease forwards;
-    animation-delay:calc(var(--i) * 90ms);
+  /* The board is drawn as rack elevations: one rack per category, one
+     2U unit per system, U numbers on the left rail (they count up from
+     the floor, like a real rack). Only the status LEDs carry color. */
+  .board .board-panel{border-top:none}
+  .racks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:22px 28px}
+  .rack-cap{
+    display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+    padding-bottom:8px;
   }
-  .board-row .idx{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--slate);opacity:.6}
-  .board-row:hover{background:var(--accent-soft)}
-  .board-row .sname{font-weight:700}
-  .board-row .sdesc{color:var(--slate);font-size:14px}
-  .board-row .smetric{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--slate);text-align:right;white-space:nowrap}
-  .sdot{width:9px;height:9px;border-radius:50%}
-  .sdot.live{background:var(--ok)}
-  .sdot.build{background:var(--build)}
-  .sdot.design{background:transparent;border:2px solid var(--design);width:7px;height:7px}
+  .rack-cap .rname{font-family:"Archivo",sans-serif;font-weight:800;font-size:17px;letter-spacing:-.005em}
+  .rack-cap .rmeta{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--slate)}
+  .rack-frame{
+    display:grid;grid-template-columns:34px 1fr 16px;
+    border:2px solid var(--rule);border-width:9px 2px;
+    background:var(--paper);position:relative;
+  }
+  .rack-frame::after{ /* feet */
+    content:"";position:absolute;left:10px;right:10px;bottom:-15px;height:6px;
+    background:linear-gradient(90deg,var(--rule) 0 26px,transparent 26px calc(100% - 26px),var(--rule) calc(100% - 26px));
+  }
+  .rail{
+    background:
+      repeating-linear-gradient(to bottom,transparent 0 6px,var(--line) 6px 10px,transparent 10px 16px)
+      right 4px top 0/4px 100% no-repeat;
+  }
+  .rail.l{border-right:1px solid var(--line)}
+  .rail.r{border-left:1px solid var(--line);background-position:center top}
+  .rail span{
+    display:block;height:32px;line-height:32px;padding-left:5px;
+    font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--slate);opacity:.75;
+  }
+  .unit{
+    display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:12px;align-items:center;
+    height:64px;padding:0 12px 0 10px;
+    background:var(--panel);border-bottom:1px solid var(--line);
+    text-decoration:none;color:inherit;position:relative;
+    transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s ease;
+  }
+  .unit:last-child{border-bottom:none}
+  a.unit:hover,a.unit:focus-visible{transform:translateX(10px);box-shadow:0 6px 18px var(--shadow);z-index:1}
+  a.unit:focus-visible{outline-offset:-2px}
+  .u-leds{display:flex;flex-direction:column;gap:7px;align-items:center}
+  .led{width:6px;height:6px;border-radius:50%;background:var(--line);transition:background .25s ease,box-shadow .25s ease}
+  .racks.on .unit .led.pwr{transition-delay:calc(var(--i) * 85ms)}
+  .racks.on .unit.live .pwr{background:var(--ok);box-shadow:0 0 6px var(--ok)}
+  .racks.on .unit.build .pwr{background:var(--build);box-shadow:0 0 6px var(--build);animation:ledbuild 1.8s steps(1) infinite calc(var(--i) * 85ms + .6s)}
+  .racks.on .unit.design .pwr{background:transparent;box-shadow:inset 0 0 0 1.5px var(--design)}
+  .racks.on .unit.live .act.lit{background:var(--ok);box-shadow:0 0 4px var(--ok);transition:none}
+  @keyframes ledbuild{50%{background:var(--line);box-shadow:none}}
   @keyframes rise{to{opacity:1;transform:none}}
+  .u-body{min-width:0;display:flex;flex-direction:column;gap:1px}
+  .u-name{font-family:"Archivo",sans-serif;font-weight:700;font-size:15px;letter-spacing:-.005em;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .u-tag{font-size:13px;color:var(--slate);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .u-lcd{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;line-height:1.3;max-width:128px;
+    background:var(--terminal);color:var(--terminal-ink);padding:5px 8px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 1px 6px rgba(0,0,0,.5);
+  }
+  .unit.blank{display:block;background:var(--panel)}
+  .unit.blank::before{ /* vent slots on a blanking panel */
+    content:"";position:absolute;inset:20px 18% 20px 40px;opacity:.7;
+    background:repeating-linear-gradient(90deg,var(--line) 0 2px,transparent 2px 9px);
+  }
 
   /* ---------- proposed next (roadmap) ---------- */
   .roadmap{margin:36px 0 8px}
@@ -353,6 +399,46 @@
   .code-label{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--slate);margin-bottom:8px}
   .d-links{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}
 
+  /* ---------- motion layer ----------
+     Vanilla ports of React Bits (DotGrid, DecryptedText, CountUp) and
+     Aceternity UI (GlowingEffect, CardSpotlight), tinted with the page
+     tokens instead of their stock purple/rainbow. Wired up at the end
+     of the script; everything degrades to the static page. */
+  .hero{position:relative;isolation:isolate}
+  .dotgrid{
+    position:absolute;z-index:-1;top:0;bottom:0;left:50%;
+    width:100vw;height:100%;transform:translateX(-50%);
+    pointer-events:none;
+    -webkit-mask-image:radial-gradient(ellipse 75% 85% at 78% 38%,#000 25%,transparent 78%);
+            mask-image:radial-gradient(ellipse 75% 85% at 78% 38%,#000 25%,transparent 78%);
+  }
+  body{overflow-x:clip}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+  .decrypt .enc{color:var(--slate);opacity:.55}
+  .metric .num{font-variant-numeric:tabular-nums}
+
+  .card{position:relative;isolation:isolate;--start:0;--active:0;--spread:55;--glow:var(--accent)}
+  .card:has(.badge.live){--glow:var(--ok)}
+  .card:has(.badge.build){--glow:var(--build)}
+  .card::before{ /* CardSpotlight */
+    content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+    background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%),var(--accent-soft),transparent 72%);
+    opacity:0;transition:opacity .3s ease;
+  }
+  .card:hover::before{opacity:1}
+  .card::after{ /* GlowingEffect: a conic arc of the border that tracks the pointer */
+    content:"";position:absolute;inset:-3px -1px -1px -1px;padding:2px;pointer-events:none;
+    background:conic-gradient(from calc((var(--start) - var(--spread)) * 1deg),
+      transparent 0deg,
+      var(--glow) calc(var(--spread) * .7deg),
+      var(--accent) calc(var(--spread) * 1.3deg),
+      transparent calc(var(--spread) * 2deg));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;
+            mask-composite:exclude;
+    opacity:var(--active);transition:opacity .3s ease;
+  }
+
   /* ---------- footer ---------- */
   footer{
     background:var(--terminal);color:var(--terminal-ink);
@@ -369,13 +455,13 @@
     .metric:not(:first-child){padding-left:0}
   }
   @media (max-width:640px){
-    .board-row{grid-template-columns:28px 12px 1fr}
-    .board-row .smetric{display:none}
+    .u-lcd{display:none}
+    .unit{grid-template-columns:22px minmax(0,1fr)}
     .hero{padding-top:44px}
   }
   @media (prefers-reduced-motion: reduce){
     *{animation:none !important;transition:none !important}
-    .board-row{opacity:1;transform:none}
+    .roadmap-row{opacity:1;transform:none}
   }
   @media print{
     /* Force the light palette on paper regardless of the on-screen theme. */
@@ -391,7 +477,7 @@
     header.top{border-bottom:1px solid #000;background:#fff}
     .top-inner{padding:6px 0}
     /* hidden on paper */
-    .top-links,.theme-toggle,.filters,footer,dialog,
+    .top-links,.theme-toggle,.filters,footer,dialog,.dotgrid,
     .board,.grid,.shot,.media-grid{display:none !important}
     .hero{padding:14px 0 8px}
     h1{font-size:24pt;max-width:none}
@@ -446,8 +532,9 @@
 
 <main class="wrap">
   <section class="hero">
+    <canvas class="dotgrid" aria-hidden="true"></canvas>
     <p class="eyebrow"><b>Jason Camp</b> · Technology Supervisor · Acture Solutions</p>
-    <h1>Systems that ship <span class="accent">and stay running.</span></h1>
+    <h1>Systems that ship <span class="accent" id="decrypt">and stay running.</span></h1>
     <p class="lede">
       I build and operate production software and infrastructure for a K-12 school district:
       replacing legacy vendor systems with modern serverless apps, automating manual workflows,
@@ -499,7 +586,7 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-09-23";
+const LAST_UPDATED = "2026-09-29";
 
 /* Hero metrics strip. Keep numbers honest and current.
    num may be a string, or a function of the project pool the board is
@@ -1172,13 +1259,36 @@ const byId = Object.fromEntries(PROJECTS.map(p => [p.id, p]));
 const boardRows = BOARD
   .map(row => ({ row, p: byId[row.id] }))
   .filter(({ p }) => p && (!DISTRICT_VIEW || isDistrict(p)));
-$("#board").innerHTML = boardRows.map(({ row, p }, i) => `<a class="board-row" style="--i:${i}" href="#" data-open="${p.id}">
-    <span class="idx" aria-hidden="true">${String(i+1).padStart(2,"0")}</span>
-    <span class="sdot ${p.status}" aria-hidden="true"></span>
-    <span><span class="sname">${esc(p.name)}</span>
-      <span class="sdesc"> · ${esc(p.tagline)}</span></span>
-    <span class="smetric">${esc(row.metric)}</span>
-  </a>`).join("");
+/* One rack per category, BOARD order top to bottom, 2U per system.
+   Racks share a height (the fullest rack plus one blanking panel) so
+   their tops and feet line up; spare space is filled with blanks. */
+const RACKS = [
+  { key: "district", label: "District" },
+  { key: "personal", label: "Home lab" },
+].map(r => ({ ...r, rows: boardRows.filter(({ p }) => p.category === r.key) }))
+ .filter(r => r.rows.length);
+const RACK_U = Math.max(...RACKS.map(r => r.rows.length)) * 2 + 2;
+let unitIdx = 0;
+$("#board").innerHTML = `<div class="racks">${RACKS.map(r => {
+  const blanks = (RACK_U - r.rows.length * 2) / 2;
+  const units = r.rows.map(({ row, p }) => `<a class="unit ${p.status}" style="--i:${unitIdx++}" href="#" data-open="${p.id}" title="${esc(p.name)}: ${esc(p.tagline)}">
+      <span class="u-leds" aria-hidden="true"><i class="led pwr"></i><i class="led act"></i></span>
+      <span class="u-body"><span class="u-name">${esc(p.name)}</span>
+        <span class="u-tag">${esc(p.tagline)}</span></span>
+      <span class="u-lcd">${esc(row.metric)}</span>
+      <span class="sr-only">${esc(STATUS[p.status].label)}</span>
+    </a>`).join("") + `<div class="unit blank" aria-hidden="true"></div>`.repeat(blanks);
+  const uMarks = Array.from({ length: RACK_U }, (_, k) => `<span>${RACK_U - k}</span>`).join("");
+  return `<figure class="rack">
+    <figcaption class="rack-cap"><span class="rname">${esc(r.label)}</span>
+      <span class="rmeta">${r.rows.length} systems · ${RACK_U}U</span></figcaption>
+    <div class="rack-frame">
+      <div class="rail l" aria-hidden="true">${uMarks}</div>
+      <div class="rack-units">${units}</div>
+      <div class="rail r" aria-hidden="true"></div>
+    </div>
+  </figure>`;
+}).join("")}</div>`;
 const liveCount = countPool.filter(p => p.status === "live").length;
 $("#board-count").textContent = `${countPool.length} systems · ${liveCount} in production`;
 
@@ -1365,6 +1475,228 @@ $("#print-sheet").innerHTML = `<div class="sec-label">District systems</div>` +
     apply();
   });
   if (mq.addEventListener) mq.addEventListener("change", () => { if (!stored()) apply(); });
+})();
+
+/* Motion layer. Vanilla ports of React Bits (DotGrid, DecryptedText,
+   CountUp) and Aceternity UI (GlowingEffect, CardSpotlight), reading
+   colors from the page tokens so both themes stay in palette. Under
+   prefers-reduced-motion the dot grid draws once and nothing animates. */
+(function motionLayer(){
+  const root = document.documentElement;
+  const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const rgb = (v) => {
+    const m = v.trim().match(/^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i);
+    return m ? m.slice(1).map(x => parseInt(x, 16)) : [128, 128, 128];
+  };
+  let tok;
+  const readTokens = () => {
+    const cs = getComputedStyle(root);
+    tok = { line: rgb(cs.getPropertyValue("--line")), accent: rgb(cs.getPropertyValue("--accent")) };
+  };
+  readTokens();
+
+  /* DotGrid: dots warm toward the accent near the cursor, get shoved by
+     fast moves, and a click in the hero sends a shockwave. GSAP's
+     InertiaPlugin is swapped for a damped spring. */
+  (function dotGrid(){
+    const canvas = $(".dotgrid"), hero = $(".hero");
+    if (!canvas || !canvas.getContext) return;
+    const ctx = canvas.getContext("2d");
+    const DOT = 2.5, GAP = 22, PROX = 150, SHOCK = 240;
+    const ptr = { x: -1e4, y: -1e4, lx: 0, ly: 0, lt: 0 };
+    let dots = [], w = 0, h = 0, raf = 0, onScreen = true;
+
+    function build(){
+      const r = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+      w = r.width; h = r.height;
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const cell = DOT + GAP;
+      const cols = Math.floor((w + GAP) / cell), rows = Math.floor((h + GAP) / cell);
+      const sx = (w - (cell * cols - GAP)) / 2 + DOT / 2, sy = (h - (cell * rows - GAP)) / 2 + DOT / 2;
+      dots = [];
+      for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++)
+        dots.push({ cx: sx + x * cell, cy: sy + y * cell, ox: 0, oy: 0, vx: 0, vy: 0 });
+      draw();
+    }
+    function draw(){
+      ctx.clearRect(0, 0, w, h);
+      const [br, bg, bb] = tok.line, [ar, ag, ab] = tok.accent;
+      for (const d of dots){
+        const dx = d.cx - ptr.x, dy = d.cy - ptr.y, dsq = dx * dx + dy * dy;
+        const t = dsq < PROX * PROX ? 1 - Math.sqrt(dsq) / PROX : 0;
+        ctx.fillStyle = `rgb(${br + (ar - br) * t | 0},${bg + (ag - bg) * t | 0},${bb + (ab - bb) * t | 0})`;
+        ctx.beginPath();
+        ctx.arc(d.cx + d.ox, d.cy + d.oy, DOT / 2 + t * 1.25, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    function tick(){
+      raf = 0;
+      let moving = false;
+      for (const d of dots){
+        d.vx = (d.vx - d.ox * 0.055) * 0.87;
+        d.vy = (d.vy - d.oy * 0.055) * 0.87;
+        d.ox += d.vx; d.oy += d.vy;
+        if (Math.abs(d.ox) + Math.abs(d.oy) + Math.abs(d.vx) + Math.abs(d.vy) > 0.05) moving = true;
+      }
+      draw();
+      const near = ptr.x > -PROX && ptr.x < w + PROX && ptr.y > -PROX && ptr.y < h + PROX;
+      if ((moving || near) && onScreen && !document.hidden) wake();
+    }
+    function wake(){ if (!REDUCE && !raf) raf = requestAnimationFrame(tick); }
+    function push(cx, cy, radius, strength, vx = 0, vy = 0){
+      for (const d of dots){
+        const dx = d.cx - cx, dy = d.cy - cy, dist = Math.hypot(dx, dy) || 1;
+        if (dist > radius) continue;
+        const f = (1 - dist / radius) * strength;
+        d.vx += (dx / dist) * f + vx; d.vy += (dy / dist) * f + vy;
+      }
+    }
+
+    window.addEventListener("pointermove", (e) => {
+      const r = canvas.getBoundingClientRect(), now = performance.now();
+      const dt = Math.max(8, now - (ptr.lt || now - 16));
+      const vx = (e.clientX - ptr.lx) / dt * 1000, vy = (e.clientY - ptr.ly) / dt * 1000;
+      const speed = Math.min(Math.hypot(vx, vy), 5000);
+      Object.assign(ptr, { x: e.clientX - r.left, y: e.clientY - r.top, lx: e.clientX, ly: e.clientY, lt: now });
+      if (REDUCE) return;
+      if (speed > 400) push(ptr.x, ptr.y, PROX * .8, speed / 900, vx * 0.0006, vy * 0.0006);
+      wake();
+    }, { passive: true });
+    hero.addEventListener("click", (e) => {
+      if (REDUCE) return;
+      const r = canvas.getBoundingClientRect();
+      push(e.clientX - r.left, e.clientY - r.top, SHOCK, 11);
+      wake();
+    });
+    if ("IntersectionObserver" in window)
+      new IntersectionObserver(([en]) => { onScreen = en.isIntersecting; if (onScreen) wake(); }).observe(canvas);
+    if ("ResizeObserver" in window) new ResizeObserver(build).observe(hero);
+    else window.addEventListener("resize", build);
+    new MutationObserver(() => { readTokens(); draw(); })
+      .observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+    matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => { readTokens(); draw(); });
+    build();
+  })();
+
+  /* DecryptedText: the accent phrase resolves left to right on load and
+     rescrambles briefly on hover. Screen readers get the plain text. */
+  (function decrypt(){
+    const el = $("#decrypt");
+    if (!el || REDUCE) return;
+    const text = el.textContent;
+    const pool = "abcdefghijklmnopqrstuvwxyz";
+    el.classList.add("decrypt");
+    el.innerHTML = `<span class="sr-only">${esc(text)}</span><span aria-hidden="true"></span>`;
+    const out = el.lastChild;
+    const paint = (revealed) => {
+      out.innerHTML = [...text].map((c, i) =>
+        c === " " || revealed(i) ? esc(c)
+          : `<span class="enc">${pool[Math.random() * pool.length | 0]}</span>`).join("");
+    };
+    let timer = 0;
+    function run(sequential){
+      clearInterval(timer);
+      let n = 0;
+      const steps = sequential ? text.length : 9;
+      timer = setInterval(() => {
+        n++;
+        paint(sequential ? (i) => i < n : () => n >= steps);
+        if (n >= steps) clearInterval(timer);
+      }, sequential ? 48 : 45);
+    }
+    paint(() => false);
+    setTimeout(() => run(true), 350);
+    el.addEventListener("mouseenter", () => run(false));
+  })();
+
+  /* CountUp: every number inside a hero metric counts up from zero,
+     keeping the surrounding text ("$", "k/yr", "-node") in place. */
+  (function countUp(){
+    if (REDUCE) return;
+    const nums = [...document.querySelectorAll(".metric .num")];
+    const DUR = 1600, ease = (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+    const jobs = nums.map(el => ({ el, final: el.textContent }));
+    const start = performance.now();
+    (function frame(now){
+      const t = Math.min(1, (now - start) / DUR);
+      for (const j of jobs)
+        j.el.textContent = j.final.replace(/\d+/g, (d) => String(Math.round(+d * ease(t))));
+      if (t < 1) requestAnimationFrame(frame);
+    })(start);
+  })();
+
+  /* Rack power-on: the first time the board scrolls into view, power
+     LEDs come up top to bottom. After that, live units' activity LEDs
+     flicker irregularly, and only while the racks are on screen. */
+  (function racks(){
+    const el = $(".racks");
+    if (!el) return;
+    if (REDUCE || !("IntersectionObserver" in window)) { el.classList.add("on"); return; }
+    const acts = [...el.querySelectorAll(".unit.live .act")];
+    let visible = false, timer = 0;
+    function flicker(){
+      for (const a of acts) a.classList.toggle("lit", Math.random() < (a.classList.contains("lit") ? 0.45 : 0.12));
+    }
+    new IntersectionObserver(([en]) => {
+      visible = en.isIntersecting;
+      if (visible && !el.classList.contains("on")) {
+        el.classList.add("on");
+        const settle = acts.length * 85 + 700;
+        setTimeout(() => { if (visible && !timer) timer = setInterval(flicker, 110); }, settle);
+        return;
+      }
+      if (visible && !timer && el.classList.contains("on")) timer = setInterval(flicker, 110);
+      if (!visible && timer) { clearInterval(timer); timer = 0; acts.forEach(a => a.classList.remove("lit")); }
+    }, { rootMargin: "0px 0px -35% 0px" }).observe(el);
+  })();
+
+  /* GlowingEffect + CardSpotlight: a conic arc of each card's border
+     turns to face the pointer (status-colored: green live, amber in
+     build), and a soft accent spotlight follows it inside the card. */
+  (function glow(){
+    const grid = $("#grid");
+    const PROXIMITY = 64, EASE = 0.12;
+    const state = new WeakMap();
+    let raf = 0;
+    function animate(){
+      raf = 0;
+      let again = false;
+      for (const card of grid.children){
+        const s = state.get(card);
+        if (!s) continue;
+        const diff = s.target - s.angle;
+        s.angle = REDUCE || Math.abs(diff) < 0.2 ? s.target : s.angle + diff * EASE;
+        card.style.setProperty("--start", s.angle.toFixed(2));
+        if (s.angle !== s.target) again = true;
+      }
+      if (again) raf = requestAnimationFrame(animate);
+    }
+    function update(x, y){
+      for (const card of grid.children){
+        const r = card.getBoundingClientRect();
+        const active = x > r.left - PROXIMITY && x < r.right + PROXIMITY &&
+                       y > r.top - PROXIMITY && y < r.bottom + PROXIMITY;
+        card.style.setProperty("--active", active ? "1" : "0");
+        if (!active) continue;
+        card.style.setProperty("--mx", `${x - r.left}px`);
+        card.style.setProperty("--my", `${y - r.top}px`);
+        const s = state.get(card) || { angle: 0, target: 0 };
+        const target = Math.atan2(y - (r.top + r.height / 2), x - (r.left + r.width / 2)) * 180 / Math.PI + 90;
+        s.target = s.angle + ((((target - s.angle) % 360) + 540) % 360 - 180); /* shortest way round */
+        state.set(card, s);
+      }
+      if (!raf) raf = requestAnimationFrame(animate);
+    }
+    let last = null;
+    document.body.addEventListener("pointermove", (e) => {
+      if (e.pointerType !== "mouse") return;
+      last = [e.clientX, e.clientY];
+      update(...last);
+    }, { passive: true });
+    window.addEventListener("scroll", () => { if (last) update(...last); }, { passive: true });
+  })();
 })();
 </script>
 </body>
