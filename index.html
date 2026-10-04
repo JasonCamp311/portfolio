@@ -586,7 +586,7 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-09-29";
+const LAST_UPDATED = "2026-10-03";
 
 /* Hero metrics strip. Keep numbers honest and current.
    num may be a string, or a function of the project pool the board is
@@ -607,6 +607,8 @@ const BOARD = [
   { id: "video-library", metric: "reviewed before students" },
   { id: "distribution-groups", metric: "0 students on staff lists" },
   { id: "discord-bot",  metric: "24/7 uptime" },
+  { id: "personal-assistant", metric: "daily use" },
+  { id: "media-sharing", metric: "invite-only" },
   { id: "jellyfin-push", metric: "unattended" },
   { id: "homelab",      metric: "self-hosted" },
   { id: "adguard-dns",  metric: "encrypted DNS, 2 resolvers" },
@@ -877,6 +879,56 @@ def _answers_match(user: str, correct: str) -> bool:
     }
   },
   {
+    id: "personal-assistant",
+    name: "Personal Assistant",
+    category: "personal",
+    status: "live",
+    period: "2026 - present",
+    tagline: "Single-owner assistant on a local 14B model, with code that checks the model actually did what it says.",
+    summary: "A private Discord DM assistant running on a local Qwen3 14B model through Ollama: reminders with follow-through, Google Calendar read and write, a morning briefing, saved-for-later items, voice-note transcription, and homelab status. It started as a cog in the community bot and was extracted into its own repo and container so it deploys independently. The interesting engineering is in the loop around the model: small local models claim actions they never took and get date math wrong, so the code resolves dates against the real clock, detects action claims that have no tool call behind them, and replaces an unbacked claim with the actual state.",
+    stack: ["Python", "discord.py", "Ollama / Qwen3 14B", "Function calling", "Google Calendar API", "faster-whisper", "Podman quadlet", "systemd timers"],
+    impact: [
+      "In daily use since September 2026; talks to exactly one user and ignores everyone else",
+      "Relative dates ('tomorrow', 'next Thursday', 'in 20 minutes') are resolved by code, not by the model",
+      "A reply that claims an action with no tool call is nudged twice, then replaced with the real pending list",
+      "Reminders arrive with Done / Snooze buttons and are re-sent if ignored, within waking hours only",
+      "Model chosen by a scored bake-off: six local models run through a 21-turn end-to-end harness at two context sizes",
+      "146 unit tests with Discord, Ollama, and Google all faked; a replay harness pins the date bugs found in real use",
+      "Also the homelab's notification bridge: media requests arrive with Approve / Deny buttons"
+    ],
+    operations: [
+      "Source: GitHub repo; deploy.sh pulls, rebuilds the image, and restarts the service",
+      "Runs as a rootless Podman quadlet under systemd, separate from the community bot",
+      "Watchdog timer polls /healthz every 5 minutes; three misses restart the service and send a push notification",
+      "Status page at /status for a small rack display, refreshed from a one-minute host collector"
+    ],
+    media: [],
+    code: {
+      lang: "python",
+      label: "pa/cog.py — never relay an action the model only talked about",
+      source: `def _claims_action(text: str | None) -> bool:
+    """True when *text* says an action happened or will happen (curly quotes included)."""
+    text = (text or "").replace("\\u2019", "'")
+    return bool(_ACTION_CLAIM_RE.search(text) or _BARE_CLAIM_RE.search(text))
+
+                # ... inside the agent loop, after the model replies:
+                if not used_tools and _claims_action(reply):
+                    if nudges < _MAX_NUDGES:
+                        nudges += 1
+                        logger.info("PA nudge %d: action claimed without tools: %r", nudges, reply[:120])
+                        messages.append({"role": "assistant", "content": reply})
+                        state = "Pending reminders right now:\\n" + self._pending_summary()
+                        messages.append({
+                            "role": "user",
+                            "content": (_NUDGE if nudges == 1 else f"{_NUDGE_HARD}\\n\\nOriginal request: {user_text}")
+                                       + "\\n\\n" + state,
+                        })
+                        continue
+                    # Two nudges and it still only talks about acting: don't relay the false
+                    # claim — show the owner the actual state instead.`
+    }
+  },
+  {
     id: "discord-activity",
     name: "Discord Activity: Game Platform",
     category: "games",
@@ -900,13 +952,17 @@ def _answers_match(user: str, correct: str) -> bool:
     category: "personal",
     status: "build",
     period: "2026",
-    tagline: "Self-hostable watch-party web app anyone can run with Docker Compose.",
-    summary: "A standalone, self-hostable watch-party app: React, Vite, TypeScript, and Three.js on the front, deployed with Docker Compose on Fedora, with coturn providing TURN so it works across real-world NATs. Same problem space as the Discord cinema, but packaged so anyone can run their own instance.",
-    stack: ["React", "Vite", "TypeScript", "Three.js", "Docker Compose", "coturn / WebRTC"],
+    tagline: "Self-hostable 3D watch-party app: pick a film in a walkable video store, then watch it in sync.",
+    summary: "A standalone, self-hostable watch-party app: React, Vite, TypeScript, and react-three-fiber on the front, a Node signaling server, and a self-hosted LiveKit SFU, deployed with Compose on Fedora with coturn providing TURN so it works across real-world NATs. It has three watch modes: the host shares a file or screen over WebRTC, a browser extension syncs each person's own streaming account, or everyone plays their own stream from a Jellyfin server while SyncPlay keeps the room in lockstep. In Jellyfin mode the room opens in a walkable 90s video store built from the library: people pull cases off the shelves, put them on the table, vote, and the whole room walks into the auditorium with the winner queued.",
+    stack: ["React", "Vite", "TypeScript", "Three.js / react-three-fiber", "Node", "LiveKit (WebRTC SFU)", "Jellyfin SyncPlay", "coturn", "Compose"],
     impact: [
-      "One-command self-hosted deployment via Docker Compose",
-      "Own TURN infrastructure for reliable connectivity behind NAT",
-      "Clean separation from the Discord version: same domain, different distribution model"
+      "Three watch modes behind one room model: host share, extension sync, and Jellyfin SyncPlay",
+      "Jellyfin tokens stay in each viewer's browser; the party server never sees them",
+      "Walkable video store generated from the Jellyfin library, with a nominate-and-vote flow that hands the winner to SyncPlay",
+      "Multiple host-picked venues and per-viewer themes, with rigged characters, seat picking, emotes, and chat",
+      "Graphics pipeline: PBR materials, a Blender-baked lightmap for the store, a per-venue post stack, and an automatic quality ladder for weaker GPUs",
+      "One-command self-hosted deployment, with its own TURN infrastructure for guests behind strict NATs",
+      "Served to invited friends over Tailscale on the same host as the media server"
     ],
     media: [
       { type: "img", src: "assets/party-theater.png", caption: "Theater room view" },
@@ -1101,6 +1157,46 @@ scheduleNextPoll(delay);`
     }
   },
   {
+    id: "recipe-book",
+    name: "Family Recipe Book",
+    category: "personal",
+    status: "build",
+    period: "2026",
+    tagline: "An interactive recipe site for my dad's cooking: cook mode, automatic timers, video chapters, and a printable book.",
+    summary: "A family recipe site meant to outlast its hosting: every recipe is one Markdown file, the public site is fully static (Astro), and the interactive parts are small scripts with no framework. A fullscreen cook mode shows one step at a time and keeps the screen awake; any duration written in a step becomes a tap-to-start timer; a step with a timestamp jumps the recipe video to that moment. Around the recipes sits the legacy side: scans of the handwritten cards, audio of the stories, a scrapbook of memories, and a print-ready book with a QR code on every recipe. One small zero-dependency Node service handles the only thing a static site cannot: family members posting their own photos, behind a family code and a moderation queue. The design and features are built and working with sample content; the real recipes are being collected.",
+    stack: ["Astro", "TypeScript", "Markdown content collections", "Node (zero deps)", "Print CSS"],
+    impact: [
+      "Durations in plain recipe text ('simmer 20 minutes', '1 to 1½ hours') become timers automatically, with no markup",
+      "Cook mode: one step per screen, swipe or arrow keys, screen wake lock, remembers finished steps",
+      "Recipe schema is validated at build time, so a typo fails the build instead of publishing a broken page",
+      "Print edition: cover, contents, one recipe per page, and a QR code linking each page to its video",
+      "Family photo posts are held in a moderation queue until approved",
+      "Video originals are kept out of Git by design; the site references them, the archive stores them"
+    ],
+    media: [
+      { type: "img", src: "assets/recipe-book-home.png", caption: "Home page with sample content, captured from the static build" },
+      { type: "img", src: "assets/recipe-book-recipe.png", caption: "Recipe header as an index card, with cook mode one tap away" }
+    ],
+    code: {
+      lang: "typescript",
+      label: "src/lib/steps.ts — turning 'simmer 20 minutes' into a timer",
+      source: `/** Splits text around durations. For a range ("40 to 45 minutes") the timer uses the lower bound. */
+export function parseDurations(text: string): StepSegment[] {
+  const segments: StepSegment[] = [];
+  let cursor = 0;
+  for (const match of text.matchAll(DURATION)) {
+    const seconds = Math.round(toNumber(match[1]) * unitSeconds(match[2]));
+    if (seconds <= 0) continue;
+    if (match.index > cursor) segments.push({ text: text.slice(cursor, match.index) });
+    segments.push({ text: match[0], seconds });
+    cursor = match.index + match[0].length;
+  }
+  if (cursor < text.length) segments.push({ text: text.slice(cursor) });
+  return segments;
+}`
+    }
+  },
+  {
     id: "jellyfin-push",
     name: "Jellyfin Push Pipeline",
     category: "personal",
@@ -1137,6 +1233,53 @@ $lastYear = $years[$years.Count - 1]
 $year     = [int]$lastYear.Value
 $titleRaw = $work.Substring(0, $lastYear.Index)
 $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Trim().ToLower()))`
+    }
+  },
+  {
+    id: "media-sharing",
+    name: "Invite-Only Media Sharing",
+    category: "personal",
+    status: "live",
+    period: "2026 - present",
+    tagline: "The home media server shared with friends over Tailscale, with nothing exposed to the open internet.",
+    summary: "Opening the home Jellyfin server to a handful of friends without opening a port. The server is shared machine-by-machine through Tailscale, and the tailnet policy limits share recipients to three HTTPS ports on that one host: the media server, a request site, and Party Theater. Friends request titles on the request site; each request lands in a Discord channel with Approve and Deny buttons. A read-only status page shows them free space, recent additions, and failures without exposing any admin interface. The repo is the runbook: add a friend, revoke one, rotate the share, recover after a reinstall.",
+    stack: ["Tailscale (grants policy, serve)", "Jellyfin", "Seerr", "Podman quadlets", "Python (stdlib)", "systemd timers"],
+    impact: [
+      "Friends reach three HTTPS services and nothing else; tailnet members keep full access",
+      "TLS from Tailscale-issued certificates, with no public DNS record and no port forward",
+      "Onboarding and offboarding are one script each: account created with library restrictions, or disabled with history kept",
+      "Requests are approved from a Discord button; trusted users can be switched to auto-approve",
+      "Status page serves a sanitized, cached snapshot: no keys, no paths, no admin links",
+      "Curated collections (new releases, just added, seasonal) rebuilt hourly by a timer",
+      "Friend-facing setup guide per platform, plus a roll-out test checklist"
+    ],
+    operations: [
+      "Source: GitHub repo holding the quadlets, tailnet policy, scripts, and runbook",
+      "Policy changes are edited in the repo first, then applied in the Tailscale admin console",
+      "Revoking access is immediate: remove the share, disable the account",
+      "Runbook: README.md in the repo, with a dated status log"
+    ],
+    media: [],
+    code: {
+      lang: "json",
+      label: "tailscale/policy.hujson — what a share recipient can reach",
+      source: `"grants": [
+	// Everyone who is a member of this tailnet: unchanged, full access.
+	{"src": ["autogroup:member"], "dst": ["*"], "ip": ["*"]},
+
+	// Share recipients: Jellyfin + Seerr over HTTPS on fedora, nothing else.
+	{"src": ["autogroup:shared"], "dst": ["fedora"], "ip": ["443", "8443", "8444"]},
+],
+
+// Tailscale SSH: members may SSH into their own devices, in check mode.
+"ssh": [
+	{
+		"action": "check",
+		"src":    ["autogroup:member"],
+		"dst":    ["autogroup:self"],
+		"users":  ["autogroup:nonroot", "root"],
+	},
+],`
     }
   },
   {
@@ -1216,16 +1359,23 @@ WantedBy=default.target
     id: "inference-platform",
     name: "Hybrid Inference Platform",
     category: "personal",
-    status: "design",
-    period: "2026 - planned",
+    status: "build",
+    period: "2026",
     tagline: "Local GPU serving with an AWS burst plane.",
-    summary: "In design: a hybrid inference platform that serves models from local GPU hardware and bursts to AWS when demand exceeds local capacity. The Mac mini cluster proves that on-prem inference works for the district; this project answers the follow-up question of when on-prem stops being cheaper than cloud: model serving, autoscaling across a cost boundary, observability, and the actual economics of local-vs-cloud inference.",
-    stack: ["AWS", "GPU serving", "Autoscaling", "Observability"],
+    summary: "A hybrid inference platform that serves models from local GPU hardware and will burst to AWS when demand exceeds local capacity. The Mac mini cluster proves that on-prem inference works for the district; this project answers the follow-up question of when on-prem stops being cheaper than cloud. The local half is built and measured: vLLM serving Qwen3-4B-AWQ on a 16 GB RTX 4090 Mobile, a FastAPI gateway in front of it that logs every request with tokens, time to first token, and route, and Prometheus, Grafana, and a GPU exporter for observability, all as rootless Podman quadlets. The AWS burst plane, Terraform, and cost-per-request reporting are the remaining milestones.",
+    stack: ["vLLM", "FastAPI gateway", "Prometheus", "Grafana", "Podman quadlets", "CDI GPU passthrough", "AWS (planned)"],
     impact: [
-      "Designed to answer a real question: when does on-prem inference stop being cheaper than cloud?",
+      "Measured baseline: 130 tokens/s single stream, 1,531 tokens/s aggregate at 16 concurrent requests",
+      "Time to first token 27 ms at one stream, 232 ms at sixteen",
+      "Gateway overhead about 1 ms of time to first token, with no measurable throughput loss",
+      "VRAM budgeted so a 14B assistant model stays fully on the GPU alongside it (14.9 of 16.4 GB with both resident)",
+      "Finding: saturation comes from KV cache pressure, not compute, which is the queueing signal the burst router needs",
+      "Not yet built: AWS burst plane, Terraform, cost-per-request report",
       "Personal infrastructure, kept separate from district systems"
     ],
-    media: []
+    media: [
+      { type: "img", src: "assets/inference-dashboard.png", caption: "Grafana dashboard under a load test: throughput, latency percentiles, queue depth, KV cache, and GPU" }
+    ]
   }
 ];
 
