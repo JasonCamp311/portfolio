@@ -60,11 +60,9 @@
 
   LAST_UPDATED near the top of the script stamps the footer.
 ================================================================ -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/vendor/atom-one-dark.min.css">
+<script src="assets/vendor/highlight.min.js" defer></script>
 <style>
   :root{
     color-scheme:light;
@@ -82,8 +80,10 @@
     --ok-soft:#E4EFE7;
     --build:#B07C14;
     --build-soft:#F5EDD8;
+    --build-ink:#855C0A;
     --design:#6E7267;
     --design-soft:#EAE8DD;
+    --design-ink:#5E6258;
     --shadow:rgba(26,29,27,.08);
     --radius:0px;
     --maxw:1120px;
@@ -106,9 +106,9 @@
       --ok:#4CB98A;
       --ok-soft:#17281F;
       --build:#D9A63E;
-      --build-soft:#2B2413;
+      --build-soft:#2B2413;--build-ink:#D9A63E;
       --design:#8E9186;
-      --design-soft:#22231C;
+      --design-soft:#22231C;--design-ink:#8E9186;
       --shadow:rgba(0,0,0,.5);
     }
   }
@@ -127,9 +127,9 @@
     --ok:#4CB98A;
     --ok-soft:#17281F;
     --build:#D9A63E;
-    --build-soft:#2B2413;
+    --build-soft:#2B2413;--build-ink:#D9A63E;
     --design:#8E9186;
-    --design-soft:#22231C;
+    --design-soft:#22231C;--design-ink:#8E9186;
     --shadow:rgba(0,0,0,.5);
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -337,8 +337,8 @@
     text-transform:uppercase;padding:4px 9px;border-radius:0;
   }
   .badge.live{background:var(--ok-soft);color:var(--ok)}
-  .badge.build{background:var(--build-soft);color:var(--build)}
-  .badge.design{background:var(--design-soft);color:var(--design)}
+  .badge.build{background:var(--build-soft);color:var(--build-ink)}
+  .badge.design{background:var(--design-soft);color:var(--design-ink)}
   .badge .bdot{width:6px;height:6px;border-radius:50%;background:currentColor}
   .cat{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--slate);
     text-transform:uppercase;letter-spacing:.1em}
@@ -469,7 +469,7 @@
       color-scheme:light;
       --paper:#fff;--panel:#fff;--ink:#000;--slate:#444;--line:#bbb;--rule:#000;
       --accent:#1a3f9c;--accent-soft:#fff;--shadow:none;
-      --ok:#1E6E52;--ok-soft:#fff;--build:#9a6a0e;--build-soft:#fff;--design:#555;--design-soft:#fff;
+      --ok:#1E6E52;--ok-soft:#fff;--build:#9a6a0e;--build-soft:#fff;--design:#555;--design-soft:#fff;--build-ink:#9a6a0e;--design-ink:#555;
     }
     html,body{background:#fff !important;color:#000}
     body{font-size:10.5pt;line-height:1.35}
@@ -538,8 +538,8 @@
     <p class="lede">
       I build and operate production software and infrastructure for a K-12 school district:
       replacing legacy vendor systems with modern serverless apps, automating manual workflows,
-      and running self-hosted AI and media infrastructure after hours. Everything below is real,
-      in use, and maintained by me.
+      and running self-hosted AI and media infrastructure after hours. Everything below is real
+      and maintained by me; the status badges show what is in production.
     </p>
     <div class="metrics" id="metrics"></div>
   </section>
@@ -606,7 +606,7 @@ const BOARD = [
   { id: "app-gallery",  metric: "reviewed before publish" },
   { id: "video-library", metric: "reviewed before students" },
   { id: "distribution-groups", metric: "0 students on staff lists" },
-  { id: "discord-bot",  metric: "24/7 uptime" },
+  { id: "discord-bot",  metric: "always-on service" },
   { id: "personal-assistant", metric: "daily use" },
   { id: "media-sharing", metric: "invite-only" },
   { id: "jellyfin-push", metric: "unattended" },
@@ -850,10 +850,10 @@ const PROJECTS = [
     status: "live",
     period: "2024 - present",
     tagline: "Production discord.py bot with an AI assistant, per-user memory, and a full voice pipeline.",
-    summary: "A production Discord bot serving my community 24/7, built on discord.py with a modular cog architecture: economy, games, music, and an AI assistant. The assistant runs Hermes 3 locally via Ollama with per-user long-term memory (Mem0 + Chroma), so it remembers context across conversations, and users can wipe their own memory with a single command. A voice pipeline adds Kokoro TTS and RVC voice conversion. It runs on Fedora under rootless Podman with SELinux enforcing.",
+    summary: "A production Discord bot serving my community around the clock, built on discord.py with a modular cog architecture: economy, games, music, and an AI assistant. The assistant runs Hermes 3 locally via Ollama with per-user long-term memory (Mem0 + Chroma), so it remembers context across conversations, and users can wipe their own memory with a single command. A voice pipeline adds Kokoro TTS and RVC voice conversion. It runs on Fedora under rootless Podman with SELinux enforcing.",
     stack: ["Python", "discord.py", "Ollama / Hermes 3", "Mem0 + Chroma", "Kokoro TTS", "RVC", "Podman"],
     impact: [
-      "24/7 production uptime on self-managed infrastructure",
+      "Always-on production service on self-managed infrastructure",
       "Per-user AI memory with user-controlled deletion (!forgetme)",
       "Modular cog architecture: features ship independently without downtime",
       "Local inference: zero API spend, full data ownership",
@@ -1680,7 +1680,10 @@ $("#print-sheet").innerHTML = `<div class="sec-label">District systems</div>` +
 /* Motion layer. Vanilla ports of React Bits (DotGrid, DecryptedText,
    CountUp) and Aceternity UI (GlowingEffect, CardSpotlight), reading
    colors from the page tokens so both themes stay in palette. Under
-   prefers-reduced-motion the dot grid draws once and nothing animates. */
+   prefers-reduced-motion the dot grid draws once and nothing animates.
+   React Bits: Copyright (c) 2026 David Haz, MIT + Commons Clause,
+   https://github.com/DavidHDev/react-bits/blob/main/LICENSE.md
+   Aceternity UI: https://ui.aceternity.com */
 (function motionLayer(){
   const root = document.documentElement;
   const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
