@@ -1133,7 +1133,7 @@ static func lamp_fill_for(dish: StringName) -> float:
     period: "2026",
     tagline: "Fantasy football assistant for Sleeper and ESPN leagues: the code computes, the model judges.",
     summary: "A zero-dependency Node app — one server file, a single-file vanilla-JS UI, no npm, no build step — that polls the Sleeper draft API every 2 seconds and recomputes survival odds, VORP, roster needs, and snake-order math after every pick. All arithmetic happens in code; the model only receives finished numbers and renders judgment. In its default mode there is no API key at all: a Claude Code session running in the folder is the advisor, woken by a watcher process whose exit signals that advice is wanted.",
-    stack: ["Node (zero deps)", "Vanilla JS", "Server-sent events", "Sleeper API", "Claude Code"],
+    stack: ["Node (zero deps)", "Vanilla JS", "Server-sent events", "Sleeper + ESPN APIs","Claude Code"],
     impact: [
       "Built for draft day: recommendations with alternatives land inside the pick clock",
       "The poll loop never dies: exponential backoff (1s to 15s) with degraded-state broadcast to the UI",
