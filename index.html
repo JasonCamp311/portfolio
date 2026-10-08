@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#F2F0E9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#121310" media="(prefers-color-scheme: dark)">
 <title>Jason Camp · Systems Portfolio</title>
+<meta name="description" content="Production software and infrastructure built and operated by Jason Camp: K-12 district systems, self-hosted AI, and a home lab.">
 <!-- ================================================================
   HOW TO UPDATE THIS PORTFOLIO
   ================================================================
@@ -226,7 +227,7 @@
   .rack-cap .rname{font-family:"Archivo",sans-serif;font-weight:800;font-size:17px;letter-spacing:-.005em}
   .rack-cap .rmeta{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--slate)}
   .rack-frame{
-    display:grid;grid-template-columns:34px 1fr 16px;
+    display:grid;grid-template-columns:34px minmax(0,1fr) 16px;
     border:2px solid var(--rule);border-width:9px 2px;
     background:var(--paper);position:relative;
   }
@@ -359,6 +360,7 @@
     border:1px solid var(--line);border-top:3px solid var(--rule);border-radius:0;padding:0;
     width:min(880px,calc(100vw - 32px));
     max-height:calc(100vh - 48px);
+    margin:auto; /* the * reset above zeroes the modal's centering margin */
     background:var(--panel);color:var(--ink);
   }
   dialog::backdrop{background:rgba(12,21,32,.55);backdrop-filter:blur(2px)}
@@ -586,15 +588,15 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-10-07";
+const LAST_UPDATED = "2026-10-08";
 
 /* Hero metrics strip. Keep numbers honest and current.
    num may be a string, or a function of the project pool the board is
    counting (all projects, or district-only under ?view=district). */
 const METRICS = [
   { num: "50-75", lbl: "tickets / week processed" },
-  { num: "300+",  lbl: "legacy records migrated" },
-  { num: "$10k/yr", lbl: "SchoolDude license eliminated" },
+  { num: "300",   lbl: "legacy tickets migrated" },
+  { num: "Retired", lbl: "SchoolDude license" },
   { num: (pool) => String(pool.length), lbl: "systems built and operated" },
   { num: "4-node",lbl: "TB5 inference cluster" },
 ];
@@ -612,7 +614,7 @@ const BOARD = [
   { id: "jellyfin-push", metric: "unattended" },
   { id: "pickem-bench", metric: "6 models, graded weekly" },
   { id: "homelab",      metric: "self-hosted" },
-  { id: "adguard-dns",  metric: "encrypted DNS, 2 resolvers" },
+  { id: "adguard-dns",  metric: "encrypted DNS" },
   { id: "mac-cluster",  metric: "on-prem inference" },
 ];
 
@@ -856,6 +858,7 @@ const PROJECTS = [
       "Always-on production service on self-managed infrastructure",
       "Per-user AI memory with user-controlled deletion (!forgetme)",
       "Modular cog architecture: features ship independently without downtime",
+      "Deploys build right away but restart only when nobody is in a voice channel",
       "Local inference: zero API spend, full data ownership",
       "Rootless containers with SELinux enforcing, security as a default not an afterthought"
     ],
@@ -963,6 +966,7 @@ def _answers_match(user: str, correct: str) -> bool:
       "Multiple host-picked venues and per-viewer themes, with rigged characters, seat picking, emotes, and chat",
       "Graphics pipeline: PBR materials, a Blender-baked lightmap for the store, a per-venue post stack, and an automatic quality ladder for weaker GPUs",
       "One-command self-hosted deployment, with its own TURN infrastructure for guests behind strict NATs",
+      "Headless real-browser harness drives two clients through a room before every deploy, with no window and no GPU",
       "Served to invited friends over Tailscale on the same host as the media server"
     ],
     media: [
@@ -1127,14 +1131,18 @@ static func lamp_fill_for(dish: StringName) -> float:
     category: "personal",
     status: "live",
     period: "2026",
-    tagline: "Sleeper fantasy-draft assistant: the code computes, the model judges.",
+    tagline: "Fantasy football assistant for Sleeper and ESPN leagues: the code computes, the model judges.",
     summary: "A zero-dependency Node app — one server file, a single-file vanilla-JS UI, no npm, no build step — that polls the Sleeper draft API every 2 seconds and recomputes survival odds, VORP, roster needs, and snake-order math after every pick. All arithmetic happens in code; the model only receives finished numbers and renders judgment. In its default mode there is no API key at all: a Claude Code session running in the folder is the advisor, woken by a watcher process whose exit signals that advice is wanted.",
     stack: ["Node (zero deps)", "Vanilla JS", "Server-sent events", "Sleeper API", "Claude Code"],
     impact: [
       "Built for draft day: recommendations with alternatives land inside the pick clock",
       "The poll loop never dies: exponential backoff (1s to 15s) with degraded-state broadcast to the UI",
       "A deterministic top-5 fallback board ships with every update, so the screen always has an answer",
-      "Replay mode re-serves a real completed draft for end-to-end testing without the live API"
+      "Replay mode re-serves a real completed draft for end-to-end testing without the live API",
+      "Since the draft: several Sleeper and ESPN leagues at once, plus a season mode for lineups, waivers, trades, and matchups"
+    ],
+    links: [
+      { label: "Source", href: "https://github.com/JasonCamp311/draft-war-room" }
     ],
     media: [
       { type: "img", src: "assets/draft-war-room-board.png", caption: "Pick #124 of a replayed draft: survival odds, VORP, and a live recommendation" }
@@ -1296,7 +1304,9 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
       "Every service containerized, rootless, SELinux enforcing",
       "GPU passthrough serving local LLM inference and hardware transcode",
       "Designed a 2.5GbE backhaul over existing coax after cable runs were ruled out",
-      "Secure remote access via Tailscale, nothing exposed to the open internet"
+      "Secure remote access via Tailscale, nothing exposed to the open internet",
+      "Nightly configuration backup to the NAS, with a written restore guide",
+      "SSH is keys-only; container images and OS packages update on timers"
     ],
     media: []
   },
@@ -1306,15 +1316,15 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
     category: "personal",
     status: "live",
     period: "2026 - present",
-    tagline: "Every device in the house (and every one of my devices anywhere) resolves through AdGuard Home over DNS-over-HTTPS, with ~650k ad and tracker rules.",
-    summary: "AdGuard Home runs as a rootless Podman quadlet on the Fedora server and is the resolver for the LAN and for my Tailscale devices. Upstream lookups go to Quad9 and Cloudflare over DNS-over-HTTPS, so the ISP no longer sees or resolves any query. Three blocklists (AdGuard DNS, OISD Big, HaGeZi Pro) remove ad and tracking domains for every phone, TV and laptop with zero client setup. A second instance on the Synology NAS, kept in sync every ten minutes, is the failover so a server reboot never takes the house offline. The whole thing was configured through AdGuard's REST API rather than the setup wizard, so it is reproducible.",
-    stack: ["AdGuard Home", "Podman quadlet", "DNS-over-HTTPS", "Quad9 / Cloudflare", "firewalld", "Tailscale", "Synology"],
+    tagline: "AdGuard Home on the home server: DNS-over-HTTPS upstreams and ~650k ad and tracker rules, answering on the LAN and on Tailscale.",
+    summary: "AdGuard Home runs as a rootless Podman quadlet on the Fedora server, answering on the LAN and on Tailscale. Upstream lookups go to Quad9 and Cloudflare over DNS-over-HTTPS, so a query sent through it is never seen or resolved by the ISP. Three blocklists (AdGuard DNS, OISD Big, HaGeZi Pro) remove ad and tracking domains with nothing installed on the client. The whole thing was configured through AdGuard's REST API rather than the setup wizard, so it is reproducible. The resolver is in service; making it the default for the whole house is the remaining step. The router still hands out its own DNS, and the failover replica for the Synology NAS is written but not switched on.",
+    stack: ["AdGuard Home", "Podman quadlet", "DNS-over-HTTPS", "Quad9 / Cloudflare", "firewalld", "Tailscale"],
     impact: [
-      "ISP-visible DNS logs eliminated: every upstream query is encrypted",
+      "Every upstream query is encrypted, so lookups sent through it stay out of the ISP's DNS logs",
       "~650k blocked domains across three curated lists, 4-5 ms average resolution",
       "Rootless container binding port 53 via a scoped sysctl, not a root container",
       "Real client IPs in the query log (host networking), so per-device visibility is intact",
-      "Two resolvers handed out by DHCP so a single-box reboot is not an outage"
+      "Not yet done: router DHCP cutover, the Tailscale nameserver setting, and the NAS failover replica"
     ],
     media: [],
     code: {
@@ -1350,8 +1360,8 @@ WantedBy=default.target
 # /control/filtering/add_url and /control/querylog/config/update, so the build is a script, not clicks.`
     },
     operations: [
-      "Primary on the Fedora server (rootless quadlet, auto-updated nightly); replica on the Synology NAS via Container Manager, synced with adguardhome-sync every 10 minutes",
-      "Router DHCP hands out both resolvers; Tailscale's global nameserver points my own devices at the Fedora instance when away from home",
+      "Runs on the Fedora server as a rootless quadlet, auto-updated nightly",
+      "Failover: a replica for the Synology NAS and a 10-minute sync job are written, not yet deployed",
       "firewalld: port 53 opened only on the LAN and Tailscale zones; the admin UI is LAN-only",
       "Upstreams: Quad9 + Cloudflare DoH, bootstrap by IP, TLS fallback; query log 7 days, stats 30 days"
     ]
@@ -1508,7 +1518,7 @@ const FILTERS = [
   { key: "all", label: "All" },
   { key: "district", label: "District / Work" },
   { key: "personal", label: "Personal Lab" },
-  { key: "games", label: "Games" },
+  { key: "games", label: "Game Dev" },
   { key: "live", label: "In production" },
 ];
 let active = DISTRICT_VIEW ? "district" : "all";
@@ -1815,7 +1825,7 @@ $("#print-sheet").innerHTML = `<div class="sec-label">District systems</div>` +
   })();
 
   /* CountUp: every number inside a hero metric counts up from zero,
-     keeping the surrounding text ("$", "k/yr", "-node") in place. */
+     keeping the surrounding text ("-", "-node") in place. */
   (function countUp(){
     if (REDUCE) return;
     const nums = [...document.querySelectorAll(".metric .num")];
