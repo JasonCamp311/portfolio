@@ -586,7 +586,7 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-10-03";
+const LAST_UPDATED = "2026-10-07";
 
 /* Hero metrics strip. Keep numbers honest and current.
    num may be a string, or a function of the project pool the board is
@@ -610,6 +610,7 @@ const BOARD = [
   { id: "personal-assistant", metric: "daily use" },
   { id: "media-sharing", metric: "invite-only" },
   { id: "jellyfin-push", metric: "unattended" },
+  { id: "pickem-bench", metric: "6 models, graded weekly" },
   { id: "homelab",      metric: "self-hosted" },
   { id: "adguard-dns",  metric: "encrypted DNS, 2 resolvers" },
   { id: "mac-cluster",  metric: "on-prem inference" },
@@ -1354,6 +1355,55 @@ WantedBy=default.target
       "firewalld: port 53 opened only on the LAN and Tailscale zones; the admin UI is LAN-only",
       "Upstreams: Quad9 + Cloudflare DoH, bootstrap by IP, TLS fallback; query log 7 days, stats 30 days"
     ]
+  },
+  {
+    id: "pickem-bench",
+    name: "Pick'em Bench",
+    category: "personal",
+    status: "live",
+    period: "2026 - present",
+    tagline: "Six AI models pick every NFL game from one prompt, then get graded against the closing line.",
+    summary: "An evaluation harness that happens to be about football. Every week six language models, five hosted and one running on the home server, get the identical prompt: the schedule plus each team's record, scoring and results, with no betting lines. Each returns a final score and a win probability per game. Picks are saved once and fingerprinted before kickoff, then graded straight-up, against the spread, on the total and on calibration, next to two no-model baselines. A public site shows the standings, each model's stated reasoning beside the data it was given, and where the models disagree with the market.",
+    stack: ["Node (zero deps)", "React", "Vite", "OpenRouter", "Ollama", "systemd timers", "GitHub Pages"],
+    impact: [
+      "Six models answer one identical prompt; a full week of picks costs about 10 cents",
+      "Picks are write-once and SHA-256 fingerprinted; a late or edited pick is dropped or flagged",
+      "Spread and over/under results are derived from each predicted score, so no model ever sees a line",
+      "Always-home and always-favorite baselines plus a consensus entry give every record something to beat",
+      "A fact-check pass flagged 8 stated reasons that contradicted the data in week 5, 7 of them from the smallest model",
+      "Runs unattended: timers pick, grade, commit and publish, and a failure sends a phone alert"
+    ],
+    media: [
+      { type: "img", src: "assets/pickem-bench-card.png", caption: "Week 5 card: every model's predicted score, with the spread and total sides it implies" }
+    ],
+    links: [
+      { label: "Live site", href: "https://jasoncamp311.github.io/pickem-bench/" },
+      { label: "Source", href: "https://github.com/JasonCamp311/pickem-bench" }
+    ],
+    operations: [
+      "Source: github.com/JasonCamp311/pickem-bench (public); the site is GitHub Pages from the docs folder",
+      "Two systemd user timers on the Fedora server: picks Tuesday and Wednesday 10:00, lines and grading daily 08:00",
+      "The server is the only writer of the data folder and pushes with a deploy key scoped to this one repository",
+      "Failed runs notify by ntfy; regular season only"
+    ],
+    code: {
+      lang: "javascript",
+      label: "src/grade.js \u2014 the spread pick is implied by the predicted score",
+      source: `export function gradePick(pick, final, line, { ats: gradeAts = true, ou: gradeOu = true } = {}) {
+  const predMargin = pick.home_score - pick.away_score;
+  const margin = final.homeScore - final.awayScore;
+  const su = margin === 0 ? 'T' : Math.sign(predMargin) === Math.sign(margin) ? 'W' : 'L';
+
+  // The ATS side is implied: whichever team the predicted margin says covers.
+  let ats = null;
+  let atsSide = null;
+  if (gradeAts && line && Number.isFinite(line.homeLine)) {
+    const edge = predMargin + line.homeLine;
+    atsSide = edge > 0 ? 'home' : edge < 0 ? 'away' : null;
+    const cover = margin + line.homeLine;
+    if (atsSide) ats = cover === 0 ? 'P' : (cover > 0) === (atsSide === 'home') ? 'W' : 'L';
+  }`
+    }
   },
   {
     id: "inference-platform",
