@@ -588,7 +588,7 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-10-08";
+const LAST_UPDATED = "2026-10-13";
 
 /* Hero metrics strip. Keep numbers honest and current.
    num may be a string, or a function of the project pool the board is
@@ -615,6 +615,7 @@ const BOARD = [
   { id: "pickem-bench", metric: "6 models, graded weekly" },
   { id: "homelab",      metric: "self-hosted" },
   { id: "adguard-dns",  metric: "encrypted DNS" },
+  { id: "cluster-relay", metric: "single way in" },
   { id: "mac-cluster",  metric: "on-prem inference" },
 ];
 
@@ -763,7 +764,8 @@ const PROJECTS = [
       "Pools compute from 4 machines the district already owned",
       "Serves Qwen3.6 35B-A3B (5-bit) through exo across the pooled nodes",
       "Custom frontend built and iterated with an agentic CLI workflow",
-      "On-prem inference: no per-token vendor costs, data stays in-district"
+      "On-prem inference: no per-token vendor costs, data stays in-district",
+      "Reached only through a Mac Studio relay, so the four nodes stay off the district network"
     ],
     media: [
       { type: "img", src: "assets/cluster-frontend.png", caption: "Chat frontend answering live from the on-prem exo cluster" },
@@ -775,6 +777,28 @@ const PROJECTS = [
       "Single operator so far; shared ownership planned as the team comes on",
       "Runbook: docs/HEAD_NODE_DEPLOYMENT.md in the repo"
     ]
+  },
+  {
+    id: "cluster-relay",
+    name: "Cluster Relay (Mac Studio)",
+    category: "district",
+    status: "live",
+    period: "2026",
+    tagline: "A Mac Studio in front of the Mac mini cluster: the only machine that staff and admin traffic touches.",
+    summary: "The compute cluster's nodes are managed Macs whose firewall would not let them accept connections directly, and I did not want inference machines sitting on the district network anyway. So a Mac Studio sits in front as a relay. It bridges the district network to the cluster, runs a reverse proxy that passes staff requests through to the head node, and is the hop I use to administer the cluster remotely. The head node still runs the chat frontend and its database; the relay only carries traffic. Staff get one stable address that does not change when the nodes behind it do.",
+    stack: ["Mac Studio", "macOS", "Reverse proxy", "Network isolation"],
+    impact: [
+      "The four inference nodes take no connections from the district network; the relay is the only machine exposed",
+      "Staff reach the chat frontend at one stable address, whatever changes on the nodes behind it",
+      "Worked within the MDM-managed firewall, which kept the nodes from accepting inbound connections, by routing through a separate machine",
+      "Remote administration of the cluster goes through the same relay, so there is one way in to secure and watch",
+      "The relay holds no conversations: the frontend and its database stay on the head node"
+    ],
+    operations: [
+      "A separate machine in front of the head node; it is not one of the four inference nodes",
+      "Single operator so far; shared ownership planned as the team comes on"
+    ],
+    media: []
   },
   {
     id: "distribution-groups",
@@ -964,7 +988,9 @@ def _answers_match(user: str, correct: str) -> bool:
       "Jellyfin tokens stay in each viewer's browser; the party server never sees them",
       "Walkable video store generated from the Jellyfin library, with a nominate-and-vote flow that hands the winner to SyncPlay",
       "Multiple host-picked venues and per-viewer themes, with rigged characters, seat picking, emotes, and chat",
-      "Graphics pipeline: PBR materials, a Blender-baked lightmap for the store, a per-venue post stack, and an automatic quality ladder for weaker GPUs",
+      "Graphics pipeline: PBR materials, Blender-baked lightmaps for the store and five theater venues, a per-venue post stack, and an automatic quality ladder for weaker GPUs",
+      "Show flow around the film: pre-show reel and trivia, a curtain countdown on the host's first play, intermission, and an after-film verdict vote",
+      "A mock Jellyfin server runs end-to-end browser scenarios with throwaway users; it found six SyncPlay bugs before a real movie night did",
       "One-command self-hosted deployment, with its own TURN infrastructure for guests behind strict NATs",
       "Headless real-browser harness drives two clients through a room before every deploy, with no window and no GPU",
       "Served to invited friends over Tailscale on the same host as the media server"
@@ -1305,7 +1331,9 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
       "GPU passthrough serving local LLM inference and hardware transcode",
       "Designed a 2.5GbE backhaul over existing coax after cable runs were ruled out",
       "Secure remote access via Tailscale, nothing exposed to the open internet",
+      "Media library lives on a Synology NAS mounted over NFS; service databases stay on the server's SSD",
       "Nightly configuration backup to the NAS, with a written restore guide",
+      "The server's lid LED strip is a health light: dark when all is well, a hazard pattern when a service is down or AC power is lost",
       "SSH is keys-only; container images and OS packages update on timers"
     ],
     media: []
