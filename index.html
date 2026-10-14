@@ -461,6 +461,87 @@
     opacity:var(--active);transition:opacity .3s ease;
   }
 
+  /* ---------- console layer ----------
+     Hero status terminal (after Cult UI's TerminalAnimation), a sliding
+     filter indicator with cards that glide to their new spots, and a
+     "/" command palette (after Watermelon UI's CommandSearch). Vanilla,
+     wired up at the end of the script. */
+  .hero{display:grid;grid-template-columns:minmax(0,1fr);column-gap:48px;align-items:end}
+  .hero .metrics{grid-column:1/-1}
+  @media (min-width:980px){
+    .hero{grid-template-columns:minmax(0,1fr) 400px}
+    .hero h1{max-width:13ch}
+  }
+  .term{
+    margin-top:30px;background:var(--terminal);color:var(--terminal-ink);
+    border:1px solid var(--line);border-top:3px solid var(--rule);
+    box-shadow:0 18px 40px var(--shadow);
+    font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+  }
+  .term-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid #2A2C25}
+  .term-bar i{width:8px;height:8px;border-radius:50%;background:#3A3C33}
+  .term-bar span{margin-left:auto;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#8F8D7E}
+  .term-body{
+    margin:0;padding:14px 16px 16px;min-height:calc(1.65em * 9 + 30px);
+    font:inherit;line-height:1.65;white-space:pre;overflow:hidden;
+  }
+  .term-body .p{color:#A9BFF0}
+  .term-body .dim{color:#8F8D7E}
+  .term-body .up{color:#4CB98A}
+  .term-body .bld{color:#D9A63E}
+  .term-body .cur{display:inline-block;width:.6em;height:1.1em;vertical-align:-.2em;background:var(--terminal-ink);animation:blink 1.1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  .filters{position:relative;isolation:isolate}
+  .fpill{
+    position:absolute;z-index:-1;left:0;top:0;width:0;height:0;
+    background:var(--ink);pointer-events:none;
+    transition:transform .38s cubic-bezier(.2,.8,.2,1),width .38s cubic-bezier(.2,.8,.2,1),height .38s cubic-bezier(.2,.8,.2,1);
+  }
+  .filters.slide .fbtn[aria-pressed="true"]{background:transparent}
+  .fbtn{transition:color .25s ease}
+
+  .kbar-open kbd,#kbar kbd{
+    font:inherit;font-size:10.5px;padding:1px 5px;border:1px solid currentColor;opacity:.7;margin-left:2px;
+  }
+  #kbar{
+    width:min(620px,calc(100vw - 32px));margin:12vh auto auto;
+    background:var(--terminal);color:var(--terminal-ink);border-color:#2A2C25;border-top-color:#A9BFF0;
+    font-family:"IBM Plex Mono",monospace;font-size:13px;
+  }
+  .kbar-input{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #2A2C25}
+  .kbar-prompt{color:#A9BFF0;font-weight:600}
+  #kbar-q{flex:1;min-width:0;background:transparent;border:0;outline:0;color:inherit;font:inherit;font-size:15px}
+  #kbar-q::placeholder{color:#6F6D60}
+  #kbar .kbar-input kbd{color:#8F8D7E}
+  .kbar-list{list-style:none;max-height:min(420px,55vh);overflow-y:auto;padding:6px 0}
+  .kbar-group{padding:10px 16px 4px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8F8D7E}
+  .kbar-item{
+    display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:10px;align-items:baseline;
+    padding:8px 16px;cursor:pointer;border-left:2px solid transparent;
+  }
+  .kbar-item .k-dot{width:7px;height:7px;border-radius:50%;background:#6F6D60;align-self:center}
+  .kbar-item .k-dot.live{background:#4CB98A}
+  .kbar-item .k-dot.build{background:#D9A63E}
+  .kbar-item .k-dot.cmd{border-radius:0;background:#A9BFF0;transform:rotate(45deg) scale(.8)}
+  .kbar-item .k-name{color:#EBE9DD;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .kbar-item .k-sub{display:block;color:#8F8D7E;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .kbar-item .k-meta{color:#8F8D7E;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .kbar-item[aria-selected="true"]{background:#1E2019;border-left-color:#A9BFF0}
+  .kbar-item[aria-selected="true"] .k-name{color:#fff}
+  .kbar-empty{padding:18px 16px;color:#8F8D7E}
+  .kbar-foot{display:flex;gap:16px;padding:9px 16px;border-top:1px solid #2A2C25;color:#8F8D7E;font-size:11px}
+  .kbar-foot #kbar-count{margin-left:auto}
+  #kbar[open]{animation:kbar-in .16s ease-out}
+  @keyframes kbar-in{from{opacity:0;transform:translateY(-6px) scale(.985)}}
+  @media (max-width:640px){
+    .kbar-foot span:not(#kbar-count){display:none}
+    .kbar-open kbd{display:none}
+    .top-links{gap:14px;flex-wrap:wrap}
+    .term{font-size:10.5px}
+    .term-body{padding:12px 12px 14px}
+  }
+
   /* ---------- footer ---------- */
   footer{
     background:var(--terminal);color:var(--terminal-ink);
@@ -500,7 +581,7 @@
     header.top{border-bottom:1px solid #000;background:#fff}
     .top-inner{padding:6px 0}
     /* hidden on paper */
-    .top-links,.theme-toggle,.filters,footer,dialog,.dotgrid,
+    .top-links,.theme-toggle,.filters,footer,dialog,.dotgrid,.term,
     .board,.grid,.shot,.media-grid{display:none !important}
     .hero{padding:14px 0 8px}
     h1{font-size:24pt;max-width:none}
@@ -546,6 +627,9 @@
       <a href="#systems">System board</a>
       <a href="#projects">Projects</a>
       <a href="https://github.com/JasonCamp311" target="_blank" rel="noopener">GitHub ↗</a>
+      <button id="kbar-open" class="theme-toggle kbar-open" type="button" aria-haspopup="dialog" aria-keyshortcuts="/ Control+K">
+        Search <kbd>/</kbd>
+      </button>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" aria-pressed="false">
         <span class="tt-label">Dark</span>
       </button>
@@ -556,14 +640,21 @@
 <main class="wrap">
   <section class="hero">
     <canvas class="dotgrid" aria-hidden="true"></canvas>
-    <p class="eyebrow"><b>Jason Camp</b> · Technology Supervisor · Acture Solutions</p>
-    <h1>Systems that ship <span class="accent" id="decrypt">and stay running.</span></h1>
-    <p class="lede">
-      I build and operate production software and infrastructure for a K-12 school district:
-      replacing legacy vendor systems with modern serverless apps, automating manual workflows,
-      and running self-hosted AI and media infrastructure after hours. Everything below is real
-      and maintained by me; the status badges show what is in production.
-    </p>
+    <div class="hero-copy">
+      <p class="eyebrow"><b>Jason Camp</b> · Technology Supervisor · Acture Solutions</p>
+      <h1>Systems that ship <span class="accent" id="decrypt">and stay running.</span></h1>
+      <p class="lede">
+        I build and operate production software and infrastructure for a K-12 school district:
+        replacing legacy vendor systems with modern serverless apps, automating manual workflows,
+        and running self-hosted AI and media infrastructure after hours. Everything below is real
+        and maintained by me; the status badges show what is in production.
+      </p>
+    </div>
+    <!-- Typed out from BOARD on load; the system board below carries the same facts for screen readers. -->
+    <div class="term" id="term" aria-hidden="true">
+      <div class="term-bar"><i></i><i></i><i></i><span>status</span></div>
+      <pre class="term-body" id="term-body"></pre>
+    </div>
     <div class="metrics" id="metrics"></div>
   </section>
 
@@ -595,6 +686,18 @@
 
 <dialog id="detail" aria-label="Project details">
   <div class="d-inner" id="d-inner"></div>
+</dialog>
+
+<dialog id="kbar" aria-label="Search projects and commands">
+  <div class="kbar-input">
+    <span class="kbar-prompt" aria-hidden="true">&gt;</span>
+    <input id="kbar-q" type="text" autocomplete="off" spellcheck="false"
+      placeholder="Search projects, filters, sections…"
+      role="combobox" aria-expanded="true" aria-controls="kbar-list" aria-autocomplete="list">
+    <kbd>esc</kbd>
+  </div>
+  <ul class="kbar-list" id="kbar-list" role="listbox" aria-label="Results"></ul>
+  <div class="kbar-foot"><span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>enter</kbd> open</span><span id="kbar-count"></span></div>
 </dialog>
 
 <footer>
@@ -1767,14 +1870,38 @@ FILTERS.filter(f => !(DISTRICT_VIEW && f.key === "games")).forEach(f => {
   b.className = "fbtn";
   b.setAttribute("aria-pressed", f.key === active);
   b.innerHTML = `${esc(f.label)} <span class="cnt">${count}</span>`;
+  b.dataset.key = f.key;
   b.addEventListener("click", () => {
+    if (active === f.key) return;
     active = f.key;
     filterWrap.querySelectorAll(".fbtn").forEach(x => x.setAttribute("aria-pressed","false"));
     b.setAttribute("aria-pressed","true");
+    movePill();
     renderGrid();
   });
   filterWrap.appendChild(b);
 });
+
+/* Sliding filter indicator: one ink block that glides to the pressed
+   button (and down a row when the filters wrap on a phone). */
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const pill = document.createElement("span");
+pill.className = "fpill";
+pill.setAttribute("aria-hidden", "true");
+filterWrap.prepend(pill);
+function movePill(){
+  const b = filterWrap.querySelector('.fbtn[aria-pressed="true"]');
+  if (!b) return;
+  pill.style.width = `${b.offsetWidth}px`;
+  pill.style.height = `${b.offsetHeight}px`;
+  pill.style.transform = `translate(${b.offsetLeft}px,${b.offsetTop}px)`;
+}
+pill.style.transition = "none"; /* no glide on first paint */
+movePill();
+filterWrap.classList.add("slide");
+requestAnimationFrame(() => requestAnimationFrame(() => { pill.style.transition = ""; }));
+window.addEventListener("resize", movePill);
+document.fonts?.ready.then(movePill);
 
 /* cards */
 function keyMetric(p){ return p.impact && p.impact.length ? p.impact[0] : ""; }
@@ -1782,7 +1909,10 @@ function renderGrid(){
   const list = PROJECTS.filter(p =>
     active === "all" || p.category === active || p.status === active
   );
-  $("#grid").innerHTML = list.map(p => `
+  /* FLIP: cards that stay glide from their old spot, new ones fade up. */
+  const grid = $("#grid");
+  const before = new Map([...grid.children].map(c => [c.dataset.open, c.getBoundingClientRect()]));
+  grid.innerHTML = list.map(p => `
     <button class="card" data-open="${p.id}">
       <div class="card-top">
         <span class="badge ${p.status}"><span class="bdot"></span>${STATUS[p.status].label}</span>
@@ -1794,6 +1924,19 @@ function renderGrid(){
       <div class="kmetric">▸ ${esc(keyMetric(p))}</div>
     </button>
   `).join("");
+  if (REDUCED || !before.size || !grid.animate) return;
+  [...grid.children].forEach((c, i) => {
+    const was = before.get(c.dataset.open);
+    if (was){
+      const now = c.getBoundingClientRect();
+      const dx = was.left - now.left, dy = was.top - now.top;
+      if (dx || dy) c.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: "none" }],
+        { duration: 420, easing: "cubic-bezier(.2,.8,.2,1)" });
+    } else {
+      c.animate([{ opacity: 0, transform: "translateY(10px) scale(.98)" }, { opacity: 1, transform: "none" }],
+        { duration: 320, delay: Math.min(i, 8) * 30, easing: "ease-out", fill: "backwards" });
+    }
+  });
 }
 renderGrid();
 
@@ -2151,6 +2294,131 @@ $("#print-sheet").innerHTML = `<div class="sec-label">District systems</div>` +
       update(...last);
     }, { passive: true });
     window.addEventListener("scroll", () => { if (last) update(...last); }, { passive: true });
+  })();
+})();
+
+/* Console layer, part 2: the hero status terminal and the command palette. */
+(function consoleLayer(){
+  /* Status terminal (after Cult UI's TerminalAnimation): types a command,
+     then prints live systems from BOARD with their board metric. */
+  (function terminal(){
+    const body = $("#term-body");
+    if (!body) return;
+    const live = boardRows.filter(({ p }) => p.status === "live").slice(0, 6);
+    const width = Math.max(...live.map(({ p }) => p.id.length)) + 2;
+    const cmd = "status --live";
+    const lines = [
+      ...live.map(({ row, p }) => `<span class="up">●</span> ${esc(p.id.padEnd(width))}<span class="dim">${esc(row.metric)}</span>`),
+      "",
+      `<span class="dim">${liveCount} of ${countPool.length} systems in production</span>`,
+    ];
+    const prompt = `<span class="p">jason@lab</span><span class="dim">:~$</span> `;
+    const cursor = `<span class="cur"></span>`;
+    const finish = () => { body.innerHTML = `${prompt}${cmd}\n${lines.join("\n")}\n${prompt}${cursor}`; };
+    if (REDUCED) return finish();
+    let typed = 0, shown = 0;
+    const paint = () => {
+      body.innerHTML = `${prompt}${cmd.slice(0, typed)}${typed < cmd.length ? cursor : ""}` +
+        (typed >= cmd.length ? `\n${lines.slice(0, shown).join("\n")}` : "");
+    };
+    paint();
+    setTimeout(function type(){
+      if (typed < cmd.length){ typed++; paint(); return setTimeout(type, 45 + Math.random() * 60); }
+      if (shown < lines.length){ shown++; paint(); return setTimeout(type, shown === 1 ? 260 : 110); }
+      finish();
+    }, 900);
+  })();
+
+  /* Command palette (after Watermelon UI's CommandSearch): "/" or
+     Ctrl/Cmd+K opens it; jump to a project, filter, section or action. */
+  (function palette(){
+    const kbar = $("#kbar"), q = $("#kbar-q"), list = $("#kbar-list"), count = $("#kbar-count");
+    if (!kbar || !kbar.showModal) { $("#kbar-open")?.remove(); return; }
+    const clickFilter = (key) => filterWrap.querySelector(`.fbtn[data-key="${key}"]`)?.click();
+    const go = (sel) => $(sel)?.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth" });
+    const themeBtn = $("#theme-toggle");
+    const items = [
+      ...[["System board", "#systems"], ["Projects", "#projects"], ["Proposed next", "#roadmap"]]
+        .filter(([, sel]) => !$(sel)?.hidden)
+        .map(([name, sel]) => ({ group: "Jump to", name, sub: "section", run: () => go(sel) })),
+      ...[...filterWrap.querySelectorAll(".fbtn")].map(b => ({
+        group: "Filter", name: `Show: ${b.firstChild.textContent.trim()}`, sub: `${b.querySelector(".cnt").textContent} projects`,
+        run: () => { clickFilter(b.dataset.key); go("#projects"); } })),
+      ...countPool.map(p => ({
+        group: "Projects", name: p.name, sub: p.tagline, meta: CATS[p.category], dot: p.status,
+        hay: `${p.name} ${p.tagline} ${p.stack.join(" ")} ${CATS[p.category]} ${STATUS[p.status].label}`.toLowerCase(),
+        run: () => openDetail(p.id) })),
+      { group: "Actions", name: "Toggle light / dark", sub: "theme", run: () => themeBtn?.click() },
+      { group: "Actions", name: "Print the district handout", sub: "File > Print layout", run: () => setTimeout(() => window.print(), 50) },
+      { group: "Actions", name: "Open GitHub", sub: "github.com/JasonCamp311", run: () => window.open("https://github.com/JasonCamp311", "_blank", "noopener") },
+    ];
+    items.forEach(it => { it.hay = it.hay || `${it.name} ${it.sub} ${it.group}`.toLowerCase(); });
+
+    let shown = [], sel = 0;
+    function score(it, words, raw){
+      const name = it.name.toLowerCase();
+      let s = 0;
+      for (const w of words){
+        if (!it.hay.includes(w)) return -1;
+        s += name.includes(w) ? 3 : 1;
+      }
+      if (name.startsWith(raw)) s += 5;
+      return s;
+    }
+    function render(){
+      const raw = q.value.trim().toLowerCase();
+      const words = raw.split(/\s+/).filter(Boolean);
+      shown = raw
+        ? items.map(it => ({ it, s: score(it, words, raw) })).filter(r => r.s >= 0)
+            .sort((a, b) => b.s - a.s).map(r => r.it)
+        : items;
+      sel = Math.min(sel, Math.max(0, shown.length - 1));
+      let html = "", group = "";
+      shown.forEach((it, i) => {
+        if (!raw && it.group !== group){ group = it.group; html += `<li class="kbar-group" role="presentation">${esc(group)}</li>`; }
+        html += `<li class="kbar-item" role="option" id="k-${i}" data-i="${i}" aria-selected="${i === sel}">
+          <span class="k-dot ${it.dot || "cmd"}"></span>
+          <span><span class="k-name">${esc(it.name)}</span><span class="k-sub">${esc(it.sub || "")}</span></span>
+          <span class="k-meta">${esc(it.meta || (raw ? it.group : ""))}</span></li>`;
+      });
+      list.innerHTML = html || `<li class="kbar-empty" role="presentation">No match. Try a project, a tool (e.g. "podman"), or "filter".</li>`;
+      count.textContent = `${shown.length} result${shown.length === 1 ? "" : "s"}`;
+      q.setAttribute("aria-activedescendant", shown.length ? `k-${sel}` : "");
+    }
+    function select(i){
+      if (!shown.length) return;
+      sel = (i + shown.length) % shown.length;
+      list.querySelectorAll(".kbar-item").forEach(el => el.setAttribute("aria-selected", String(+el.dataset.i === sel)));
+      q.setAttribute("aria-activedescendant", `k-${sel}`);
+      $(`#k-${sel}`)?.scrollIntoView({ block: "nearest" });
+    }
+    function run(i){
+      const it = shown[i]; if (!it) return;
+      kbar.close();
+      it.run();
+    }
+    function open(){
+      if (kbar.open) return;
+      if (dlg.open) dlg.close();
+      q.value = ""; sel = 0; render();
+      kbar.showModal();
+      q.focus();
+    }
+    q.addEventListener("input", () => { sel = 0; render(); });
+    q.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown"){ e.preventDefault(); select(sel + 1); }
+      else if (e.key === "ArrowUp"){ e.preventDefault(); select(sel - 1); }
+      else if (e.key === "Enter"){ e.preventDefault(); run(sel); }
+    });
+    list.addEventListener("click", (e) => { const li = e.target.closest(".kbar-item"); if (li) run(+li.dataset.i); });
+    list.addEventListener("mousemove", (e) => { const li = e.target.closest(".kbar-item"); if (li && +li.dataset.i !== sel) select(+li.dataset.i); });
+    kbar.addEventListener("click", (e) => { if (e.target === kbar) kbar.close(); }); /* backdrop */
+    $("#kbar-open").addEventListener("click", open);
+    document.addEventListener("keydown", (e) => {
+      const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
+      if ((e.key === "k" || e.key === "K") && (e.ctrlKey || e.metaKey)){ e.preventDefault(); kbar.open ? kbar.close() : open(); }
+      else if (e.key === "/" && !typing && !e.ctrlKey && !e.metaKey && !e.altKey){ e.preventDefault(); open(); }
+    });
   })();
 })();
 </script>
