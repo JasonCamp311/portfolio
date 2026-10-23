@@ -846,7 +846,6 @@ const PROJECTS = [
     stack: ["Apple Silicon", "Thunderbolt 5 + RDMA", "exo", "Tensor parallelism", "Qwen3.6 35B-A3B (5-bit)", "Qwen3.6 27B (8-bit)"],
     impact: [
       "Runs on 3 Mac minis the district already owned",
-      "Benchmarked layouts before choosing one: a model that fits on one node ran 3.6x faster than a bigger model split across three, so the fast tier runs on a single node",
       "Splitting the 27B across two nodes over Thunderbolt RDMA nearly doubled its speed (8.6 to 15.5 tokens a second), checked for accuracy on prompts up to 34k tokens",
       "A watchdog re-places any model that drops and sends each one a test prompt every 15 minutes; 184 of 184 checks passed in its first overnight run",
       "Auto mode (admins): a rule-based score sends harder questions to the deeper model and fails over either way",
