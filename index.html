@@ -588,7 +588,7 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-10-13";
+const LAST_UPDATED = "2026-10-23";
 
 /* Hero metrics strip. Keep numbers honest and current.
    num may be a string, or a function of the project pool the board is
@@ -598,7 +598,7 @@ const METRICS = [
   { num: "300",   lbl: "legacy tickets migrated" },
   { num: "Retired", lbl: "SchoolDude license" },
   { num: (pool) => String(pool.length), lbl: "systems built and operated" },
-  { num: "4-node",lbl: "TB5 inference cluster" },
+  { num: "3-node",lbl: "TB5 inference cluster" },
 ];
 
 /* System board rows. id must match a project id below. */
@@ -606,7 +606,8 @@ const BOARD = [
   { id: "ticketing",    metric: "50-75 tickets/wk" },
   { id: "registration", metric: "live for 2026-27 intake" },
   { id: "app-gallery",  metric: "reviewed before publish" },
-  { id: "video-library", metric: "reviewed before students" },
+  { id: "video-library", metric: "clips + playlists" },
+  { id: "staff-offboarding", metric: "pilot, audited" },
   { id: "distribution-groups", metric: "0 students on staff lists" },
   { id: "discord-bot",  metric: "always-on service" },
   { id: "personal-assistant", metric: "daily use" },
@@ -614,6 +615,7 @@ const BOARD = [
   { id: "jellyfin-push", metric: "unattended" },
   { id: "pickem-bench", metric: "6 models, graded weekly" },
   { id: "homelab",      metric: "self-hosted" },
+  { id: "homelab-as-code", metric: "nightly drift check" },
   { id: "adguard-dns",  metric: "encrypted DNS" },
   { id: "cluster-relay", metric: "single way in" },
   { id: "mac-cluster",  metric: "on-prem inference" },
@@ -653,12 +655,14 @@ const PROJECTS = [
       "Role-based routing: requests reach the right technician automatically",
       "Photo attachments and recurring scheduled tasks, which the old system handled poorly",
       "Security review (July 2026) covered CORS, rate limiting, security headers, sessions, uploads, CSV export, and the webhook: 16 findings, 15 fixed, 1 dev-only dependency item deferred",
+      "October 2026: a personal hold queue for the head of buildings and grounds and a \"just mine\" filter, both built by a colleague I'm bringing on as a developer",
+      "Second security review opened October 2026, with each finding to be tracked as its own GitHub issue",
       "SharePoint archival of closed tickets via Graph API: scoped, not yet built"
     ],
     operations: [
       "Source: district GitHub org; CI runs typecheck and tests on every push",
       "Data: Cloudflare D1, attachments in R2; export and point-in-time restore steps are in RUNBOOK.md",
-      "Sole admin today; team onboarding planned",
+      "I'm the sole admin on production; since late September a colleague contributes through issues and pull requests that I review and deploy",
       "Runbook: RUNBOOK.md in the repo (deploy, rollback, secrets, backups, triage)"
     ],
     media: [
@@ -692,36 +696,42 @@ const PROJECTS = [
   },
   {
     id: "app-gallery",
-    name: "Teacher App Gallery",
+    name: "Teacher Studio (Apps and Video)",
     category: "district",
     status: "live",
     period: "2026",
-    tagline: "A reviewed, on-prem home for the classroom HTML apps staff build, each isolated on its own web address.",
-    summary: "The district wanted one safe place for staff to share the interactive HTML apps they build for class. I built an on-prem gallery from a design mockup: staff sign in with Microsoft, upload an app, and a reviewer approves it before it publishes. Every upload gets an automatic safety report, and every published app runs on its own web address, so uploaded code can't reach another app's data or a teacher's signed-in session. It runs on a repurposed Mac mini, is reachable only on the district network, and starts staff-only: teachers present apps in class and share individual app links with students.",
-    stack: ["Node.js", "Express", "SQLite", "Caddy", "Apache (built into macOS)", "Microsoft Entra ID", "Let's Encrypt (DNS-01)", "launchd"],
+    tagline: "An on-prem home for the classroom apps, videos and audio teachers use, where every uploaded app is reviewed and runs on its own web address.",
+    summary: "It started in September as a gallery for the interactive HTML apps staff build for class and has grown into the place teachers keep their classroom media. Staff sign in with Microsoft and add apps, videos and audio. Apps go through a review queue before they publish, and every published app runs on its own web address, so uploaded code can't reach another app's data or a teacher's signed-in session. Teachers organize what they use into collections and can share those with colleagues. I rebuilt the interface from a full design mockup in late September and have shipped changes in rounds since. It runs on a Mac mini and is reachable only on the district network.",
+    stack: ["Node.js", "Express", "SQLite", "Caddy", "Apache (built into macOS)", "Microsoft Entra ID", "Let's Encrypt (DNS-01)", "launchd", "Playwright + Chrome", "Transformers.js (MiniLM)"],
     impact: [
-      "Review queue: nothing reaches students until a reviewer approves it, and a reviewer can unpublish an app immediately",
-      "Automatic report on every upload flags secret keys, direct AI API calls, password boxes, forms that post off-site, trackers, and outside scripts; it informs the reviewer and never blocks the upload",
+      "Review queue for apps: nothing publishes until a reviewer approves it, and a reviewer can unpublish an app immediately",
+      "Automatic report on every app upload flags secret keys, direct AI API calls, password boxes, forms that post off-site, trackers, and outside scripts; it informs the reviewer and never blocks the upload",
       "Uploads are validated before anything is written: 50 MB cap, allowlisted file types, and checks for path traversal, symlinks, and zip bombs",
-      "Each app is its own web origin, so one app can't read another's saved data or the gallery's session",
+      "Each app is its own web origin, so one app can't read another's saved data or the Studio's session",
+      "Search by meaning (October 2026): a small embedding model runs inside the server, so a vague search still finds the right app or video, with no outside AI service and about 5 ms per search",
+      "Checked search against 32 labeled test searches before it shipped (30 found); exact word matches still rank first, so nothing vanishes while a teacher types",
+      "After each upload, headless Chrome takes a screenshot of the app for its card, and flags pages that come out blank",
+      "Collections hold apps and videos together, with folders inside, and can be shared with other teachers as view-only or collaborative",
+      "Private apps and videos stay out of the shared gallery while the teacher still uses them in class",
+      "Items can be tagged with the actual high school course from the course directory, not just a subject",
       "Microsoft sign-in with Staff and Reviewer app roles, checked by the app itself as well as by Entra",
       "Worked within the MDM-managed firewall, which only admits Apple-signed listeners, by fronting the service with the web server built into macOS",
-      "Traced an intermittent Chrome certificate error to handshake ordering in the server's TLS library, and fixed it with one certificate covering the gallery and every app address",
-      "Every upload posts a card to the IT Teams channel with the app, the teacher, and the automatic report's findings, linking straight to the review queue",
-      "Now also hosts the Classroom Video Library, sharing its sign-in, review queue, and deploy"
+      "Traced an intermittent Chrome certificate error to handshake ordering in the server's TLS library, and fixed it with one certificate covering the Studio and every app address",
+      "Every app upload posts a card to the IT Teams channel with the app, the teacher, and the automatic report's findings, linking straight to the review queue"
     ],
     operations: [
       "Source: district GitHub org; the deploy script runs the test suite before shipping to the server",
       "Services start at boot with nobody signed in, restart on their own, and the server powers back on after an outage",
       "Data: SQLite database and uploaded files on the server; automated backups not yet set up",
       "Certificates renew automatically through a daily job",
+      "The staff offboarding app shares the same front door and certificate but runs as its own account",
       "Runbook: README.md in the repo (deploy, first install, health checks, emergency unpublish)"
     ],
     media: [
-      { type: "img", src: "assets/app-gallery-home.png", caption: "Staff gallery with the app menu open (local copy with sample apps)" },
-      { type: "img", src: "assets/app-gallery-upload.png", caption: "Upload form with a live preview of the gallery card" },
+      { type: "img", src: "assets/app-gallery-home.png", caption: "Staff gallery with the app menu open (local copy with sample apps, before the September redesign)" },
+      { type: "img", src: "assets/app-gallery-upload.png", caption: "Upload form with a live preview of the gallery card (before the redesign)" },
       { type: "img", src: "assets/app-gallery-review.png", caption: "Review queue: the automatic report flags a password box and an off-site form" },
-      { type: "img", src: "assets/app-gallery-signin.png", caption: "Sign-in page for anyone not signed in as staff" }
+      { type: "img", src: "assets/app-gallery-signin.png", caption: "Sign-in page for anyone not signed in as staff (before the redesign)" }
     ]
   },
   {
@@ -730,24 +740,98 @@ const PROJECTS = [
     category: "district",
     status: "live",
     period: "2026",
-    tagline: "Teachers paste a YouTube or Vimeo link; students watch a reviewed copy served from our own network.",
-    summary: "With YouTube headed toward being blocked for students, teachers still need to show classroom videos. I built a library inside the Teacher App Gallery: a teacher pastes a YouTube or Vimeo link and confirms its classroom use, a background worker downloads a copy to the server, and a reviewer approves it before any student can see it. Teachers group videos into collections and share one link; students open it without signing in and watch from a district-hosted address. Built in five staged releases, each deployed and verified before the next.",
-    stack: ["Node.js", "SQLite", "yt-dlp", "ffmpeg", "Caddy", "launchd", "Microsoft Teams (Power Automate)"],
+    tagline: "Teachers find a YouTube or Vimeo video from inside the Studio, trim it to the part they need, and share it with students as a playlist.",
+    summary: "With YouTube headed toward being blocked for students, teachers still need to show classroom videos. The library lives inside the Teacher Studio. A teacher searches YouTube or pastes a link and the video is added to the library; audio can be saved on its own for listening activities. Teachers cut clips down to the part they want, group videos into playlists, and share one link that students open without signing in. In October I took videos out of the review queue: teachers choose their own classroom videos, the same as they always have. Apps still go through review.",
+    stack: ["Node.js", "SQLite", "yt-dlp", "ffmpeg", "YouTube / Vimeo players", "launchd", "Microsoft Teams (Power Automate)"],
     impact: [
-      "Every request records who submitted it and their stated classroom use",
-      "Reviewer approval required before students see a video, in the same queue as app uploads, with a Teams card when one is waiting",
-      "Background worker downloads one video at a time with caps on resolution, file size, and length; retries temporary failures on a backoff and alerts Teams when a download gives up",
-      "Collections: teachers order videos by hand and share one link; students see only approved videos, and re-sharing retires the old link",
-      "Videos stream from their own address with seeking; only the video and its poster image are served, never the stored metadata",
-      "The downloader updates itself daily and runs a test download, so a change on YouTube's side raises a Teams alert before a teacher notices",
-      "Reviewer health page: disk used and free, counts by status, failed downloads with reasons, bulk retry, and cleanup of removed videos after 30 days"
+      "Search YouTube from the add form without the YouTube API's daily quota: 12 searches a minute per person, three at once, results cached for 15 minutes",
+      "Clips: a teacher picks a start and end on a filmstrip, and the player keeps playback inside the clip even on replay, which YouTube's own start and end settings don't do",
+      "Clips stack under their original video with a count badge, so the grid stays clean",
+      "Student playlists: one link, no sign-in, only the videos the teacher put on it; re-sharing retires the old link",
+      "Private library: a teacher's private videos are hidden from other teachers, and the student link still works",
+      "Background worker cuts clips and saves audio one job at a time with caps on size and length, retries temporary failures on a backoff, and alerts Teams when a job gives up",
+      "The downloader updates itself daily and runs a test, so a change on YouTube's side raises a Teams alert before a teacher notices"
     ],
     operations: [
-      "Source: same district GitHub repo as the App Gallery; the test suite runs before every deploy",
-      "The download worker and downloader updater run as their own boot services and restart on their own",
-      "Data: video files on the server disk alongside the gallery database; automated backups not yet set up",
-      "Student rollout waits on district sign-off for downloading and a web-filter allow rule for the video address",
+      "Source: same district GitHub repo as the Studio; the test suite runs before every deploy",
+      "The worker and the downloader updater run as their own boot services and restart on their own",
+      "Data: files on the server disk alongside the Studio database; automated backups not yet set up",
+      "Not yet checked on student devices behind the web filter",
       "Runbook: README.md in the repo"
+    ],
+    media: []
+  },
+  {
+    id: "staff-offboarding",
+    name: "Staff Offboarding Checklist",
+    category: "district",
+    status: "live",
+    period: "2026",
+    tagline: "One shared checklist for a departing employee, in place of the paper exit form that goes desk to desk.",
+    summary: "When staff leave, the district's paper exit checklist travels between the supervisor, payroll, IT, and HR. I built a web app where the supervisor starts a case and every department gets its own steps at the same time. Steps that have to happen in order stay locked until what they wait on is done: IT can't close an account until the employee's files and records are saved and they've signed for district property, and the final paycheck waits on the supervisor's sign-off and final attendance. It runs on the same district Mac mini as the Teacher Studio, reachable only on the district network, and is live with a small pilot group. Onboarding is built and switched off until offboarding is proven.",
+    stack: ["Node.js", "Express", "SQLite", "Microsoft Entra ID", "AES-256-GCM", "launchd", "Apache + Caddy"],
+    impact: [
+      "Department sign-offs on top of enforced order: a sign-off is refused while any of that department's steps still waits on someone else",
+      "Every action and every view of a case goes into an audit log; skipping a step or letting one go early needs a written reason",
+      "Private details (forwarding address, salary, benefits) are encrypted in the database, shown only to the roles that need them, and deleted on March 1 after the case closes",
+      "The departing employee signs for district property with their own Microsoft sign-in and sees only their own checklist",
+      "Processes are data: an admin edits a draft and publishes a new version, and cases already under way keep the version they started with",
+      "Runs as its own account that can't log in, so nothing else on the server can read HR data",
+      "Personnel data never leaves the server; the Cloudflare DNS record is lookup-only, so Cloudflare never sees a request",
+      "Security review before launch; the fixes went out with the first deploy"
+    ],
+    operations: [
+      "Source: district GitHub org; the deploy script refuses uncommitted changes and runs the tests first",
+      "Data: SQLite on the server with 14 daily backups; an off-site copy is still to be decided",
+      "Before real HR data goes in: full-disk encryption on the server, a sending mailbox for email alerts, and moving the Mac to a server group and a locked room",
+      "Runbook: README.md in the repo (install, deploy, settings)"
+    ],
+    media: []
+  },
+  {
+    id: "assessment-writer",
+    name: "Locked-Down Test Writing App",
+    category: "district",
+    status: "build",
+    period: "2026",
+    tagline: "A native Mac app that locks a student's Mac for a written test, with Read&Write allowed for students who have that accommodation.",
+    summary: "The district needed a way to give written tests on student Macs that keeps students out of every other app, while students with a Read&Write accommodation can still use it. I wrote a native Mac app in Swift that locks the Mac with Apple's Assessment Mode. A teacher makes a test link or a 4-digit join code, posts it in Schoology, and picks how the test ends. When it's over, the student's work is saved as a locked PDF with a record of the session. Teachers can watch from their own Mac and get an alert if a student leaves the test. The Assessment Mode entitlement is requested from Apple; until it's approved, test builds use kiosk mode and say so on every screen.",
+    stack: ["Swift", "SwiftUI + AppKit", "Apple Assessment Mode", "Ed25519 signing", "Mosyle MDM profiles", "Node (relay)"],
+    impact: [
+      "Test links are signed, so a student who edits a link to change how the test ends gets it refused",
+      "Read&Write is added to the locked session only for students Mosyle marks for it, and the test won't start if it's missing, so nobody quietly tests without their accommodation",
+      "Work saves every couple of seconds; after a crash or power loss the test reopens only with the proctor password",
+      "The PDF records start and end times, how the test ended, breaks, and wrong password attempts, and can't be edited",
+      "Teacher alerts go through a small relay, built to run on the district server, that keeps nothing on disk, which avoids a network permission prompt on every student Mac",
+      "Building proctor passwords and signing keys reach Macs through Mosyle profiles written by an IT command-line tool",
+      "37 automated tests (24 in the app, 13 in the relay), including link tampering"
+    ],
+    operations: [
+      "Source: district GitHub org (private)",
+      "Waiting on Apple's approval of the Assessment Mode entitlement; a pilot checklist is written",
+      "The relay is dependency-free Node and holds everything in memory"
+    ],
+    media: []
+  },
+  {
+    id: "lost-and-found",
+    name: "Elementary Lost and Found",
+    category: "district",
+    status: "build",
+    period: "2026",
+    tagline: "Families find a lost item by photo and claim it; the site never stores a name.",
+    summary: "Built for one of our elementary schools from a working design prototype. Families browse photos of found items without signing in and claim one; staff sign in with Microsoft to add items, close claims, and keep a history. The prototype only pretended to save and sign in, so the job was making those parts real while keeping its look exactly. The main design call is where names go: a claim's details are emailed to the school's shared mailbox through Microsoft Graph and never written to the site's database.",
+    stack: ["Node.js", "Express 5", "SQLite", "Microsoft Entra ID", "Microsoft Graph mail", "Cloudflare Turnstile", "Cloudflare Tunnel (planned)"],
+    impact: [
+      "No student names, parent names, or parent emails on disk; a test runs a full round of claims and then scans every data file to prove it",
+      "The parent's confirmation email leaves out the child's name, in case the address was mistyped",
+      "\"Mark sent home\" links carry the parent's address sealed with AES-256-GCM, work once, and expire in 30 days",
+      "The claim form is behind Turnstile and a per-address limit, because every claim makes the district send email",
+      "Matches the prototype pixel for pixel at desktop width, with phone layouts added"
+    ],
+    operations: [
+      "Hosting: the district Mac mini behind a Cloudflare Tunnel so families can reach it from home; not yet set up",
+      "Still to do: an Entra app registration with mail limited to the one shared mailbox, and a reachability check from a school machine"
     ],
     media: []
   },
@@ -757,15 +841,18 @@ const PROJECTS = [
     category: "district",
     status: "build",
     period: "2026",
-    tagline: "Four Mac minis pooled over Thunderbolt 5 for on-prem AI inference.",
-    summary: "Repurposed four Mac minis into a pooled compute cluster networked over Thunderbolt 5 and running exo for distributed inference. The resident model is Qwen3.6 35B-A3B (5-bit); the lineup is updated as new models are released. A custom web frontend puts it in front of staff: Microsoft sign-in for a pilot group, per-user conversation history, and an admin view. This is on-prem AI capability the district gets from hardware it already owned.",
-    stack: ["Apple Silicon", "Thunderbolt 5 networking", "exo", "Distributed inference", "Qwen3.6 35B-A3B (5-bit)"],
+    tagline: "Three Mac minis linked over Thunderbolt 5 for on-prem AI chat, with a fast model and a deeper one.",
+    summary: "I repurposed Mac minis the district already owned into an on-prem AI cluster, networked over Thunderbolt 5 and running exo. It serves two models: Qwen3.6 35B-A3B (5-bit) on the head node as the fast default, and Qwen3.6 27B (8-bit) split across the other two nodes as the deeper option. A custom web frontend puts it in front of staff: Microsoft sign-in for a pilot group, per-user conversation history, and an admin view. Staff get the fast model; admins can pick a model or let Auto route by how hard the question is.",
+    stack: ["Apple Silicon", "Thunderbolt 5 + RDMA", "exo", "Tensor parallelism", "Qwen3.6 35B-A3B (5-bit)", "Qwen3.6 27B (8-bit)"],
     impact: [
-      "Pools compute from 4 machines the district already owned",
-      "Serves Qwen3.6 35B-A3B (5-bit) through exo across the pooled nodes",
+      "Runs on 3 Mac minis the district already owned",
+      "Benchmarked layouts before choosing one: a model that fits on one node ran 3.6x faster than a bigger model split across three, so the fast tier runs on a single node",
+      "Splitting the 27B across two nodes over Thunderbolt RDMA nearly doubled its speed (8.6 to 15.5 tokens a second), checked for accuracy on prompts up to 34k tokens",
+      "A watchdog re-places any model that drops and sends each one a test prompt every 15 minutes; 184 of 184 checks passed in its first overnight run",
+      "Auto mode (admins): a rule-based score sends harder questions to the deeper model and fails over either way",
       "Custom frontend built and iterated with an agentic CLI workflow",
       "On-prem inference: no per-token vendor costs, data stays in-district",
-      "Reached only through a Mac Studio relay, so the four nodes stay off the district network"
+      "Reached only through a Mac Studio relay, so the three nodes stay off the district network"
     ],
     media: [
       { type: "img", src: "assets/cluster-frontend.png", caption: "Chat frontend answering live from the on-prem exo cluster" },
@@ -788,14 +875,14 @@ const PROJECTS = [
     summary: "The compute cluster's nodes are managed Macs whose firewall would not let them accept connections directly, and I did not want inference machines sitting on the district network anyway. So a Mac Studio sits in front as a relay. It bridges the district network to the cluster, runs a reverse proxy that passes staff requests through to the head node, and is the hop I use to administer the cluster remotely. The head node still runs the chat frontend and its database; the relay only carries traffic. Staff get one stable address that does not change when the nodes behind it do.",
     stack: ["Mac Studio", "macOS", "Reverse proxy", "Network isolation"],
     impact: [
-      "The four inference nodes take no connections from the district network; the relay is the only machine exposed",
+      "The three inference nodes take no connections from the district network; the relay is the only machine exposed",
       "Staff reach the chat frontend at one stable address, whatever changes on the nodes behind it",
       "Worked within the MDM-managed firewall, which kept the nodes from accepting inbound connections, by routing through a separate machine",
       "Remote administration of the cluster goes through the same relay, so there is one way in to secure and watch",
       "The relay holds no conversations: the frontend and its database stay on the head node"
     ],
     operations: [
-      "A separate machine in front of the head node; it is not one of the four inference nodes",
+      "A separate machine in front of the head node; it is not one of the three inference nodes",
       "Single operator so far; shared ownership planned as the team comes on"
     ],
     media: []
@@ -993,6 +1080,8 @@ def _answers_match(user: str, correct: str) -> bool:
       "A mock Jellyfin server runs end-to-end browser scenarios with throwaway users; it found six SyncPlay bugs before a real movie night did",
       "One-command self-hosted deployment, with its own TURN infrastructure for guests behind strict NATs",
       "Headless real-browser harness drives two clients through a room before every deploy, with no window and no GPU",
+      "October 2026 art pass: the store now reads as a fluorescent-lit 90s rental shop, and the Cinematic setting gained 4x MSAA, full-resolution ambient occlusion, and 16x anisotropic filtering on the shelves",
+      "The test harness can now draw on the real GPU at a chosen pixel ratio, measure the store's frame rate, and score sharpness and color from captured shots with ffmpeg",
       "Served to invited friends over Tailscale on the same host as the media server"
     ],
     media: [
@@ -1278,14 +1367,16 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
     period: "2026 - present",
     tagline: "The home media server shared with friends over Tailscale, with nothing exposed to the open internet.",
     summary: "Opening the home Jellyfin server to a handful of friends without opening a port. The server is shared machine-by-machine through Tailscale, and the tailnet policy limits share recipients to three HTTPS ports on that one host: the media server, a request site, and Party Theater. Friends request titles on the request site; each request lands in a Discord channel with Approve and Deny buttons. A read-only status page shows them free space, recent additions, and failures without exposing any admin interface. The repo is the runbook: add a friend, revoke one, rotate the share, recover after a reinstall.",
-    stack: ["Tailscale (grants policy, serve)", "Jellyfin", "Seerr", "Podman quadlets", "Python (stdlib)", "systemd timers"],
+    stack: ["Tailscale (grants policy, serve)", "Jellyfin", "Seerr", "Audiobookshelf", "Calibre-Web", "LazyLibrarian", "Podman quadlets", "Python (stdlib)", "systemd timers"],
     impact: [
       "Friends reach three HTTPS services and nothing else; tailnet members keep full access",
       "TLS from Tailscale-issued certificates, with no public DNS record and no port forward",
       "Onboarding and offboarding are one script each: account created with library restrictions, or disabled with history kept",
       "Requests are approved from a Discord button; trusted users can be switched to auto-approve",
       "Status page serves a sanitized, cached snapshot: no keys, no paths, no admin links",
-      "Curated collections (new releases, just added, seasonal) rebuilt hourly by a timer",
+      "Curated collections (new releases, just added, seasonal, Best Picture winners) rebuilt hourly by a timer",
+      "Books (October 2026): Audiobookshelf and Calibre-Web for friends; a !book request in Discord goes to me as an Approve / Deny card, and approved books are fetched automatically",
+      "!bookaccount makes a friend the same login in both reading apps and DMs it to them; if the Calibre-Web step fails, the new Audiobookshelf account is removed again",
       "Friend-facing setup guide per platform, plus a roll-out test checklist"
     ],
     operations: [
@@ -1334,9 +1425,56 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
       "Media library lives on a Synology NAS mounted over NFS; service databases stay on the server's SSD",
       "Nightly configuration backup to the NAS, with a written restore guide",
       "The server's lid LED strip is a health light: dark when all is well, a hazard pattern when a service is down or AC power is lost",
-      "SSH is keys-only; container images and OS packages update on timers"
+      "SSH is keys-only; container images and OS packages update on timers",
+      "Since October 2026 the whole host is described in an Ansible playbook with a nightly drift check (see Homelab as Code)"
     ],
     media: []
+  },
+  {
+    id: "homelab-as-code",
+    name: "Homelab as Code",
+    category: "personal",
+    status: "live",
+    period: "2026 - present",
+    tagline: "The whole home server described in one Ansible playbook, with a nightly check that the real machine still matches it.",
+    summary: "My home server had grown to dozens of containers and timers set up by hand. In October I brought the running machine under code instead of rebuilding it: every container definition, systemd unit, firewall zone, and hardening file was captured as it was, and the milestone was a check-mode run reporting zero changes. Applying a change and restarting a service are separate steps, so an edit can't kick friends out of a movie. A timer runs the same check every night and sends a phone alert if the machine has drifted from the repo. With the nightly data backup, a rebuild is: install Fedora, run the playbook, restore the backup.",
+    stack: ["Ansible", "Podman quadlets", "systemd", "firewalld", "GitHub Actions", "ntfy"],
+    impact: [
+      "28 rootless container definitions, 32 user units, the root units, firewall zones, and SSH and kernel hardening, all in one playbook",
+      "Adopted live with no rebuild: the first milestone was done when check mode reported changed=0",
+      "Nightly drift check at 05:15, after the config backup, with a phone alert listing what changed",
+      "Restarts, firewall reloads, and the SSH reload only happen when asked for explicitly",
+      "Credentials never go in the repo; a role checks that each credential file exists with the right owner and mode 0600, without reading it",
+      "CI runs yamllint, a playbook syntax check, ansible-lint on the production profile, and shellcheck on every push",
+      "Decisions written up as three ADRs; next are OpenTofu for the Tailscale and Cloudflare side and sops + age for credentials"
+    ],
+    operations: [
+      "Source: private GitHub repo; scripts/capture.sh pulls a hand edit on the host back into the repo for review",
+      "CI can't reach the host because nothing on it accepts connections from the internet, so the nightly timer on the host is the real check"
+    ],
+    media: [],
+    code: {
+      lang: "bash",
+      label: "scripts/drift-check.sh — compare the live host to the repo without changing anything",
+      source: `# Exit 0 = no drift, 1 = drift (or a failed invariant), 2 = could not run.
+cd "$repo" || exit 2
+ANSIBLE_NOCOLOR=1 ansible-playbook site.yml --check --diff >"$log" 2>&1
+rc=$?
+
+recap=$(grep -E '^fedora +:' "$log" || true)
+changed=$(sed -nE 's/.*changed=([0-9]+).*/\\1/p' <<<"$recap")
+failed=$(sed -nE 's/.*failed=([0-9]+).*/\\1/p' <<<"$recap")
+
+if [[ -z $recap ]]; then
+  echo "drift-check: playbook did not finish (rc=$rc)"; tail -20 "$log"; exit 2
+fi
+
+if [[ $changed == 0 && $failed == 0 && $rc == 0 ]]; then
+  echo "drift-check: clean ($recap)"
+  exit 0
+fi
+# Otherwise: list what changed and post it to ntfy, then exit 1.`
+    }
   },
   {
     id: "adguard-dns",
@@ -1449,8 +1587,8 @@ WantedBy=default.target
     category: "personal",
     status: "build",
     period: "2026",
-    tagline: "Local GPU serving with an AWS burst plane.",
-    summary: "A hybrid inference platform that serves models from local GPU hardware and will burst to AWS when demand exceeds local capacity. The Mac mini cluster proves that on-prem inference works for the district; this project answers the follow-up question of when on-prem stops being cheaper than cloud. The local half is built and measured: vLLM serving Qwen3-4B-AWQ on a 16 GB RTX 4090 Mobile, a FastAPI gateway in front of it that logs every request with tokens, time to first token, and route, and Prometheus, Grafana, and a GPU exporter for observability, all as rootless Podman quadlets. The AWS burst plane, Terraform, and cost-per-request reporting are the remaining milestones.",
+    tagline: "Local GPU serving with a planned AWS burst plane; parked for now.",
+    summary: "A hybrid inference platform that serves models from local GPU hardware and will burst to AWS when demand exceeds local capacity. The Mac mini cluster proves that on-prem inference works for the district; this project answers the follow-up question of when on-prem stops being cheaper than cloud. The local half is built and measured: vLLM serving Qwen3-4B-AWQ on a 16 GB RTX 4090 Mobile, a FastAPI gateway in front of it that logs every request with tokens, time to first token, and route, and Prometheus, Grafana, and a GPU exporter for observability, all as rootless Podman quadlets. The AWS burst plane, Terraform, and cost-per-request reporting are the remaining milestones. The project is parked for now: the vLLM container is still defined in the homelab playbook but isn't running.",
     stack: ["vLLM", "FastAPI gateway", "Prometheus", "Grafana", "Podman quadlets", "CDI GPU passthrough", "AWS (planned)"],
     impact: [
       "Measured baseline: 130 tokens/s single stream, 1,531 tokens/s aggregate at 16 concurrent requests",
@@ -1458,7 +1596,7 @@ WantedBy=default.target
       "Gateway overhead about 1 ms of time to first token, with no measurable throughput loss",
       "VRAM budgeted so a 14B assistant model stays fully on the GPU alongside it (14.9 of 16.4 GB with both resident)",
       "Finding: saturation comes from KV cache pressure, not compute, which is the queueing signal the burst router needs",
-      "Not yet built: AWS burst plane, Terraform, cost-per-request report",
+      "Parked as of October 2026; not yet built: AWS burst plane, Terraform, cost-per-request report",
       "Personal infrastructure, kept separate from district systems"
     ],
     media: [
