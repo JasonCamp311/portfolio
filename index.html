@@ -9,6 +9,20 @@
 <meta name="theme-color" content="#121310" media="(prefers-color-scheme: dark)">
 <title>Jason Camp · Systems Portfolio</title>
 <meta name="description" content="Production software and infrastructure built and operated by Jason Camp: K-12 district systems, self-hosted AI, and a home lab.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jason Camp">
+<meta property="og:title" content="Jason Camp · Systems Portfolio">
+<meta property="og:description" content="Production software and infrastructure built and operated by Jason Camp: K-12 district systems, self-hosted AI, and a home lab.">
+<meta property="og:url" content="https://jasoncamp311.github.io/portfolio/">
+<meta property="og:image" content="https://jasoncamp311.github.io/portfolio/assets/party-theater-lobby.png">
+<meta property="og:image:width" content="1440">
+<meta property="og:image:height" content="900">
+<meta property="og:image:alt" content="Lobby with the avatar customizer, captured live from the dev server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Jason Camp · Systems Portfolio">
+<meta name="twitter:description" content="Production software and infrastructure built and operated by Jason Camp: K-12 district systems, self-hosted AI, and a home lab.">
+<meta name="twitter:image" content="https://jasoncamp311.github.io/portfolio/assets/party-theater-lobby.png">
+<meta name="twitter:image:alt" content="Lobby with the avatar customizer, captured live from the dev server">
 <!-- ================================================================
   HOW TO UPDATE THIS PORTFOLIO
   ================================================================
@@ -67,6 +81,7 @@
 <link rel="stylesheet" href="assets/fonts/fonts.css">
 <link rel="stylesheet" href="assets/vendor/atom-one-dark.min.css">
 <script src="assets/vendor/highlight.min.js" defer></script>
+<script src="assets/vendor/highlight-powershell.min.js" defer></script>
 <style>
   :root{
     color-scheme:light;
@@ -145,7 +160,7 @@
     font-size:16px;line-height:1.55;
     -webkit-font-smoothing:antialiased;
   }
-  ::selection{background:var(--accent);color:#fff}
+  ::selection{background:var(--accent);color:var(--paper)}
   a{color:var(--accent)}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
   .mono{font-family:"IBM Plex Mono",monospace}
@@ -185,7 +200,7 @@
   .eyebrow b{color:var(--ink);font-weight:600}
   h1{
     font-family:"Archivo",sans-serif;
-    font-weight:900;
+    font-weight:800;
     font-size:clamp(38px,6vw,68px);
     line-height:0.99;
     letter-spacing:-0.02em;
@@ -293,7 +308,7 @@
     animation-delay:calc(var(--i) * 90ms);
   }
   .roadmap-row .idx{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--slate);opacity:.6;grid-row:span 2}
-  .roadmap-row .rtitle{font-weight:700}
+  .roadmap-row .rtitle{font-weight:600}
   .roadmap-row .rnote{color:var(--slate);font-size:14px;grid-column:2}
 
   /* ---------- print sheet (only rendered on paper) ---------- */
@@ -315,12 +330,12 @@
   .fbtn:hover{border-color:var(--accent);color:var(--accent)}
   .fbtn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
   .fbtn .cnt{color:var(--slate)}
-  .fbtn[aria-pressed="true"] .cnt{color:var(--paper);opacity:.55}
+  .fbtn[aria-pressed="true"] .cnt{color:var(--paper);opacity:.7}
 
   /* ---------- cards ---------- */
   .grid{
     display:grid;gap:16px;
-    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));
     padding-bottom:64px;
   }
   .card{
@@ -397,10 +412,12 @@
   }
   .shot.placeholder .ph .big{font-size:20px}
   pre.codeblock{
-    background:var(--terminal);border-radius:0;overflow:auto;
+    background:var(--terminal);color:var(--terminal-ink);border-radius:0;overflow:auto;
     font-size:13px;line-height:1.5;
   }
   pre.codeblock code{font-family:"IBM Plex Mono",monospace;padding:16px 18px;display:block;background:transparent}
+  /* atom-one-dark's #5c6370 comments are under 3:1 on the terminal; lift them to AA. */
+  pre.codeblock .hljs-comment,pre.codeblock .hljs-quote{color:#7f8794}
   .code-label{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--slate);margin-bottom:8px}
   .d-links{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}
 
@@ -465,7 +482,8 @@
     .hero{padding-top:44px}
   }
   @media (prefers-reduced-motion: reduce){
-    *{animation:none !important;transition:none !important}
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation:none !important;transition:none !important}
     .roadmap-row{opacity:1;transform:none}
   }
   @media print{
@@ -591,7 +609,7 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-10-23";
+const LAST_UPDATED = "2026-10-25";
 
 /* Hero metrics strip. Keep numbers honest and current.
    num may be a string, or a function of the project pool the board is
@@ -959,6 +977,55 @@ const PROJECTS = [
     media: []
   },
   {
+    id: "pickem-bench",
+    name: "Pick'em Bench",
+    category: "personal",
+    status: "live",
+    period: "2026 - present",
+    tagline: "Six AI models pick every NFL game from one prompt, then get graded against the closing line.",
+    summary: "An evaluation harness that happens to be about football. Every week six language models, five hosted and one running on the home server, get the identical prompt: the schedule plus each team's record, scoring and results, with no betting lines. Each returns a final score and a win probability per game. Picks are saved once and fingerprinted before kickoff, then graded straight-up, against the spread, on the total and on calibration, next to two no-model baselines. A public site shows the standings, each model's stated reasoning beside the data it was given, and where the models disagree with the market.",
+    stack: ["Node (zero deps)", "React", "Vite", "OpenRouter", "Ollama", "systemd timers", "GitHub Pages"],
+    impact: [
+      "Six models answer one identical prompt; a full week of picks costs about 10 cents",
+      "Picks are write-once and SHA-256 fingerprinted; a late or edited pick is dropped or flagged",
+      "Spread and over/under results are derived from each predicted score, so no model ever sees a line",
+      "Always-home and always-favorite baselines plus a consensus entry give every record something to beat",
+      "A fact-check pass flagged 8 stated reasons that contradicted the data in week 5, 7 of them from the smallest model",
+      "Runs unattended: timers pick, grade, commit and publish, and a failure sends a phone alert"
+    ],
+    media: [
+      { type: "img", src: "assets/pickem-bench-card.png", caption: "Week 5 card: every model's predicted score, with the spread and total sides it implies" }
+    ],
+    links: [
+      { label: "Live site", href: "https://jasoncamp311.github.io/pickem-bench/" },
+      { label: "Source", href: "https://github.com/JasonCamp311/pickem-bench" }
+    ],
+    operations: [
+      "Source: github.com/JasonCamp311/pickem-bench (public); the site is GitHub Pages from the docs folder",
+      "Two systemd user timers on the Fedora server: picks Tuesday and Wednesday 10:00, lines and grading daily 08:00",
+      "The server is the only writer of the data folder and pushes with a deploy key scoped to this one repository",
+      "Failed runs notify by ntfy; regular season only"
+    ],
+    code: {
+      lang: "javascript",
+      label: "src/grade.js \u2014 the spread pick is implied by the predicted score",
+      source: `export function gradePick(pick, final, line, { ats: gradeAts = true, ou: gradeOu = true } = {}) {
+  const predMargin = pick.home_score - pick.away_score;
+  const margin = final.homeScore - final.awayScore;
+  const su = margin === 0 ? 'T' : Math.sign(predMargin) === Math.sign(margin) ? 'W' : 'L';
+
+  // The ATS side is implied: whichever team the predicted margin says covers.
+  let ats = null;
+  let atsSide = null;
+  if (gradeAts && line && Number.isFinite(line.homeLine)) {
+    const edge = predMargin + line.homeLine;
+    atsSide = edge > 0 ? 'home' : edge < 0 ? 'away' : null;
+    const cover = margin + line.homeLine;
+    if (atsSide) ats = cover === 0 ? 'P' : (cover > 0) === (atsSide === 'home') ? 'W' : 'L';
+  }`
+    }
+  },
+  {
     id: "discord-bot",
     name: "AI Community Bot",
     category: "personal",
@@ -1087,7 +1154,7 @@ def _answers_match(user: str, correct: str) -> bool:
       "Served to invited friends over Tailscale on the same host as the media server"
     ],
     media: [
-      { type: "img", src: "assets/party-theater.png", caption: "Theater room view" },
+      { type: "img", src: "assets/party-theater.jpg", caption: "Theater room view" },
       { type: "img", src: "assets/party-theater-lobby.png", caption: "Lobby with the avatar customizer, captured live from the dev server" }
     ],
     code: {
@@ -1535,55 +1602,6 @@ WantedBy=default.target
     ]
   },
   {
-    id: "pickem-bench",
-    name: "Pick'em Bench",
-    category: "personal",
-    status: "live",
-    period: "2026 - present",
-    tagline: "Six AI models pick every NFL game from one prompt, then get graded against the closing line.",
-    summary: "An evaluation harness that happens to be about football. Every week six language models, five hosted and one running on the home server, get the identical prompt: the schedule plus each team's record, scoring and results, with no betting lines. Each returns a final score and a win probability per game. Picks are saved once and fingerprinted before kickoff, then graded straight-up, against the spread, on the total and on calibration, next to two no-model baselines. A public site shows the standings, each model's stated reasoning beside the data it was given, and where the models disagree with the market.",
-    stack: ["Node (zero deps)", "React", "Vite", "OpenRouter", "Ollama", "systemd timers", "GitHub Pages"],
-    impact: [
-      "Six models answer one identical prompt; a full week of picks costs about 10 cents",
-      "Picks are write-once and SHA-256 fingerprinted; a late or edited pick is dropped or flagged",
-      "Spread and over/under results are derived from each predicted score, so no model ever sees a line",
-      "Always-home and always-favorite baselines plus a consensus entry give every record something to beat",
-      "A fact-check pass flagged 8 stated reasons that contradicted the data in week 5, 7 of them from the smallest model",
-      "Runs unattended: timers pick, grade, commit and publish, and a failure sends a phone alert"
-    ],
-    media: [
-      { type: "img", src: "assets/pickem-bench-card.png", caption: "Week 5 card: every model's predicted score, with the spread and total sides it implies" }
-    ],
-    links: [
-      { label: "Live site", href: "https://jasoncamp311.github.io/pickem-bench/" },
-      { label: "Source", href: "https://github.com/JasonCamp311/pickem-bench" }
-    ],
-    operations: [
-      "Source: github.com/JasonCamp311/pickem-bench (public); the site is GitHub Pages from the docs folder",
-      "Two systemd user timers on the Fedora server: picks Tuesday and Wednesday 10:00, lines and grading daily 08:00",
-      "The server is the only writer of the data folder and pushes with a deploy key scoped to this one repository",
-      "Failed runs notify by ntfy; regular season only"
-    ],
-    code: {
-      lang: "javascript",
-      label: "src/grade.js \u2014 the spread pick is implied by the predicted score",
-      source: `export function gradePick(pick, final, line, { ats: gradeAts = true, ou: gradeOu = true } = {}) {
-  const predMargin = pick.home_score - pick.away_score;
-  const margin = final.homeScore - final.awayScore;
-  const su = margin === 0 ? 'T' : Math.sign(predMargin) === Math.sign(margin) ? 'W' : 'L';
-
-  // The ATS side is implied: whichever team the predicted margin says covers.
-  let ats = null;
-  let atsSide = null;
-  if (gradeAts && line && Number.isFinite(line.homeLine)) {
-    const edge = predMargin + line.homeLine;
-    atsSide = edge > 0 ? 'home' : edge < 0 ? 'away' : null;
-    const cover = margin + line.homeLine;
-    if (atsSide) ats = cover === 0 ? 'P' : (cover > 0) === (atsSide === 'home') ? 'W' : 'L';
-  }`
-    }
-  },
-  {
     id: "inference-platform",
     name: "Hybrid Inference Platform",
     category: "personal",
@@ -1733,7 +1751,7 @@ const dlg = $("#detail");
 function mediaHTML(m){
   if (m.type === "video"){
     return `<figure class="shot" data-src="${esc(m.src)}">
-      <video controls muted playsinline preload="metadata" src="${esc(m.src)}"></video>
+      <video controls muted playsinline preload="metadata" src="${esc(m.src)}" aria-label="${esc(m.caption)}"></video>
       <figcaption>${esc(m.caption)}</figcaption></figure>`;
   }
   return `<figure class="shot" data-src="${esc(m.src)}">
@@ -1794,7 +1812,12 @@ function openDetail(id){
   if (p.code){
     const codeEl = $("#d-inner code");
     codeEl.textContent = p.code.source;
-    if (window.hljs) hljs.highlightElement(codeEl);
+    if (window.hljs){
+      // The bundled highlight.js has no GDScript grammar; Python's is close enough.
+      if (!hljs.getLanguage("gdscript")) hljs.registerAliases("gdscript", { languageName: "python" });
+      if (!hljs.getLanguage(p.code.lang)) codeEl.className = "language-plaintext";
+      hljs.highlightElement(codeEl);
+    }
   }
   // swap missing media for labeled placeholders
   $("#d-inner").querySelectorAll(".shot").forEach(fig => {
