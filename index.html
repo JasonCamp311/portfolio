@@ -609,7 +609,7 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-10-25";
+const LAST_UPDATED = "2026-11-03";
 
 /* Hero metrics strip. Keep numbers honest and current.
    num may be a string, or a function of the project pool the board is
@@ -637,7 +637,8 @@ const BOARD = [
   { id: "pickem-bench", metric: "6 models, graded weekly" },
   { id: "homelab",      metric: "self-hosted" },
   { id: "homelab-as-code", metric: "nightly drift check" },
-  { id: "adguard-dns",  metric: "encrypted DNS" },
+  { id: "adguard-dns",  metric: "2 resolvers, whole house" },
+  { id: "offline-library", metric: "~800 GB offline" },
   { id: "cluster-relay", metric: "single way in" },
   { id: "mac-cluster",  metric: "on-prem inference" },
 ];
@@ -983,12 +984,13 @@ const PROJECTS = [
     status: "live",
     period: "2026 - present",
     tagline: "Six AI models pick every NFL game from one prompt, then get graded against the closing line.",
-    summary: "An evaluation harness that happens to be about football. Every week six language models, five hosted and one running on the home server, get the identical prompt: the schedule plus each team's record, scoring and results, with no betting lines. Each returns a final score and a win probability per game. Picks are saved once and fingerprinted before kickoff, then graded straight-up, against the spread, on the total and on calibration, next to two no-model baselines. A public site shows the standings, each model's stated reasoning beside the data it was given, and where the models disagree with the market.",
+    summary: "An evaluation harness that happens to be about football. Every week six language models, five hosted and one running on the home server, get the identical prompt: the schedule plus each team's record, scoring and results. Each returns a final score and a win probability per game. Picks are saved once and fingerprinted before kickoff, then graded straight-up, against the spread, on the total and on calibration, next to two no-model baselines. The prompt is run as separate tracks that change one thing at a time: scores only, then ratings and injuries, then the model's own past scorecard, then the betting line itself, then a structured debate before the pick, so each change can be measured against the same games. A public site shows the standings, each model's stated reasoning beside the data it was given, and where the models disagree with the market.",
     stack: ["Node (zero deps)", "React", "Vite", "OpenRouter", "Ollama", "systemd timers", "GitHub Pages"],
     impact: [
       "Six models answer one identical prompt; a full week of picks costs about 10 cents",
       "Picks are write-once and SHA-256 fingerprinted; a late or edited pick is dropped or flagged",
-      "Spread and over/under results are derived from each predicted score, so no model ever sees a line",
+      "On the original tracks, spread and over/under results are derived from each predicted score, so the model never sees a line",
+      "Five tracks, each one change apart: the 'Against the line' track (from week 8) shows the spread and lets a model pass; the 'After a debate' track (from week 9) has home and away advocates argue blind before the pick",
       "Always-home and always-favorite baselines plus a consensus entry give every record something to beat",
       "A fact-check pass flagged 8 stated reasons that contradicted the data in week 5, 7 of them from the smallest model",
       "Runs unattended: timers pick, grade, commit and publish, and a failure sends a phone alert"
@@ -1138,7 +1140,7 @@ def _answers_match(user: str, correct: str) -> bool:
     period: "2026",
     tagline: "Self-hostable 3D watch-party app: pick a film in a walkable video store, then watch it in sync.",
     summary: "A standalone, self-hostable watch-party app: React, Vite, TypeScript, and react-three-fiber on the front, a Node signaling server, and a self-hosted LiveKit SFU, deployed with Compose on Fedora with coturn providing TURN so it works across real-world NATs. It has three watch modes: the host shares a file or screen over WebRTC, a browser extension syncs each person's own streaming account, or everyone plays their own stream from a Jellyfin server while SyncPlay keeps the room in lockstep. In Jellyfin mode the room opens in a walkable 90s video store built from the library: people pull cases off the shelves, put them on the table, vote, and the whole room walks into the auditorium with the winner queued.",
-    stack: ["React", "Vite", "TypeScript", "Three.js / react-three-fiber", "Node", "LiveKit (WebRTC SFU)", "Jellyfin SyncPlay", "coturn", "Compose"],
+    stack: ["React", "Vite", "TypeScript", "Three.js / react-three-fiber", "Node", "LiveKit (WebRTC SFU)", "Jellyfin SyncPlay", "coturn", "Compose", "Unreal Engine 5 (rebuild)"],
     impact: [
       "Three watch modes behind one room model: host share, extension sync, and Jellyfin SyncPlay",
       "Jellyfin tokens stay in each viewer's browser; the party server never sees them",
@@ -1151,7 +1153,10 @@ def _answers_match(user: str, correct: str) -> bool:
       "Headless real-browser harness drives two clients through a room before every deploy, with no window and no GPU",
       "October 2026 art pass: the store now reads as a fluorescent-lit 90s rental shop, and the Cinematic setting gained 4x MSAA, full-resolution ambient occlusion, and 16x anisotropic filtering on the shelves",
       "The test harness can now draw on the real GPU at a chosen pixel ratio, measure the store's frame rate, and score sharpness and color from captured shots with ffmpeg",
-      "Served to invited friends over Tailscale on the same host as the media server"
+      "Served to invited friends over Tailscale on the same host as the media server",
+      "Found why remote friends stalled while the host was smooth: the same file moved at 5 Mbps through the tailnet's HTTPS proxy and 80 Mbps without it, so media and rooms now ride a direct TLS path at the same address",
+      "Automatic quality: each viewer's real throughput is measured once per title, a rung is picked with headroom below it, and two stalls in a minute drop a rung; below Original, streams are AV1 encoded on the server's Intel GPU",
+      "November 2026: a parallel rebuild in Unreal Engine 5 for realistic lighting, starting with the video store and two venues; playback, HDR, and sync already work against the same room server, and the web app stays live for friends meanwhile"
     ],
     media: [
       { type: "img", src: "assets/party-theater.jpg", caption: "Theater room view" },
@@ -1435,10 +1440,10 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
     status: "live",
     period: "2026 - present",
     tagline: "The home media server shared with friends over Tailscale, with nothing exposed to the open internet.",
-    summary: "Opening the home Jellyfin server to a handful of friends without opening a port. The server is shared machine-by-machine through Tailscale, and the tailnet policy limits share recipients to three HTTPS ports on that one host: the media server, a request site, and Party Theater. Friends request titles on the request site; each request lands in a Discord channel with Approve and Deny buttons. A read-only status page shows them free space, recent additions, and failures without exposing any admin interface. The repo is the runbook: add a friend, revoke one, rotate the share, recover after a reinstall.",
+    summary: "Opening the home Jellyfin server to a handful of friends without opening a port. The server is shared machine-by-machine through Tailscale, and the tailnet policy limits share recipients to a short list of ports on that one host: the media server and Party Theater, a request site, two reading apps, the offline library, and one game server. Friends request titles on the request site; each request lands in a Discord channel with Approve and Deny buttons. A read-only status page shows them free space, recent additions, and failures without exposing any admin interface. The repo is the runbook: add a friend, revoke one, rotate the share, recover after a reinstall.",
     stack: ["Tailscale (grants policy, serve)", "Jellyfin", "Seerr", "Audiobookshelf", "Calibre-Web", "LazyLibrarian", "Podman quadlets", "Python (stdlib)", "systemd timers"],
     impact: [
-      "Friends reach three HTTPS services and nothing else; tailnet members keep full access",
+      "Friends reach six HTTPS ports and one game server's UDP ports on one host, and nothing else; tailnet members keep full access",
       "TLS from Tailscale-issued certificates, with no public DNS record and no port forward",
       "Onboarding and offboarding are one script each: account created with library restrictions, or disabled with history kept",
       "Requests are approved from a Discord button; trusted users can be switched to auto-approve",
@@ -1446,7 +1451,9 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
       "Curated collections (new releases, just added, seasonal, Best Picture winners) rebuilt hourly by a timer",
       "Books (October 2026): Audiobookshelf and Calibre-Web for friends; a !book request in Discord goes to me as an Approve / Deny card, and approved books are fetched automatically",
       "!bookaccount makes a friend the same login in both reading apps and DMs it to them; if the Calibre-Web step fails, the new Audiobookshelf account is removed again",
-      "Friend-facing setup guide per platform, plus a roll-out test checklist"
+      "Friend-facing setup guide per platform, plus a roll-out test checklist",
+      "Live TV (November 2026): an over-the-air network tuner feeds local channels into the media server, with a sports guide pulled every four hours and LIVE badges on the channel logos",
+      "Friends can also browse the offline library (read-only; no bulk downloads) and join a modded game server through the same share"
     ],
     operations: [
       "Source: GitHub repo holding the quadlets, tailnet policy, scripts, and runbook",
@@ -1462,8 +1469,8 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
 	// Everyone who is a member of this tailnet: unchanged, full access.
 	{"src": ["autogroup:member"], "dst": ["*"], "ip": ["*"]},
 
-	// Share recipients: Jellyfin + Seerr over HTTPS on fedora, nothing else.
-	{"src": ["autogroup:shared"], "dst": ["fedora"], "ip": ["443", "8443", "8444"]},
+	// Share recipients: Jellyfin, Seerr, book apps + Kiwix over HTTPS, plus the Zomboid game ports. Nothing else.
+	{"src": ["autogroup:shared"], "dst": ["fedora"], "ip": ["443", "8443", "8445", "8446", "8447", "8449", "udp:16261-16262"]},
 ],
 
 // Tailscale SSH: members may SSH into their own devices, in check mode.
@@ -1483,19 +1490,20 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
     category: "personal",
     status: "live",
     period: "ongoing",
-    tagline: "Fedora + Podman infrastructure: media server, local AI, managed network, remote access.",
-    summary: "A production homelab I run the way I'd run a small company's infrastructure. Fedora with rootless Podman and SELinux enforcing, CDI GPU passthrough to an RTX 4090 Mobile, Jellyfin with Intel QSV hardware transcode, Ollama + Open WebUI for local AI, and Tailscale for zero-config secure remote access. The network side is a managed UniFi setup with VLANs, a MoCA 2.5 backhaul over existing coax, and a self-hosted UniFi controller in Podman.",
-    stack: ["Fedora", "Podman + SELinux", "CDI GPU passthrough", "Jellyfin", "Ollama", "UniFi VLANs", "MoCA 2.5", "Tailscale"],
+    tagline: "Fedora + Podman infrastructure: media server, local AI, NAS storage, remote access.",
+    summary: "A production homelab I run the way I'd run a small company's infrastructure. Fedora with rootless Podman and SELinux enforcing, Jellyfin with Intel QSV hardware transcode, a Synology NAS over NFS for the media library, Ollama for local AI, and Tailscale for secure remote access with nothing exposed to the open internet. The network is a flat LAN today; a UniFi gateway, access points, and VLANs that give the server its own segment are planned, and the self-hosted UniFi controller is already running in Podman.",
+    stack: ["Fedora", "Podman + SELinux", "Jellyfin (Intel QSV)", "Ollama", "Synology NAS (NFS)", "Tailscale", "UniFi controller"],
     impact: [
       "Every service containerized, rootless, SELinux enforcing",
-      "GPU passthrough serving local LLM inference and hardware transcode",
-      "Designed a 2.5GbE backhaul over existing coax after cable runs were ruled out",
+      "When the server's laptop GPU began silently corrupting memory in October, a fill-and-verify test proved it was hardware; a small boot service fenced the bad region and kept the GPU in use for three more weeks",
+      "When the fault spread in November, inference moved to CPU and video encoding to the Intel GPU, and every HDR transcode path was retested before friends used it",
       "Secure remote access via Tailscale, nothing exposed to the open internet",
       "Media library lives on a Synology NAS mounted over NFS; service databases stay on the server's SSD",
       "Nightly configuration backup to the NAS, with a written restore guide",
       "The server's lid LED strip is a health light: dark when all is well, a hazard pattern when a service is down or AC power is lost",
       "SSH is keys-only; container images and OS packages update on timers",
-      "Since October 2026 the whole host is described in an Ansible playbook with a nightly drift check (see Homelab as Code)"
+      "Since October 2026 the whole host is described in an Ansible playbook with a nightly drift check (see Homelab as Code)",
+      "Read-only morning checks (November 2026): both DNS resolvers, certificate expiry, a listening-port baseline, pending security updates, 30 HTTP probes, and backup age, summarized in one message; quiet when healthy"
     ],
     media: []
   },
@@ -1515,7 +1523,9 @@ $title    = ConvertTo-SafeName ((Get-Culture).TextInfo.ToTitleCase($titleRaw.Tri
       "Restarts, firewall reloads, and the SSH reload only happen when asked for explicitly",
       "Credentials never go in the repo; a role checks that each credential file exists with the right owner and mode 0600, without reading it",
       "CI runs yamllint, a playbook syntax check, ansible-lint on the production profile, and shellcheck on every push",
-      "Decisions written up as three ADRs; next are OpenTofu for the Tailscale and Cloudflare side and sops + age for credentials"
+      "Decisions written up as three ADRs",
+      "The router keeps UPnP on for gaming, so a 15-minute timer lists its port mappings and alerts once on any mapping not on an allow list",
+      "In progress: the Tailscale policy and Cloudflare DNS records written as OpenTofu import blocks (plan shows imports only, not yet applied), then sops + age for credentials"
     ],
     operations: [
       "Source: private GitHub repo; scripts/capture.sh pulls a hand edit on the host back into the repo for review",
@@ -1552,14 +1562,15 @@ fi
     status: "live",
     period: "2026 - present",
     tagline: "AdGuard Home on the home server: DNS-over-HTTPS upstreams and ~650k ad and tracker rules, answering on the LAN and on Tailscale.",
-    summary: "AdGuard Home runs as a rootless Podman quadlet on the Fedora server, answering on the LAN and on Tailscale. Upstream lookups go to Quad9 and Cloudflare over DNS-over-HTTPS, so a query sent through it is never seen or resolved by the ISP. Three blocklists (AdGuard DNS, OISD Big, HaGeZi Pro) remove ad and tracking domains with nothing installed on the client. The whole thing was configured through AdGuard's REST API rather than the setup wizard, so it is reproducible. The resolver is in service; making it the default for the whole house is the remaining step. The router still hands out its own DNS, and the failover replica for the Synology NAS is written but not switched on.",
+    summary: "AdGuard Home runs as a rootless Podman quadlet on the Fedora server, answering on the LAN and on Tailscale. Upstream lookups go to Quad9 and Cloudflare over DNS-over-HTTPS, so a query sent through it is never seen or resolved by the ISP. Three blocklists (AdGuard DNS, OISD Big, HaGeZi Pro) remove ad and tracking domains with nothing installed on the client. The whole thing was configured through AdGuard's REST API rather than the setup wizard, so it is reproducible. Since late October it answers for the whole house and every Tailscale device, with a replica on the Synology NAS kept in sync every 10 minutes as the failover.",
     stack: ["AdGuard Home", "Podman quadlet", "DNS-over-HTTPS", "Quad9 / Cloudflare", "firewalld", "Tailscale"],
     impact: [
       "Every upstream query is encrypted, so lookups sent through it stay out of the ISP's DNS logs",
       "~650k blocked domains across three curated lists, 4-5 ms average resolution",
       "Rootless container binding port 53 via a scoped sysctl, not a root container",
-      "Real client IPs in the query log (host networking), so per-device visibility is intact",
-      "Not yet done: router DHCP cutover, the Tailscale nameserver setting, and the NAS failover replica"
+      "Two resolvers: the server and a NAS replica in Container Manager, synced every 10 minutes by adguardhome-sync",
+      "The ISP router can't change the DNS it hands out by DHCP, so its own upstream points at AdGuard instead; the trade-off is that LAN clients appear as the router until it is replaced",
+      "Tailscale devices use it as the tailnet's global nameserver and show up individually in the query log"
     ],
     media: [],
     code: {
@@ -1596,10 +1607,50 @@ WantedBy=default.target
     },
     operations: [
       "Runs on the Fedora server as a rootless quadlet, auto-updated nightly",
-      "Failover: a replica for the Synology NAS and a 10-minute sync job are written, not yet deployed",
+      "Failover: replica on the Synology NAS, configuration pushed from the server every 10 minutes",
       "firewalld: port 53 opened only on the LAN and Tailscale zones; the admin UI is LAN-only",
       "Upstreams: Quad9 + Cloudflare DoH, bootstrap by IP, TLS fallback; query log 7 days, stats 30 days"
     ]
+  },
+  {
+    id: "offline-library",
+    name: "Offline Library",
+    category: "personal",
+    status: "live",
+    period: "2026 - present",
+    tagline: "About 800 GB of reference material on the NAS, searchable with no internet: encyclopedias, medical and repair guides, textbooks, and a world map.",
+    summary: "A self-hosted reference library for the day the internet isn't there. A manifest of 132 sources in seven tiers (core reference, medical, survival, power and water, food, maps and communications, textbooks) is fetched by one re-runnable Python script onto the NAS: Wikipedia and 73 other Kiwix archives, Project Gutenberg, Khan Academy, open textbooks, and the whole planet's map as a single PMTiles file. Kiwix serves full-text search over the archives and a small file index serves the PDFs and the map viewer, both as read-only rootless containers. Friends on the media share get the Kiwix reader only.",
+    stack: ["Python", "Kiwix", "nginx", "PMTiles", "Podman quadlets", "Synology NAS (NFS)", "Tailscale"],
+    impact: [
+      "132 sources and 799 GB, with zero failures on the first full run; 74 archives in the Kiwix catalog",
+      "The manifest names archives by prefix, not version: a re-run skips finished files, pulls newer dumps, and deletes the ones they replace",
+      "Every file is size-checked and hash-verified against the mirror's metalink before it is moved into place; downloads resume, and are rate-capped so streaming keeps its bandwidth",
+      "Containers mount the library read-only and listen on localhost; the tailnet reaches them only through Tailscale's HTTPS proxy",
+      "Friends can read and search but not download whole archives, and connections per client are capped"
+    ],
+    operations: [
+      "Source: local git repo on the server; manifest.tsv plus fetch.py, with --dry-run and --max-order to fetch tier by tier",
+      "Data lives on the NAS; each finished tier sends a phone alert",
+      "kiwix-serve watches a catalog the fetcher rebuilds, so new archives appear without a restart",
+      "Both containers are captured in the homelab playbook"
+    ],
+    media: [],
+    code: {
+      lang: "python",
+      label: "fetch.py — the manifest names an archive by prefix, so every run gets the newest dump",
+      source: `def resolve_zim(order, dest, prefix, state_dir) -> list[File]:
+    pat = re.compile(rf"^{re.escape(prefix)}_(\\d{{4}}-\\d{{2}})([a-z]?)\\.zim$")
+    cands = []
+    for fn, d in kiwix_index(state_dir).items():
+        m = pat.match(fn)
+        if m:
+            cands.append(((m.group(1), m.group(2)), fn, d))
+    if not cands:
+        raise LookupError(f"no ZIM matches prefix {prefix!r}")
+    _, fn, d = max(cands)
+    url = f"{KIWIX}/zim/{d}/{fn}"
+    return [File(order, dest, url, fn, meta4=url + ".meta4", zim_prefix=prefix)]`
+    }
   },
   {
     id: "inference-platform",
@@ -1616,7 +1667,7 @@ WantedBy=default.target
       "Gateway overhead about 1 ms of time to first token, with no measurable throughput loss",
       "VRAM budgeted so a 14B assistant model stays fully on the GPU alongside it (14.9 of 16.4 GB with both resident)",
       "Finding: saturation comes from KV cache pressure, not compute, which is the queueing signal the burst router needs",
-      "Parked as of October 2026; not yet built: AWS burst plane, Terraform, cost-per-request report",
+      "Parked as of October 2026, when the server's GPU developed a memory fault (see Self-Hosted Homelab); not yet built: AWS burst plane, Terraform, cost-per-request report",
       "Personal infrastructure, kept separate from district systems"
     ],
     media: [
