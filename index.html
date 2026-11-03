@@ -332,24 +332,9 @@
   .fbtn .cnt{color:var(--slate)}
   .fbtn[aria-pressed="true"] .cnt{color:var(--paper);opacity:.7}
 
-  /* ---------- cards ---------- */
-  .grid{
-    display:grid;gap:16px;
-    grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));
-    padding-bottom:64px;
-  }
-  .card{
-    background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--rule);
-    border-radius:0;
-    padding:20px 20px 18px;display:flex;flex-direction:column;gap:12px;
-    cursor:pointer;text-align:left;font:inherit;color:inherit;
-    transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-  }
-  .card:hover{transform:translateY(-2px);box-shadow:0 8px 24px var(--shadow);border-color:var(--slate);border-top-color:var(--accent)}
-  .card:focus-visible,.fbtn:focus-visible,a:focus-visible,button:focus-visible{
+  .fbtn:focus-visible,a:focus-visible,button:focus-visible{
     outline:2px solid var(--accent);outline-offset:2px;
   }
-  .card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
   .badge{
     display:inline-flex;align-items:center;gap:6px;
     font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;
@@ -361,16 +346,9 @@
   .badge .bdot{width:6px;height:6px;border-radius:50%;background:currentColor}
   .cat{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--slate);
     text-transform:uppercase;letter-spacing:.1em}
-  .card h3{font-family:"Archivo",sans-serif;font-weight:700;font-size:19px;letter-spacing:-.01em}
-  .card .tag{color:var(--slate);font-size:14.5px}
-  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
   .chip{
     font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--slate);
     border:1px solid var(--line);border-radius:0;padding:3px 8px;background:transparent;
-  }
-  .card .kmetric{
-    font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);
-    border-top:1px dashed var(--line);padding-top:10px;
   }
 
   /* ---------- detail dialog ---------- */
@@ -439,26 +417,124 @@
   .decrypt .enc{color:var(--slate);opacity:.55}
   .metric .num{font-variant-numeric:tabular-nums}
 
-  .card{position:relative;isolation:isolate;--start:0;--active:0;--spread:55;--glow:var(--accent)}
-  .card:has(.badge.live){--glow:var(--ok)}
-  .card:has(.badge.build){--glow:var(--build)}
-  .card::before{ /* CardSpotlight */
-    content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
-    background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%),var(--accent-soft),transparent 72%);
-    opacity:0;transition:opacity .3s ease;
+  /* ---------- mission control (projects) ----------
+     One console instead of a long card grid: a rail of projects on the
+     left, the selected one on the "screen" at right. The console is
+     always dark (a monitor on the page), so the dark tokens are set
+     locally and every reused component (badges, chips, code) follows.
+     The one loud moment: switching projects is a channel change. */
+  .mc{
+    --paper:#121310;--panel:#1A1B16;--ink:#EBE9DD;--slate:#A09E8F;--line:#34352C;--rule:#EBE9DD;
+    --accent:#7FA1F2;--accent-soft:#1D2436;--ok:#4CB98A;--ok-soft:#17281F;
+    --build:#D9A63E;--build-soft:#2C2412;--build-ink:#E8BC5E;--design:#8E9186;--design-soft:#24251F;--design-ink:#B4B6AB;
+    --sig:var(--accent);
+    position:relative;margin:56px 0 72px;color:var(--ink);
+    background:#0C0D0A;border:1px solid #2A2C25;border-top:3px solid var(--sig);
+    box-shadow:0 30px 80px -30px color-mix(in srgb,var(--sig) 45%,transparent),0 18px 40px rgba(0,0,0,.35);
+    transition:border-color .5s ease,box-shadow .6s ease;
+    scroll-margin-top:84px;
   }
-  .card:hover::before{opacity:1}
-  .card::after{ /* GlowingEffect: a conic arc of the border that tracks the pointer */
-    content:"";position:absolute;inset:-3px -1px -1px -1px;padding:2px;pointer-events:none;
-    background:conic-gradient(from calc((var(--start) - var(--spread)) * 1deg),
-      transparent 0deg,
-      var(--glow) calc(var(--spread) * .7deg),
-      var(--accent) calc(var(--spread) * 1.3deg),
-      transparent calc(var(--spread) * 2deg));
-    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor;
-            mask-composite:exclude;
-    opacity:var(--active);transition:opacity .3s ease;
+  .mc[data-status="live"]{--sig:var(--ok)}
+  .mc[data-status="build"]{--sig:var(--build)}
+  .mc-head{
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    padding:12px 16px;border-bottom:1px solid #2A2C25;
+  }
+  .mc .filters{margin:0;gap:6px}
+  .mc .fbtn{border-color:#34352C;padding:6px 12px}
+  .mc .fpill{background:var(--ink)}
+  .mc .fbtn[aria-pressed="true"]{color:#0C0D0A}
+  .mc .fbtn[aria-pressed="true"] .cnt{color:#0C0D0A}
+  .mc-hint{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:#8F8D7E}
+  .mc-hint kbd{font:inherit;padding:0 5px;border:1px solid #4A4B40;margin:0 2px}
+  .mc-body{
+    display:grid;grid-template-columns:280px minmax(0,1fr);
+    height:clamp(560px,calc(100vh - 160px),880px);
+  }
+
+  /* rail */
+  .mc-list{position:relative;overflow-y:auto;border-right:1px solid #2A2C25;padding:6px 0 12px;
+    scrollbar-width:thin;scrollbar-color:#34352C transparent}
+  .mc-group{font-family:"IBM Plex Mono",monospace;font-size:11px;color:#8F8D7E;
+    padding:14px 18px 6px;letter-spacing:.04em}
+  .mc-item{
+    position:relative;z-index:1;display:grid;grid-template-columns:12px minmax(0,1fr);gap:10px;align-items:center;
+    width:100%;padding:9px 18px;background:none;border:0;color:#B9B7A8;text-align:left;cursor:pointer;
+    font:500 14.5px/1.3 "Archivo",sans-serif;transition:color .2s ease;
+  }
+  .mc-item:hover{color:#fff}
+  .mc-item[aria-current="true"]{color:#fff}
+  .mc-item:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .mc-item .led{width:7px;height:7px;border-radius:50%;background:#55574B}
+  .mc-item .led.live{background:var(--ok);box-shadow:0 0 6px var(--ok)}
+  .mc-item .led.build{background:var(--build);box-shadow:0 0 6px var(--build)}
+  .mc-item .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mc-beam{
+    position:absolute;left:0;right:0;top:0;height:0;pointer-events:none;
+    background:linear-gradient(90deg,color-mix(in srgb,var(--sig) 26%,transparent),color-mix(in srgb,var(--sig) 6%,transparent) 70%,transparent);
+    border-left:3px solid var(--sig);
+    box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sig) 18%,transparent),-6px 0 22px -4px var(--sig);
+    transition:transform .42s cubic-bezier(.2,.9,.2,1),height .42s cubic-bezier(.2,.9,.2,1),border-color .5s ease;
+  }
+
+  /* screen */
+  .mc-screen{position:relative;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;
+    background:radial-gradient(120% 90% at 70% 0%,color-mix(in srgb,var(--sig) 9%,#121310),#121310 60%);
+    transition:background .6s ease}
+  .mc-screen::before{ /* glass: fine scanlines + a vignette, always on, very faint */
+    content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:repeating-linear-gradient(to bottom,rgba(255,255,255,.028) 0 1px,transparent 1px 3px),
+               radial-gradient(130% 100% at 50% 50%,transparent 60%,rgba(0,0,0,.45));
+  }
+  .mc-scan{ /* the channel-change sweep */
+    position:absolute;left:0;right:0;top:0;height:3px;z-index:3;pointer-events:none;opacity:0;
+    background:#fff;box-shadow:0 0 18px 4px var(--sig),0 0 60px 12px color-mix(in srgb,var(--sig) 50%,transparent);
+  }
+  .mc-view{position:relative;z-index:1;flex:1;overflow-y:auto;padding:30px clamp(20px,3.4vw,44px) 36px;
+    scrollbar-width:thin;scrollbar-color:#34352C transparent}
+  .mc-view h2{font-family:"Archivo",sans-serif;font-weight:800;font-size:clamp(30px,3.8vw,48px);
+    line-height:1.02;letter-spacing:-.025em;color:#fff;
+    text-shadow:0 0 28px color-mix(in srgb,var(--sig) 40%,transparent)}
+  .mc-view h2 .enc{color:var(--sig);opacity:.8}
+  .mc-meta{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:14px 0 0;
+    font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--slate)}
+  .mc-tagline{margin-top:18px;font-size:clamp(17px,1.6vw,20px);line-height:1.45;color:#DAD8CB;max-width:58ch}
+  .mc-view .d-summary{color:#B9B7A8;max-width:68ch}
+  .mc-view .d-section{margin-top:28px}
+  .mc-view .sec-label{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--sig);margin-bottom:10px;transition:color .5s ease}
+  .mc-view .impact li{color:#D3D1C4}
+  .mc-view .impact li::marker{color:var(--sig)}
+  .mc-view pre.codeblock{background:#080907;border:1px solid #2A2C25}
+  .mc-view .d-links a{color:var(--accent)}
+  .mc-foot{position:relative;z-index:1;display:flex;align-items:center;gap:10px;
+    padding:10px 16px;border-top:1px solid #2A2C25;background:#0C0D0A;
+    font-family:"IBM Plex Mono",monospace;font-size:12px;color:#8F8D7E}
+  .mc-foot .pos{margin:0 auto}
+  .mc-step{border:1px solid #34352C;background:transparent;color:var(--ink);font:inherit;padding:6px 12px;cursor:pointer}
+  .mc-step:hover{border-color:var(--sig);color:#fff}
+  .mc-view.tuning .mc-in{animation:mc-in .5s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--d,0) * 45ms + 80ms)}
+  @keyframes mc-in{from{opacity:0;transform:translateY(8px);filter:blur(3px)}}
+  .mc-scan.go{animation:mc-scan .55s cubic-bezier(.5,0,.3,1)}
+  @keyframes mc-scan{0%{opacity:1;transform:translateY(0)}85%{opacity:1}100%{opacity:0;transform:translateY(var(--h,600px))}}
+  .mc-screen.flash{animation:mc-flash .45s ease-out}
+  @keyframes mc-flash{0%{filter:brightness(1.9) saturate(1.4)}30%{filter:brightness(.8)}100%{filter:none}}
+
+  @media (max-width:860px){
+    .mc{margin:40px -16px 56px;border-left:0;border-right:0}
+    .mc-hint{display:none}
+    .mc-body{grid-template-columns:minmax(0,1fr);height:auto}
+    .mc-list{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;border-right:0;border-bottom:1px solid #2A2C25;
+      padding:10px 12px;scroll-snap-type:x proximity;scroll-padding-inline:12px;
+      -webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+    #mc-items{display:contents}
+    .mc-group,.mc-beam{display:none}
+    .mc-item{flex:0 0 auto;width:auto;max-width:220px;border:1px solid #34352C;padding:8px 12px;scroll-snap-align:start}
+    .mc-item[aria-current="true"]{border-color:var(--sig);background:color-mix(in srgb,var(--sig) 16%,transparent)}
+    .mc-view{overflow:visible;padding:24px 18px 28px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .mc-scan.go,.mc-screen.flash,.mc-view.tuning .mc-in{animation:none}
+    .mc-beam,.mc{transition:none}
   }
 
   /* ---------- console layer ----------
@@ -582,7 +658,7 @@
     .top-inner{padding:6px 0}
     /* hidden on paper */
     .top-links,.theme-toggle,.filters,footer,dialog,.dotgrid,.term,
-    .board,.grid,.shot,.media-grid{display:none !important}
+    .board,.mc,.shot,.media-grid{display:none !important}
     .hero{padding:14px 0 8px}
     h1{font-size:24pt;max-width:none}
     .hero p.lede{font-size:10.5pt;max-width:none;margin-top:6px}
@@ -676,17 +752,28 @@
     <div class="board-panel" id="roadmap-list"></div>
   </section>
 
-  <section id="projects" aria-label="Projects">
-    <div class="filters" id="filters" role="group" aria-label="Filter projects">
-      <span class="flabel">Filter</span>
+  <section class="mc" id="projects" aria-label="Projects">
+    <div class="mc-head">
+      <div class="filters" id="filters" role="group" aria-label="Filter projects"></div>
+      <span class="mc-hint" aria-hidden="true"><kbd>↑</kbd><kbd>↓</kbd> browse, <kbd>/</kbd> search</span>
     </div>
-    <div class="grid" id="grid"></div>
+    <div class="mc-body">
+      <nav class="mc-list" id="mc-list" aria-label="Project list">
+        <span class="mc-beam" id="mc-beam" aria-hidden="true"></span>
+        <div id="mc-items"></div>
+      </nav>
+      <article class="mc-screen" id="mc-screen">
+        <span class="mc-scan" id="mc-scan" aria-hidden="true"></span>
+        <div class="mc-view" id="mc-view" tabindex="-1" aria-live="polite"></div>
+        <div class="mc-foot">
+          <button class="mc-step" id="mc-prev" type="button" aria-label="Previous project">◂ prev</button>
+          <span class="pos" id="mc-pos"></span>
+          <button class="mc-step" id="mc-next" type="button" aria-label="Next project">next ▸</button>
+        </div>
+      </article>
+    </div>
   </section>
 </main>
-
-<dialog id="detail" aria-label="Project details">
-  <div class="d-inner" id="d-inner"></div>
-</dialog>
 
 <dialog id="kbar" aria-label="Search projects and commands">
   <div class="kbar-input">
@@ -1877,7 +1964,7 @@ FILTERS.filter(f => !(DISTRICT_VIEW && f.key === "games")).forEach(f => {
     filterWrap.querySelectorAll(".fbtn").forEach(x => x.setAttribute("aria-pressed","false"));
     b.setAttribute("aria-pressed","true");
     movePill();
-    renderGrid();
+    renderList();
   });
   filterWrap.appendChild(b);
 });
@@ -1903,45 +1990,157 @@ requestAnimationFrame(() => requestAnimationFrame(() => { pill.style.transition 
 window.addEventListener("resize", movePill);
 document.fonts?.ready.then(movePill);
 
-/* cards */
-function keyMetric(p){ return p.impact && p.impact.length ? p.impact[0] : ""; }
-function renderGrid(){
-  const list = PROJECTS.filter(p =>
-    active === "all" || p.category === active || p.status === active
-  );
-  /* FLIP: cards that stay glide from their old spot, new ones fade up. */
-  const grid = $("#grid");
-  const before = new Map([...grid.children].map(c => [c.dataset.open, c.getBoundingClientRect()]));
-  grid.innerHTML = list.map(p => `
-    <button class="card" data-open="${p.id}">
-      <div class="card-top">
-        <span class="badge ${p.status}"><span class="bdot"></span>${STATUS[p.status].label}</span>
-        <span class="cat">${esc(CATS[p.category])}</span>
-      </div>
-      <h3>${esc(p.name)}</h3>
-      <p class="tag">${esc(p.tagline)}</p>
-      <div class="chips">${p.stack.slice(0,4).map(s=>`<span class="chip">${esc(s)}</span>`).join("")}</div>
-      <div class="kmetric">▸ ${esc(keyMetric(p))}</div>
-    </button>
-  `).join("");
-  if (REDUCED || !before.size || !grid.animate) return;
-  [...grid.children].forEach((c, i) => {
-    const was = before.get(c.dataset.open);
-    if (was){
-      const now = c.getBoundingClientRect();
-      const dx = was.left - now.left, dy = was.top - now.top;
-      if (dx || dy) c.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: "none" }],
-        { duration: 420, easing: "cubic-bezier(.2,.8,.2,1)" });
-    } else {
-      c.animate([{ opacity: 0, transform: "translateY(10px) scale(.98)" }, { opacity: 1, transform: "none" }],
-        { duration: 320, delay: Math.min(i, 8) * 30, easing: "ease-out", fill: "backwards" });
-    }
-  });
-}
-renderGrid();
+/* Mission control: a rail of projects and one screen that shows the
+   selected project. Rack units and the command palette select into it. */
+const CAT_ORDER = ["district", "personal", "games"];
+const RAIL_LABEL = { district: "District", personal: "Home lab", games: "Game dev" };
+const mcSec = $("#projects"), mcList = $("#mc-list"), mcItems = $("#mc-items"), mcBeam = $("#mc-beam"),
+      mcScreen = $("#mc-screen"), mcScan = $("#mc-scan"), mcView = $("#mc-view");
+const mcSay = document.createElement("span");
+mcSay.className = "sr-only"; mcSay.setAttribute("role", "status");
+mcSec.append(mcSay);
+let railList = [], current = null;
 
-/* detail dialog */
-const dlg = $("#detail");
+function renderList(){
+  const list = PROJECTS.filter(p => active === "all" || p.category === active || p.status === active);
+  railList = CAT_ORDER.flatMap(c => list.filter(p => p.category === c));
+  let html = "", group = "";
+  railList.forEach(p => {
+    if (p.category !== group){ group = p.category; html += `<div class="mc-group">${esc(RAIL_LABEL[group])}</div>`; }
+    html += `<button type="button" class="mc-item" data-pick="${p.id}" tabindex="-1" aria-current="false">
+      <span class="led ${p.status}" aria-hidden="true"></span><span class="nm">${esc(p.name)}</span>
+      <span class="sr-only">(${esc(STATUS[p.status].label)})</span></button>`;
+  });
+  mcItems.innerHTML = html;
+  if (railList.some(p => p.id === current)) markRail();
+  else if (railList.length) show(railList[0].id, { quiet: true });
+}
+
+function markRail(){
+  let cur = null;
+  mcItems.querySelectorAll(".mc-item").forEach(b => {
+    const on = b.dataset.pick === current;
+    b.setAttribute("aria-current", String(on));
+    b.tabIndex = on ? 0 : -1;
+    if (on) cur = b;
+  });
+  const i = railList.findIndex(p => p.id === current);
+  $("#mc-pos").textContent = i >= 0 ? `${i + 1} of ${railList.length}` : "";
+  if (!cur) return;
+  mcBeam.style.height = `${cur.offsetHeight}px`;
+  mcBeam.style.transform = `translateY(${cur.offsetTop}px)`;
+  /* keep the selection visible inside the rail without moving the page */
+  if (mcList.scrollWidth > mcList.clientWidth + 4){
+    const l = cur.offsetLeft - 12, r = cur.offsetLeft + cur.offsetWidth + 12;
+    if (l < mcList.scrollLeft) mcList.scrollLeft = l;
+    else if (r > mcList.scrollLeft + mcList.clientWidth) mcList.scrollLeft = r - mcList.clientWidth;
+  } else {
+    const t = cur.offsetTop - 40, b = cur.offsetTop + cur.offsetHeight + 40;
+    if (t < mcList.scrollTop) mcList.scrollTop = t;
+    else if (b > mcList.scrollTop + mcList.clientHeight) mcList.scrollTop = b - mcList.clientHeight;
+  }
+}
+
+function detailHTML(p){
+  let d = 0;
+  const sec = (label, body) => `<div class="d-section mc-in" style="--d:${++d + 2}">
+      <div class="sec-label">${label}</div>${body}</div>`;
+  return `
+    <h2 aria-label="${esc(p.name)}">${esc(p.name)}</h2>
+    <div class="mc-meta mc-in" style="--d:1">
+      <span class="badge ${p.status}"><span class="bdot"></span>${STATUS[p.status].label}</span>
+      <span>${esc(CATS[p.category])}</span><span>${esc(p.period)}</span>
+    </div>
+    <p class="mc-tagline mc-in" style="--d:2">${esc(p.tagline)}</p>
+    <p class="d-summary mc-in" style="--d:3">${esc(p.summary)}</p>
+    ${p.media && p.media.length ? sec("Screens and demos", `<div class="media-grid">${p.media.map(mediaHTML).join("")}</div>`) : ""}
+    ${sec("What it delivers", `<ul class="impact">${p.impact.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`)}
+    ${sec("Stack", `<div class="d-chips">${p.stack.map(s=>`<span class="chip">${esc(s)}</span>`).join("")}</div>`)}
+    ${p.operations && p.operations.length ? sec("How it runs", `<ul class="impact">${p.operations.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`) : ""}
+    ${p.code ? sec("From the code", `<div class="code-label">${esc(p.code.label)}</div>
+      <pre class="codeblock"><code class="language-${esc(p.code.lang)}"></code></pre>`) : ""}
+    ${p.links && p.links.length ? sec("Links", `<div class="d-links">${p.links.map(l=>`<a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join("")}</div>`) : ""}
+  `;
+}
+
+function show(id, opts = {}){
+  const p = byId[id]; if (!p) return;
+  const changed = id !== current;
+  current = id;
+  mcSec.dataset.status = p.status;
+  mcView.innerHTML = detailHTML(p);
+  if (p.code){
+    const codeEl = mcView.querySelector("code");
+    codeEl.textContent = p.code.source;
+    if (window.hljs){
+      // The bundled highlight.js has no GDScript grammar; Python's is close enough.
+      if (!hljs.getLanguage("gdscript")) hljs.registerAliases("gdscript", { languageName: "python" });
+      if (!hljs.getLanguage(p.code.lang)) codeEl.className = "language-plaintext";
+      hljs.highlightElement(codeEl);
+    }
+  }
+  // swap missing media for labeled placeholders
+  mcView.querySelectorAll(".shot").forEach(fig => {
+    const el = fig.querySelector("img,video");
+    if (!el) return;
+    el.addEventListener("error", () => placeholderize(fig), { once:true });
+    if (el.tagName === "IMG" && el.complete && el.naturalWidth === 0) placeholderize(fig);
+  });
+  mcView.scrollTop = 0;
+  markRail();
+  if (opts.quiet) return;
+  mcSay.textContent = `Showing ${p.name}`;
+  try { history.replaceState(null, "", `#${id}`); } catch {}
+  if (changed && !REDUCED) tune(p);
+}
+
+/* The channel change: a scan line sweeps down the screen, the picture
+   flares and settles, sections paint in, and the title decodes. */
+const GLYPHS = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#%&*+<>/";
+function tune(p){
+  mcView.classList.remove("tuning"); mcScan.classList.remove("go"); mcScreen.classList.remove("flash");
+  void mcScreen.offsetWidth; /* restart the animations */
+  mcScan.style.setProperty("--h", `${mcScreen.clientHeight}px`);
+  mcView.classList.add("tuning"); mcScan.classList.add("go"); mcScreen.classList.add("flash");
+  const h = mcView.querySelector("h2"), text = p.name, t0 = performance.now(), DUR = 520;
+  (function step(now){
+    if (current !== p.id || !h.isConnected) return;
+    const k = Math.min(1, (now - t0) / DUR), n = Math.floor(k * text.length);
+    if (k >= 1){ h.textContent = text; return; }
+    const rest = [...text.slice(n)].map(c => c === " " ? " " : GLYPHS[Math.random() * GLYPHS.length | 0]).join("");
+    h.innerHTML = `${esc(text.slice(0, n))}<span class="enc">${esc(rest)}</span>`;
+    requestAnimationFrame(step);
+  })(t0);
+}
+
+function stepBy(delta, focus){
+  if (!railList.length) return;
+  const i = railList.findIndex(p => p.id === current);
+  const next = railList[(i + delta + railList.length) % railList.length];
+  show(next.id);
+  if (focus) mcItems.querySelector(`[data-pick="${next.id}"]`)?.focus({ preventScroll: true });
+}
+$("#mc-prev").addEventListener("click", () => stepBy(-1));
+$("#mc-next").addEventListener("click", () => stepBy(1));
+mcList.addEventListener("keydown", (e) => {
+  const k = e.key;
+  if (k === "ArrowDown" || k === "ArrowRight"){ e.preventDefault(); stepBy(1, true); }
+  else if (k === "ArrowUp" || k === "ArrowLeft"){ e.preventDefault(); stepBy(-1, true); }
+  else if (k === "Home" || k === "End"){
+    e.preventDefault();
+    const p = k === "Home" ? railList[0] : railList[railList.length - 1];
+    if (p){ show(p.id); mcItems.querySelector(`[data-pick="${p.id}"]`)?.focus({ preventScroll: true }); }
+  }
+});
+
+/* From the rack board or the palette: select it and bring the console up. */
+function openDetail(id){
+  if (!byId[id]) return;
+  if (!railList.some(p => p.id === id)) filterWrap.querySelector('.fbtn[data-key="all"]')?.click();
+  show(id);
+  mcSec.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "start" });
+}
+
 function mediaHTML(m){
   if (m.type === "video"){
     return `<figure class="shot" data-src="${esc(m.src)}">
@@ -1959,76 +2158,24 @@ function placeholderize(fig){
     <span>media slot</span><span>${esc(src)}</span>
     <span style="opacity:.7">drop the file in /assets to fill this in</span></div>`;
 }
-function openDetail(id){
-  const p = byId[id]; if (!p) return;
-  $("#d-inner").innerHTML = `
-    <div class="d-head">
-      <div>
-        <h2>${esc(p.name)}</h2>
-        <div class="d-meta">
-          <span class="badge ${p.status}"><span class="bdot"></span>${STATUS[p.status].label}</span>
-          <span>${esc(CATS[p.category])}</span><span>${esc(p.period)}</span>
-        </div>
-      </div>
-      <button class="d-close" data-close>ESC / close</button>
-    </div>
-    <p class="d-summary">${esc(p.summary)}</p>
-    <div class="d-section">
-      <div class="sec-label">Stack</div>
-      <div class="d-chips">${p.stack.map(s=>`<span class="chip">${esc(s)}</span>`).join("")}</div>
-    </div>
-    ${p.media && p.media.length ? `
-    <div class="d-section">
-      <div class="sec-label">Screens and demos</div>
-      <div class="media-grid">${p.media.map(mediaHTML).join("")}</div>
-    </div>` : ""}
-    <div class="d-section">
-      <div class="sec-label">What it delivers</div>
-      <ul class="impact">${p.impact.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>
-    </div>
-    ${p.operations && p.operations.length ? `
-    <div class="d-section">
-      <div class="sec-label">How it runs</div>
-      <ul class="impact">${p.operations.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>
-    </div>` : ""}
-    ${p.code ? `
-    <div class="d-section">
-      <div class="sec-label">From the code</div>
-      <div class="code-label">${esc(p.code.label)}</div>
-      <pre class="codeblock"><code class="language-${esc(p.code.lang)}"></code></pre>
-    </div>` : ""}
-    ${p.links && p.links.length ? `
-    <div class="d-section">
-      <div class="sec-label">Links</div>
-      <div class="d-links">${p.links.map(l=>`<a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join("")}</div>
-    </div>` : ""}
-  `;
-  if (p.code){
-    const codeEl = $("#d-inner code");
-    codeEl.textContent = p.code.source;
-    if (window.hljs){
-      // The bundled highlight.js has no GDScript grammar; Python's is close enough.
-      if (!hljs.getLanguage("gdscript")) hljs.registerAliases("gdscript", { languageName: "python" });
-      if (!hljs.getLanguage(p.code.lang)) codeEl.className = "language-plaintext";
-      hljs.highlightElement(codeEl);
-    }
-  }
-  // swap missing media for labeled placeholders
-  $("#d-inner").querySelectorAll(".shot").forEach(fig => {
-    const el = fig.querySelector("img,video");
-    if (!el) return;
-    el.addEventListener("error", () => placeholderize(fig), { once:true });
-    if (el.tagName === "IMG" && el.complete && el.naturalWidth === 0) placeholderize(fig);
-  });
-  dlg.showModal();
-  $("#d-inner").scrollTop = 0;
-}
 document.addEventListener("click", e => {
+  const pick = e.target.closest("[data-pick]");
+  if (pick){ show(pick.dataset.pick); return; }
   const opener = e.target.closest("[data-open]");
-  if (opener){ e.preventDefault(); openDetail(opener.dataset.open); return; }
-  if (e.target.closest("[data-close]")) dlg.close();
-  if (e.target === dlg) dlg.close(); // click on backdrop
+  if (opener){ e.preventDefault(); openDetail(opener.dataset.open); }
 });
+renderList();
+window.addEventListener("resize", markRail);
+document.fonts?.ready.then(markRail);
+/* Deep link: #<project id> opens that project in the console. */
+{
+  const fromHash = decodeURIComponent(location.hash.slice(1));
+  if (byId[fromHash]){
+    if (!railList.some(p => p.id === fromHash)) filterWrap.querySelector('.fbtn[data-key="all"]')?.click();
+    show(fromHash, { quiet: true });
+    requestAnimationFrame(() => mcSec.scrollIntoView({ block: "start" }));
+  }
+}
 
 $("#stamp").textContent = LAST_UPDATED;
 
@@ -2250,51 +2397,6 @@ $("#print-sheet").innerHTML = `<div class="sec-label">District systems</div>` +
     }, { rootMargin: "0px 0px -35% 0px" }).observe(el);
   })();
 
-  /* GlowingEffect + CardSpotlight: a conic arc of each card's border
-     turns to face the pointer (status-colored: green live, amber in
-     build), and a soft accent spotlight follows it inside the card. */
-  (function glow(){
-    const grid = $("#grid");
-    const PROXIMITY = 64, EASE = 0.12;
-    const state = new WeakMap();
-    let raf = 0;
-    function animate(){
-      raf = 0;
-      let again = false;
-      for (const card of grid.children){
-        const s = state.get(card);
-        if (!s) continue;
-        const diff = s.target - s.angle;
-        s.angle = REDUCE || Math.abs(diff) < 0.2 ? s.target : s.angle + diff * EASE;
-        card.style.setProperty("--start", s.angle.toFixed(2));
-        if (s.angle !== s.target) again = true;
-      }
-      if (again) raf = requestAnimationFrame(animate);
-    }
-    function update(x, y){
-      for (const card of grid.children){
-        const r = card.getBoundingClientRect();
-        const active = x > r.left - PROXIMITY && x < r.right + PROXIMITY &&
-                       y > r.top - PROXIMITY && y < r.bottom + PROXIMITY;
-        card.style.setProperty("--active", active ? "1" : "0");
-        if (!active) continue;
-        card.style.setProperty("--mx", `${x - r.left}px`);
-        card.style.setProperty("--my", `${y - r.top}px`);
-        const s = state.get(card) || { angle: 0, target: 0 };
-        const target = Math.atan2(y - (r.top + r.height / 2), x - (r.left + r.width / 2)) * 180 / Math.PI + 90;
-        s.target = s.angle + ((((target - s.angle) % 360) + 540) % 360 - 180); /* shortest way round */
-        state.set(card, s);
-      }
-      if (!raf) raf = requestAnimationFrame(animate);
-    }
-    let last = null;
-    document.body.addEventListener("pointermove", (e) => {
-      if (e.pointerType !== "mouse") return;
-      last = [e.clientX, e.clientY];
-      update(...last);
-    }, { passive: true });
-    window.addEventListener("scroll", () => { if (last) update(...last); }, { passive: true });
-  })();
 })();
 
 /* Console layer, part 2: the hero status terminal and the command palette. */
@@ -2399,7 +2501,6 @@ $("#print-sheet").innerHTML = `<div class="sec-label">District systems</div>` +
     }
     function open(){
       if (kbar.open) return;
-      if (dlg.open) dlg.close();
       q.value = ""; sel = 0; render();
       kbar.showModal();
       q.focus();
