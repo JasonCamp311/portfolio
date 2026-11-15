@@ -799,7 +799,7 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-11-03";
+const LAST_UPDATED = "2026-11-14";
 
 /* Hero metrics strip. Keep numbers honest and current.
    num may be a string, or a function of the project pool the board is
@@ -1174,7 +1174,7 @@ const PROJECTS = [
     status: "live",
     period: "2026 - present",
     tagline: "Six AI models pick every NFL game from one prompt, then get graded against the closing line.",
-    summary: "An evaluation harness that happens to be about football. Every week six language models, five hosted and one running on the home server, get the identical prompt: the schedule plus each team's record, scoring and results. Each returns a final score and a win probability per game. Picks are saved once and fingerprinted before kickoff, then graded straight-up, against the spread, on the total and on calibration, next to two no-model baselines. The prompt is run as separate tracks that change one thing at a time: scores only, then ratings and injuries, then the model's own past scorecard, then the betting line itself, then a structured debate before the pick, so each change can be measured against the same games. A public site shows the standings, each model's stated reasoning beside the data it was given, and where the models disagree with the market.",
+    summary: "An evaluation harness that happens to be about football. Every week six language models, five hosted and one running on the home server, get the identical prompt: the schedule plus each team's record, scoring and results. Each returns a final score and a win probability per game. Picks are saved once and fingerprinted before kickoff, then graded straight-up, against the spread, on the total and on calibration, next to two no-model baselines. The prompt is run as separate tracks that change one thing at a time: scores only, then ratings and injuries, then the model's own past scorecard, then the betting line itself, then a structured debate before the pick, so each change can be measured against the same games. A public site shows the standings, each model's stated reasoning beside the data it was given, and where the models disagree with the market. A season panel titled 'Is any of this real?' then puts every record through the statistics: is it distinguishable from a coin flip, and from the market, yet.",
     stack: ["Node (zero deps)", "React", "Vite", "OpenRouter", "Ollama", "systemd timers", "GitHub Pages"],
     impact: [
       "Six models answer one identical prompt; a full week of picks costs about 10 cents",
@@ -1182,6 +1182,8 @@ const PROJECTS = [
       "On the original tracks, spread and over/under results are derived from each predicted score, so the model never sees a line",
       "Five tracks, each one change apart: the 'Against the line' track (from week 8) shows the spread and lets a model pass; the 'After a debate' track (from week 9) has home and away advocates argue blind before the pick",
       "Always-home and always-favorite baselines plus a consensus entry give every record something to beat",
+      "'Is any of this real?' panel: each spread record gets a 95% Wilson range against 50% and the 52.4% break-even, plus the chance a coin does as well; calibration is scored against the de-vigged closing moneyline, paired per game, with no verdict inside 2 standard errors",
+      "The same panel shows how often each model just picks the favorite and how often all six pick the same winner",
       "A fact-check pass flagged 8 stated reasons that contradicted the data in week 5, 7 of them from the smallest model",
       "Runs unattended: timers pick, grade, commit and publish, and a failure sends a phone alert"
     ],
@@ -1545,13 +1547,38 @@ scheduleNextPoll(delay);`
     }
   },
   {
+    id: "wow-forever",
+    name: "Forever Field Guide",
+    category: "personal",
+    status: "live",
+    period: "2026",
+    tagline: "A fan-made setup and leveling guide for World of Warcraft: Forever, with an installer that keeps the addon set current.",
+    summary: "A static guide site for a game my friends and I play together, written so a new player can get set up in one sitting. The setup page covers the hidden graphics commands, the built-in tools worth turning on, the addons that work and the ones to skip. Around it are class guides and a 1-20 leveling route for all 56 race and class combinations, a professions page with pairings and race tiers per class, and a Hunter pets page. Every guide page renders from one shared data file, so extending a route is a data change, not a page edit. A small Python script installs or updates the guide's addon set from CurseForge and reports missing dependencies. No build step and no framework: plain HTML, CSS and JavaScript on GitHub Pages, styled like an old-school MMO with a quest log, loot cards and an XP bar.",
+    stack: ["HTML / CSS / JS (no build)", "Python", "CurseForge", "GitHub Pages"],
+    impact: [
+      "Class and leveling guides for all 56 race and class combinations, rendered from one data file",
+      "Addon installer: one command installs or updates the whole set and checks for missing addon dependencies",
+      "Stylesheets and scripts are cache-busted, so a redesign never loads against a stale file",
+      "Marked unofficial throughout; not affiliated with or endorsed by Blizzard Entertainment"
+    ],
+    links: [
+      { label: "Live site", href: "https://jasoncamp311.github.io/wow-forever/" },
+      { label: "Source", href: "https://github.com/JasonCamp311/wow-forever" }
+    ],
+    operations: [
+      "Source: github.com/JasonCamp311/wow-forever (public); GitHub Pages serves the repository root",
+      "Run the installer with the game closed, pointed at the AddOns folder"
+    ],
+    media: []
+  },
+  {
     id: "recipe-book",
     name: "Family Recipe Book",
     category: "personal",
     status: "build",
     period: "2026",
-    tagline: "An interactive recipe site for my dad's cooking: cook mode, automatic timers, video chapters, and a printable book.",
-    summary: "A family recipe site meant to outlast its hosting: every recipe is one Markdown file, the public site is fully static (Astro), and the interactive parts are small scripts with no framework. A fullscreen cook mode shows one step at a time and keeps the screen awake; any duration written in a step becomes a tap-to-start timer; a step with a timestamp jumps the recipe video to that moment. Around the recipes sits the legacy side: scans of the handwritten cards, audio of the stories, a scrapbook of memories, and a print-ready book with a QR code on every recipe. One small zero-dependency Node service handles the only thing a static site cannot: family members posting their own photos, behind a family code and a moderation queue. The design and features are built and working with sample content; the real recipes are being collected.",
+    tagline: "An interactive recipe site for my dad's cooking, with a second kitchen for my grandmother's recipe box: cook mode, automatic timers, video chapters, and a printable book.",
+    summary: "A family recipe site meant to outlast its hosting: every recipe is one Markdown file, the public site is fully static (Astro), and the interactive parts are small scripts with no framework. A fullscreen cook mode shows one step at a time and keeps the screen awake; any duration written in a step becomes a tap-to-start timer; a step with a timestamp jumps the recipe video to that moment. Around the recipes sits the legacy side: scans of the handwritten cards, audio of the stories, a scrapbook of memories, and a print-ready book with a QR code on every recipe. One small zero-dependency Node service handles the only thing a static site cannot: family members posting their own photos, behind a family code and a moderation queue. A second section, Grammy's Kitchen, holds my grandmother's recipe box with its own heirloom look. The design and features are built and working; Dad's pages still use sample content while his recipes are collected, and Grammy's Kitchen has its first real card, her banana bread.",
     stack: ["Astro", "TypeScript", "Markdown content collections", "Node (zero deps)", "Print CSS"],
     impact: [
       "Durations in plain recipe text ('simmer 20 minutes', '1 to 1½ hours') become timers automatically, with no markup",
@@ -1559,6 +1586,7 @@ scheduleNextPoll(delay);`
       "Recipe schema is validated at build time, so a typo fails the build instead of publishing a broken page",
       "Print edition: cover, contents, one recipe per page, and a QR code linking each page to its video",
       "Family photo posts are held in a moderation queue until approved",
+      "Grammy's Kitchen: a second recipe box with its own look, starting with her banana bread card",
       "Video originals are kept out of Git by design; the site references them, the archive stores them"
     ],
     media: [
