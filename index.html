@@ -50,6 +50,12 @@
                code pasted from your repo. Leave it out entirely
                otherwise; the page renders fine without it.
       links    optional array of { label, href }
+      role     optional one line: my role on the project, e.g.
+               "Lead developer and project manager · team of 3". Shows
+               under the title and on the printed handout.
+      lead     optional array of short strings: how I ran the project
+               (scoping, backlog, reviews, decisions, releases). Renders
+               as "How I led it".
       operations optional array of short strings: where the source lives,
                backups, who else has admin, runbook. Renders as "How it
                runs" in the detail view and in the printed handout.
@@ -499,6 +505,8 @@
   .mc-meta{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:14px 0 0;
     font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--slate)}
   .mc-tagline{margin-top:18px;font-size:clamp(17px,1.6vw,20px);line-height:1.45;color:#DAD8CB;max-width:58ch}
+  .mc-view .d-role{margin-top:12px;font-family:"IBM Plex Mono",monospace;font-size:13px;color:#DAD8CB;max-width:68ch}
+  .mc-view .d-role span{color:var(--sig);margin-right:8px;transition:color .5s ease}
   .mc-view .d-summary{color:#B9B7A8;max-width:68ch}
   .mc-view .d-section{margin-top:28px}
   .mc-view .sec-label{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--sig);margin-bottom:10px;transition:color .5s ease}
@@ -720,10 +728,11 @@
       <p class="eyebrow"><b>Jason Camp</b> · Technology Supervisor · Acture Solutions</p>
       <h1>Systems that ship <span class="accent" id="decrypt">and stay running.</span></h1>
       <p class="lede">
-        I build and operate production software and infrastructure for a K-12 school district:
-        replacing legacy vendor systems with modern serverless apps, automating manual workflows,
-        and running self-hosted AI and media infrastructure after hours. Everything below is real
-        and maintained by me; the status badges show what is in production.
+        I build and operate production software and infrastructure for a K-12 school district,
+        and I lead the district's small development team: I scope the work, write the backlog,
+        review and merge every pull request, and handle the deploys. After hours I run self-hosted
+        AI and media infrastructure. Everything below is real; each project says what my role was,
+        and the status badges show what is in production.
       </p>
     </div>
     <!-- Typed out from BOARD on load; the system board below carries the same facts for screen readers. -->
@@ -799,7 +808,7 @@
    EDIT BELOW THIS LINE TO UPDATE THE PORTFOLIO
    ================================================================ */
 
-const LAST_UPDATED = "2026-11-14";
+const LAST_UPDATED = "2026-11-18";
 
 /* Hero metrics strip. Keep numbers honest and current.
    num may be a string, or a function of the project pool the board is
@@ -810,13 +819,18 @@ const METRICS = [
   { num: "Retired", lbl: "SchoolDude license" },
   { num: (pool) => String(pool.length), lbl: "systems built and operated" },
   { num: "3-node",lbl: "TB5 inference cluster" },
+  { num: "87",    lbl: "team pull requests reviewed + merged" },
 ];
 
 /* System board rows. id must match a project id below. */
 const BOARD = [
+  { id: "dev-team",     metric: "87 PRs reviewed" },
   { id: "ticketing",    metric: "50-75 tickets/wk" },
   { id: "registration", metric: "live for 2026-27 intake" },
   { id: "app-gallery",  metric: "reviewed before publish" },
+  { id: "business-assistant", metric: "pilot, 41 docs synced" },
+  { id: "live-poll",    metric: "on-prem, teacher sign-in" },
+  { id: "scan-station", metric: "pilot prep" },
   { id: "video-library", metric: "clips + playlists" },
   { id: "staff-offboarding", metric: "pilot, audited" },
   { id: "distribution-groups", metric: "0 students on staff lists" },
@@ -852,11 +866,43 @@ const ROADMAP = [
 
 const PROJECTS = [
   {
+    id: "dev-team",
+    name: "District Dev Team",
+    category: "district",
+    status: "live",
+    period: "2026 - present",
+    role: "Lead developer and project manager · team of 3",
+    tagline: "I lead two developers on the district's app work: I plan it, review every pull request, and decide what ships.",
+    summary: "In late September I started bringing two colleagues from the tech office on as developers. Both were new to Git and both code with AI assistants. I moved our apps into a shared GitHub organization and set up how we work: every change starts as an issue, goes on its own branch, and comes back as a pull request that I review. Only I merge, and I run the production deploys. I write the backlog for each project, keep one pinned tracking issue per project with the order of work, and wrote the team's handouts on our GitHub workflow, security and privacy checks, and app upkeep.",
+    stack: ["GitHub (issues, PRs, milestones, CODEOWNERS)", "GitHub Actions", "Dependabot", "Claude Code", "Microsoft Teams"],
+    impact: [
+      "87 pull requests from the two developers reviewed and merged since late September, across the district's apps",
+      "Both developers started out new to Git; I taught the workflow on real issues from our backlog instead of a practice exercise",
+      "Team handouts: How we work on GitHub; a security and privacy checklist; and Keeping our apps healthy, with a key rotation schedule, a register of where every key lives (no secret values in it), an upkeep calendar, and joiner and leaver steps",
+      "Security review as team work: a developer wrote the October review of the maintenance app, and each finding became its own issue and pull request",
+      "Dependabot alerts and an npm audit check across the team's repos, with dependency updates reviewed like any other pull request",
+      "Kept the team moving through a vacation: daily check-ins to review, merge, and post each developer's next set of issues"
+    ],
+    lead: [
+      "Set the rules: work starts from an issue, one branch per change, every pull request reviewed by me, and only I merge",
+      "Turn each project into labeled issues and a pilot milestone; decisions that are mine get assigned to me so they don't block anyone",
+      "Plan at the pace the team actually ships: a few days of well-scoped issues per person plus a fallback list, and stacked pull requests so nobody waits on a merge",
+      "Answer product questions on the issue where they were asked, so the reasoning stays next to the code",
+      "Identity and cloud configuration stays with me: developers write the checklist, I apply it"
+    ],
+    operations: [
+      "All district app repos live in one GitHub organization; developers join with their own accounts",
+      "Production deploys, secrets, and sign-in configuration stay with me"
+    ],
+    media: []
+  },
+  {
     id: "ticketing",
     name: "Maintenance Ticketing System",
     category: "district",
     status: "live",
     period: "2025 - present",
+    role: "Built it; now lead developer and project manager for the team that maintains it",
     tagline: "Full replacement for SchoolDude, built from scratch on Cloudflare Workers.",
     summary: "The district was paying for a legacy ticketing product (SchoolDude) that staff disliked and that trapped our data. I designed and built a complete replacement on Cloudflare Workers, D1, and R2, with Microsoft SSO and role-based access for requesters, technicians, the head groundskeeper, and IT admin. It launched to the maintenance department and now handles all facilities requests for the district.",
     stack: ["Cloudflare Workers", "D1 (SQLite)", "R2", "Microsoft SSO", "Graph API"],
@@ -867,14 +913,22 @@ const PROJECTS = [
       "Role-based routing: requests reach the right technician automatically",
       "Photo attachments and recurring scheduled tasks, which the old system handled poorly",
       "Security review (July 2026) covered CORS, rate limiting, security headers, sessions, uploads, CSV export, and the webhook: 16 findings, 15 fixed, 1 dev-only dependency item deferred",
-      "October 2026: a personal hold queue for the head of buildings and grounds and a \"just mine\" filter, both built by a colleague I'm bringing on as a developer",
-      "Second security review opened October 2026, with each finding to be tracked as its own GitHub issue",
+      "October 2026: a personal hold queue for the head of buildings and grounds and a \"just mine\" filter, both built by a developer I'm bringing on",
+      "Second security review (October 2026), written by that developer: each finding became its own issue, fixed through pull requests I reviewed",
+      "Microsoft sign-in now links accounts by their Entra ID, and requesters can only file tickets under their own name",
+      "Dependabot and an npm audit gate in CI, plus a weekly scheduled run; dependency upgrades (including React 19 and React Router 7) reviewed and merged by the team",
       "SharePoint archival of closed tickets via Graph API: scoped, not yet built"
     ],
+    lead: [
+      "44 pull requests merged since the repo moved to the team's GitHub organization in late September",
+      "The first project I used to bring a new developer on: issue first, then a branch, a pull request, and my review",
+      "Set the fix order for the security findings and answered the product questions on each one",
+      "Production deploys and database migrations stay with me"
+    ],
     operations: [
-      "Source: district GitHub org; CI runs typecheck and tests on every push",
+      "Source: district GitHub org; CI runs typecheck, tests, and npm audit on every pull request",
       "Data: Cloudflare D1, attachments in R2; export and point-in-time restore steps are in RUNBOOK.md",
-      "I'm the sole admin on production; since late September a colleague contributes through issues and pull requests that I review and deploy",
+      "I'm the sole admin on production; two developers contribute through issues and pull requests that I review, merge, and deploy",
       "Runbook: RUNBOOK.md in the repo (deploy, rollback, secrets, backups, triage)"
     ],
     media: [
@@ -912,6 +966,7 @@ const PROJECTS = [
     category: "district",
     status: "live",
     period: "2026",
+    role: "Lead developer · designed, built, and run it",
     tagline: "An on-prem home for the classroom apps, videos and audio teachers use, where every uploaded app is reviewed and runs on its own web address.",
     summary: "It started in September as a gallery for the interactive HTML apps staff build for class and has grown into the place teachers keep their classroom media. Staff sign in with Microsoft and add apps, videos and audio. Apps go through a review queue before they publish, and every published app runs on its own web address, so uploaded code can't reach another app's data or a teacher's signed-in session. Teachers organize what they use into collections and can share those with colleagues. I rebuilt the interface from a full design mockup in late September and have shipped changes in rounds since. It runs on a Mac mini and is reachable only on the district network.",
     stack: ["Node.js", "Express", "SQLite", "Caddy", "Apache (built into macOS)", "Microsoft Entra ID", "Let's Encrypt (DNS-01)", "launchd", "Playwright + Chrome", "Transformers.js (MiniLM)"],
@@ -929,7 +984,13 @@ const PROJECTS = [
       "Microsoft sign-in with Staff and Reviewer app roles, checked by the app itself as well as by Entra",
       "Worked within the MDM-managed firewall, which only admits Apple-signed listeners, by fronting the service with the web server built into macOS",
       "Traced an intermittent Chrome certificate error to handshake ordering in the server's TLS library, and fixed it with one certificate covering the Studio and every app address",
-      "Every app upload posts a card to the IT Teams channel with the app, the teacher, and the automatic report's findings, linking straight to the review queue"
+      "Every app upload posts a card to the IT Teams channel with the app, the teacher, and the automatic report's findings, linking straight to the review queue",
+      "November 2026: reviewers can request changes on an app that's already live; the teacher's fix goes back through review and replaces the live version at the same address",
+      "Teachers get an email when changes are requested and when their app goes live, sent from the help desk mailbox so replies land where IT already looks"
+    ],
+    lead: [
+      "Built and ship it myself in design rounds from the Director's mockups and notes",
+      "Smaller pieces (the front-door config, a friendly page for off-network visitors) now come from the team as pull requests I review"
     ],
     operations: [
       "Source: district GitHub org; the deploy script runs the test suite before shipping to the server",
@@ -979,6 +1040,7 @@ const PROJECTS = [
     category: "district",
     status: "live",
     period: "2026",
+    role: "Lead developer and project manager · designed and built it, a developer now contributes",
     tagline: "One shared checklist for a departing employee, in place of the paper exit form that goes desk to desk.",
     summary: "When staff leave, the district's paper exit checklist travels between the supervisor, payroll, IT, and HR. I built a web app where the supervisor starts a case and every department gets its own steps at the same time. Steps that have to happen in order stay locked until what they wait on is done: IT can't close an account until the employee's files and records are saved and they've signed for district property, and the final paycheck waits on the supervisor's sign-off and final attendance. It runs on the same district Mac mini as the Teacher Studio, reachable only on the district network, and is live with a small pilot group. Onboarding is built and switched off until offboarding is proven.",
     stack: ["Node.js", "Express", "SQLite", "Microsoft Entra ID", "AES-256-GCM", "launchd", "Apache + Caddy"],
@@ -991,6 +1053,11 @@ const PROJECTS = [
       "Runs as its own account that can't log in, so nothing else on the server can read HR data",
       "Personnel data never leaves the server; the Cloudflare DNS record is lookup-only, so Cloudflare never sees a request",
       "Security review before launch; the fixes went out with the first deploy"
+    ],
+    lead: [
+      "Merged the Director's full design mockup into the working app, and recorded what I left out and why",
+      "Kept the scope to offboarding until it's proven, with onboarding built but switched off",
+      "A developer on my team aligned the steps with the workflow HR already uses, through a pull request I reviewed and merged"
     ],
     operations: [
       "Source: district GitHub org; the deploy script refuses uncommitted changes and runs the tests first",
@@ -1007,7 +1074,8 @@ const PROJECTS = [
     status: "build",
     period: "2026",
     tagline: "A native Mac app that locks a student's Mac for a written test, with Read&Write allowed for students who have that accommodation.",
-    summary: "The district needed a way to give written tests on student Macs that keeps students out of every other app, while students with a Read&Write accommodation can still use it. I wrote a native Mac app in Swift that locks the Mac with Apple's Assessment Mode. A teacher makes a test link or a 4-digit join code, posts it in Schoology, and picks how the test ends. When it's over, the student's work is saved as a locked PDF with a record of the session. Teachers can watch from their own Mac and get an alert if a student leaves the test. The Assessment Mode entitlement is requested from Apple; until it's approved, test builds use kiosk mode and say so on every screen.",
+    role: "Built version 1; lead developer and project manager on the rebuild · team of 3 plus the Director",
+    summary: "The district needed a way to give written tests on student Macs that keeps students out of every other app, while students with a Read&Write accommodation can still use it. I wrote the first version as a native Mac app in Swift that locks the Mac with Apple's Assessment Mode. A teacher makes a test link or a 4-digit join code, posts it in Schoology, and picks how the test ends. When it's over, the student's work is saved as a locked PDF with a record of the session. Apple approved the Assessment Mode entitlement in November, and version 1.0 went out signed and notarized through Mosyle for a test-Mac pilot. In mid-November the Director of Technology rebuilt the app in Xcode for Mac and iPad with a separate teacher app and no server. I brought his rebuild into the team's repo, fixed what it needed to lock down safely, and turned the remaining work into a tracked backlog for the team.",
     stack: ["Swift", "SwiftUI + AppKit", "Apple Assessment Mode", "Ed25519 signing", "Mosyle MDM profiles", "Node (relay)"],
     impact: [
       "Test links are signed, so a student who edits a link to change how the test ends gets it refused",
@@ -1016,12 +1084,19 @@ const PROJECTS = [
       "The PDF records start and end times, how the test ended, breaks, and wrong password attempts, and can't be edited",
       "Teacher alerts go through a small relay, built to run on the district server, that keeps nothing on disk, which avoids a network permission prompt on every student Mac",
       "Building proctor passwords and signing keys reach Macs through Mosyle profiles written by an IT command-line tool",
-      "37 automated tests (24 in the app, 13 in the relay), including link tampering"
+      "37 automated tests (24 in the app, 13 in the relay), including link tampering",
+      "Version 1.0 signed with a Developer ID, notarized by Apple, and delivered as a Mosyle package with its profiles"
+    ],
+    lead: [
+      "Split the rebuild into 33 issues across the two developers and me, with a pinned tracker for the order of work",
+      "Pull requests go to the rebuild branch and only I merge; nine merged in the first two days, with 96 tests passing",
+      "Made the app fail closed: if the lock can't start, the test doesn't",
+      "A developer's classroom test found Bonjour discovery fails across subnets on the same Wi-Fi; that became a design decision I own instead of a surprise at launch"
     ],
     operations: [
       "Source: district GitHub org (private)",
-      "Waiting on Apple's approval of the Assessment Mode entitlement; a pilot checklist is written",
-      "The relay is dependency-free Node and holds everything in memory"
+      "Version 1.0 test-Mac pilot through Mosyle; the rebuild is in development",
+      "The version 1 relay is dependency-free Node and holds everything in memory"
     ],
     media: []
   },
@@ -1031,9 +1106,10 @@ const PROJECTS = [
     category: "district",
     status: "build",
     period: "2026",
+    role: "Lead developer · built it from the Director's prototype",
     tagline: "Families find a lost item by photo and claim it; the site never stores a name.",
     summary: "Built for one of our elementary schools from a working design prototype. Families browse photos of found items without signing in and claim one; staff sign in with Microsoft to add items, close claims, and keep a history. The prototype only pretended to save and sign in, so the job was making those parts real while keeping its look exactly. The main design call is where names go: a claim's details are emailed to the school's shared mailbox through Microsoft Graph and never written to the site's database.",
-    stack: ["Node.js", "Express 5", "SQLite", "Microsoft Entra ID", "Microsoft Graph mail", "Cloudflare Turnstile", "Cloudflare Tunnel (planned)"],
+    stack: ["Node.js", "Express 5", "SQLite", "Microsoft Entra ID", "Microsoft Graph mail", "Cloudflare Turnstile", "Cloudflare Tunnel"],
     impact: [
       "No student names, parent names, or parent emails on disk; a test runs a full round of claims and then scans every data file to prove it",
       "The parent's confirmation email leaves out the child's name, in case the address was mistyped",
@@ -1041,9 +1117,155 @@ const PROJECTS = [
       "The claim form is behind Turnstile and a per-address limit, because every claim makes the district send email",
       "Matches the prototype pixel for pixel at desktop width, with phone layouts added"
     ],
+    lead: [
+      "Built from the Director's prototype and brief, and flagged where the build departs from it",
+      "Ran a preview with the Director and school staff behind Microsoft sign-in before any family sees it",
+      "Handed the last privacy question to a developer as an issue that needs the Director's written sign-off before any code"
+    ],
     operations: [
-      "Hosting: the district Mac mini behind a Cloudflare Tunnel so families can reach it from home; not yet set up",
-      "Still to do: an Entra app registration with mail limited to the one shared mailbox, and a reachability check from a school machine"
+      "Runs on the district Mac mini as its own service account; families reach it from home through a Cloudflare Tunnel",
+      "In preview behind Microsoft sign-in; claim emails send from a shared mailbox with mail access limited to that one mailbox",
+      "Launch waits on a final privacy review"
+    ],
+    media: []
+  },
+  {
+    id: "scan-station",
+    name: "Student Scan Station",
+    category: "district",
+    status: "build",
+    period: "2026",
+    role: "Lead developer and project manager · iPad app and web side built by the two developers I lead",
+    tagline: "Students scan paper work on a shared iPad and it shows up on their own MacBook as one PDF. Nothing is kept.",
+    summary: "Students with paper work to hand in walk up to a shared iPad. They open a page on their MacBook that shows a 4-digit code, type it on the iPad, scan their pages, and the PDF shows up on their MacBook to download. Nothing is stored after that. I wrote the full system design and the contract between the pieces, then split it into two tracks: one developer built the native iPad app, the other built the MacBook page and the server. Because the PDFs are student work, I moved hosting off the cloud and onto our own server on the district network before launch. The iPad app is submitted to Apple as a private app for our device management, and the first pilot is a high school library.",
+    stack: ["SwiftUI", "VisionKit", "Node.js", "TypeScript", "Mosyle MDM", "App Store Connect (custom apps)", "Apache + Caddy"],
+    impact: [
+      "One PDF per scan, held in memory only, deleted once the student downloads it or within 30 minutes",
+      "Codes are one-time and short-lived, with a lockout after repeated wrong tries",
+      "The iPad viewer stays flat on memory past 20 pages (46 MB peak), with per-page rotate before sending",
+      "VoiceOver checked on both the iPad app and the MacBook page",
+      "About 220 automated tests on the server, plus a written iPad test log run against the real server"
+    ],
+    lead: [
+      "Wrote the system design and the API contract both developers built against; the iPad app passed all 26 contract checks against the new server",
+      "Broke the build into about 50 issues across two repos, with a pilot milestone, labels for blockers and decisions, and one pinned issue with the order of work",
+      "Reviewed every pull request on both sides and merged them in order, retargeting stacked pull requests as each one landed",
+      "Made the hosting call when the privacy picture changed: moved the server from Cloudflare to the district Mac mini, network-only, and re-planned the work the same day",
+      "Settled product questions on the issues: what happens to a rejected upload, when a closed tab counts as sent, and the bundle ID and address before the first App Store upload"
+    ],
+    operations: [
+      "Server runs on the district Mac mini as its own service account, reachable only on the district network",
+      "Deploy is a checklist the web developer wrote and I run",
+      "Kiosk iPads will be locked to the app through device management"
+    ],
+    media: []
+  },
+  {
+    id: "business-assistant",
+    name: "Business Office Assistant",
+    category: "district",
+    status: "live",
+    period: "2026",
+    role: "Lead developer · built and deployed",
+    tagline: "A private AI assistant that answers the business office's questions from their own contracts, budget books and manuals.",
+    summary: "The business office wanted to ask questions of their own documents: contracts, budget books, and finance system manuals. I built a second version of our staff chat app for them, with its own address and its own sign-in role. Their documents stay in the SharePoint folder they already use. A scheduled job copies that folder to our server every 15 minutes, and the assistant reads it from there. Answers come from our on-prem cluster, so nothing goes to an outside AI service. Costing questions go through a calculator in the app; the model only fills in the form. A pilot user started in November.",
+    stack: ["Next.js", "PostgreSQL", "Microsoft Graph", "Microsoft Entra ID", "macOS Vision (OCR)", "exo"],
+    impact: [
+      "41 files (about 180 MB) synced from SharePoint, with read access granted on that one folder only, not the whole finance site",
+      "Most of the current contracts were scans with no text in them; I added on-device OCR with Apple's Vision framework, which took the newest contract from 1 searchable passage to 144",
+      "Search tuned against real questions from the office until every answer checked out, including picking the newest version when three versions of a contract are in the folder",
+      "Answers name the document and section they came from",
+      "Calculations are done by code, never by the model"
+    ],
+    operations: [
+      "Runs on the cluster's head node behind the relay; documents never go to an outside AI service",
+      "The SharePoint copy job runs on the district Mac mini with its own app registration",
+      "Access is an Entra app role assigned per person"
+    ],
+    media: []
+  },
+  {
+    id: "live-poll",
+    name: "Classroom Live Poll",
+    category: "district",
+    status: "live",
+    period: "2026",
+    role: "Moved it on-prem and run it · the original app is the Director of Technology's",
+    tagline: "Teachers run live polls from the front of the room and students answer on their phones, on a district server.",
+    summary: "Our Director of Technology built a live polling app on Cloudflare that teachers had started using. Student answers can include names, so I moved it onto our own server on the district network. I kept his app as it was and wrote a layer underneath it so it runs on Node with a local database instead of Cloudflare's services. I swapped emailed login codes for Microsoft sign-in limited to teachers, and turned the AI features off. Then I added what an on-prem version needed: an admin page to move or delete polls, an End poll button, nightly backups, and the district look.",
+    stack: ["Node.js", "TypeScript", "SQLite", "esbuild", "Microsoft Entra ID", "launchd"],
+    impact: [
+      "Student answers stay on a district machine",
+      "Teachers sign in with Microsoft and need the Teacher app role; students join with a code",
+      "Works through the district's web server without WebSockets: phones fall back to checking for updates every 2 seconds",
+      "Nightly database backups with a tested restore",
+      "Admin page to move a poll and its sessions to another teacher, export results, or delete them"
+    ],
+    lead: [
+      "Agreed the cutover with the Director before moving the address, since it switched off his version",
+      "Handed the follow-up work (backups, the join count, the reconnect message, a student sign-in plan) to a developer as issues, and reviewed each pull request"
+    ],
+    operations: [
+      "Runs as its own service account on the district Mac mini, reachable only on the district network",
+      "Backups run nightly as a separate service"
+    ],
+    media: []
+  },
+  {
+    id: "health-monitor",
+    name: "App Health Monitor",
+    category: "district",
+    status: "build",
+    period: "2026",
+    role: "Designed and built it",
+    tagline: "A nightly check of every district app and server against our own standards, with a fix button for the safe ones.",
+    summary: "With more apps and more people working on them, I wanted one page that says what's out of line. Each night it checks every app and server against the team's security checklist and upkeep handout: software updates, open security alerts, keys due for rotation, backups, and where personal data lives. Every finding shows the line of the standard it comes from. The layout follows AWS Trusted Advisor: four category cards with the worst findings first.",
+    stack: ["Node.js", "Express", "SQLite", "Microsoft Entra ID", "GitHub API", "launchd"],
+    impact: [
+      "Fixes show the exact commands before they run, and every fix starts switched off until it has been tried by hand",
+      "The web page and the worker run as separate accounts; only the worker holds tokens, and it can run only a read-only probe and an allowlisted fix script",
+      "Identity, cloud, and device management items are checklists, never automatic changes",
+      "Nightly summary to an IT Teams channel",
+      "33 tests; CI runs the tests and an npm audit on every pull request"
+    ],
+    operations: [
+      "Not deployed yet; the setup handoff list is in the repo",
+      "Sign-in limited to admins I assign"
+    ],
+    media: []
+  },
+  {
+    id: "curriculum-assistant",
+    name: "Curriculum Assistant (Phase 1)",
+    category: "district",
+    status: "build",
+    period: "2026",
+    role: "Designed and built phase 1",
+    tagline: "Ask \"what do I have 4th period Thursday?\" and get help preparing from your own notes.",
+    summary: "A teacher-facing assistant on the cluster that knows each teacher's schedule and their own materials. The cluster's model server has no tool calling, so the schedule lookup is plain SQL whose result is handed to the model, not something the model has to call. Teachers' files load from their own browser, so the server never holds a district-wide key to OneDrive. Phase 1, the schedule and materials layer, is built; a pilot with a handful of teachers comes next.",
+    stack: ["Next.js", "PostgreSQL", "Embeddings", "Microsoft Entra ID", "exo"],
+    impact: [
+      "Schedule answers come from the database, not from the model's guess",
+      "Runs with or without the vector extension, since the cluster has no internet access to install it",
+      "Tamper-evident audit log",
+      "No student data in version 1"
+    ],
+    media: []
+  },
+  {
+    id: "readwrite-profiles",
+    name: "Read&Write on Student Macs",
+    category: "district",
+    status: "build",
+    period: "2026",
+    role: "Found the cause and wrote the fix",
+    tagline: "Device profiles so students who use Read&Write for accommodations stop getting admin prompts they can't answer.",
+    summary: "A colleague reported students getting admin password prompts in Read&Write, a reading and writing support tool used for testing accommodations. Students are standard users, so they can't get past those prompts. I found the existing permissions profile was missing an entry and malformed in two places, and that the app's built-in updater needs admin rights while its installer wipes the permissions on every update. I wrote a corrected permissions profile and a second profile that turns off self-updates, so IT pushes updates instead.",
+    stack: ["Mosyle MDM", "Configuration profiles (PPPC)", "macOS"],
+    impact: [
+      "Corrected profile adds the missing Input Monitoring entry and fixes the payload type",
+      "Updates move to off-hours pushes from IT, never near state testing windows",
+      "Pilot on a student test Mac before rollout"
     ],
     media: []
   },
@@ -2080,9 +2302,11 @@ function detailHTML(p){
       <span>${esc(CATS[p.category])}</span><span>${esc(p.period)}</span>
     </div>
     <p class="mc-tagline mc-in" style="--d:2">${esc(p.tagline)}</p>
+    ${p.role ? `<p class="d-role mc-in" style="--d:2"><span>My role</span> ${esc(p.role)}</p>` : ""}
     <p class="d-summary mc-in" style="--d:3">${esc(p.summary)}</p>
     ${p.media && p.media.length ? sec("Screens and demos", `<div class="media-grid">${p.media.map(mediaHTML).join("")}</div>`) : ""}
     ${sec("What it delivers", `<ul class="impact">${p.impact.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`)}
+    ${p.lead && p.lead.length ? sec("How I led it", `<ul class="impact">${p.lead.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`) : ""}
     ${sec("Stack", `<div class="d-chips">${p.stack.map(s=>`<span class="chip">${esc(s)}</span>`).join("")}</div>`)}
     ${p.operations && p.operations.length ? sec("How it runs", `<ul class="impact">${p.operations.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`) : ""}
     ${p.code ? sec("From the code", `<div class="code-label">${esc(p.code.label)}</div>
@@ -2211,11 +2435,13 @@ $("#stamp").textContent = LAST_UPDATED;
 $("#print-sheet").innerHTML = `<div class="sec-label">District systems</div>` +
   PROJECTS.filter(isDistrict).map(p => `<article class="p-proj">
     <h2>${esc(p.name)}</h2>
-    <p class="p-meta">${STATUS[p.status].label} · ${esc(p.period)}</p>
+    <p class="p-meta">${STATUS[p.status].label} · ${esc(p.period)}${p.role ? ` · ${esc(p.role)}` : ""}</p>
     <p class="p-summary">${esc(p.summary)}</p>
     ${p.stack.length ? `<p class="p-stack">Stack: ${p.stack.map(esc).join(" · ")}</p>` : ""}
     ${p.impact.length ? `<div class="p-label">What it delivers</div>
     <ul>${p.impact.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>` : ""}
+    ${p.lead && p.lead.length ? `<div class="p-label">How I led it</div>
+    <ul>${p.lead.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>` : ""}
     ${p.operations && p.operations.length ? `<div class="p-label">How it runs</div>
     <ul>${p.operations.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>` : ""}
   </article>`).join("");
