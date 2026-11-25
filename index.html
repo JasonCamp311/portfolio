@@ -819,18 +819,19 @@ const METRICS = [
   { num: "Retired", lbl: "SchoolDude license" },
   { num: (pool) => String(pool.length), lbl: "systems built and operated" },
   { num: "3-node",lbl: "TB5 inference cluster" },
-  { num: "87",    lbl: "team pull requests reviewed + merged" },
+  { num: "138",   lbl: "team pull requests reviewed + merged" },
 ];
 
 /* System board rows. id must match a project id below. */
 const BOARD = [
-  { id: "dev-team",     metric: "87 PRs reviewed" },
+  { id: "dev-team",     metric: "138 PRs reviewed" },
   { id: "ticketing",    metric: "50-75 tickets/wk" },
   { id: "registration", metric: "live for 2026-27 intake" },
   { id: "app-gallery",  metric: "reviewed before publish" },
   { id: "business-assistant", metric: "pilot, 41 docs synced" },
   { id: "live-poll",    metric: "on-prem, teacher sign-in" },
-  { id: "scan-station", metric: "pilot prep" },
+  { id: "scan-station", metric: "server live, pilot setup" },
+  { id: "peer-tutoring", metric: "on-prem, student sign-in" },
   { id: "video-library", metric: "clips + playlists" },
   { id: "staff-offboarding", metric: "pilot, audited" },
   { id: "distribution-groups", metric: "0 students on staff lists" },
@@ -876,12 +877,13 @@ const PROJECTS = [
     summary: "In late September I started bringing two colleagues from the tech office on as developers. Both were new to Git and both code with AI assistants. I moved our apps into a shared GitHub organization and set up how we work: every change starts as an issue, goes on its own branch, and comes back as a pull request that I review. Only I merge, and I run the production deploys. I write the backlog for each project, keep one pinned tracking issue per project with the order of work, and wrote the team's handouts on our GitHub workflow, security and privacy checks, and app upkeep.",
     stack: ["GitHub (issues, PRs, milestones, CODEOWNERS)", "GitHub Actions", "Dependabot", "Claude Code", "Microsoft Teams"],
     impact: [
-      "87 pull requests from the two developers reviewed and merged since late September, across the district's apps",
+      "138 pull requests from the two developers reviewed and merged since late September, across the district's apps",
       "Both developers started out new to Git; I taught the workflow on real issues from our backlog instead of a practice exercise",
       "Team handouts: How we work on GitHub; a security and privacy checklist; and Keeping our apps healthy, with a key rotation schedule, a register of where every key lives (no secret values in it), an upkeep calendar, and joiner and leaver steps",
       "Security review as team work: a developer wrote the October review of the maintenance app, and each finding became its own issue and pull request",
       "Dependabot alerts and an npm audit check across the team's repos, with dependency updates reviewed like any other pull request",
-      "Kept the team moving through a vacation: daily check-ins to review, merge, and post each developer's next set of issues"
+      "Kept the team moving through a vacation: daily check-ins to review, merge, and post each developer's next set of issues",
+      "November 2026: non-code work (network changes, device setup, accounts, vendor requests) now goes in GitHub too, in a shared operations repo with issue templates and a simple rule for where each issue goes"
     ],
     lead: [
       "Set the rules: work starts from an issue, one branch per change, every pull request reviewed by me, and only I merge",
@@ -1075,7 +1077,7 @@ const PROJECTS = [
     period: "2026",
     tagline: "A native Mac app that locks a student's Mac for a written test, with Read&Write allowed for students who have that accommodation.",
     role: "Built version 1; lead developer and project manager on the rebuild · team of 3 plus the Director",
-    summary: "The district needed a way to give written tests on student Macs that keeps students out of every other app, while students with a Read&Write accommodation can still use it. I wrote the first version as a native Mac app in Swift that locks the Mac with Apple's Assessment Mode. A teacher makes a test link or a 4-digit join code, posts it in Schoology, and picks how the test ends. When it's over, the student's work is saved as a locked PDF with a record of the session. Apple approved the Assessment Mode entitlement in November, and version 1.0 went out signed and notarized through Mosyle for a test-Mac pilot. In mid-November the Director of Technology rebuilt the app in Xcode for Mac and iPad with a separate teacher app and no server. I brought his rebuild into the team's repo, fixed what it needed to lock down safely, and turned the remaining work into a tracked backlog for the team.",
+    summary: "The district needed a way to give written tests on student Macs that keeps students out of every other app, while students with a Read&Write accommodation can still use it. I wrote the first version as a native Mac app in Swift that locks the Mac with Apple's Assessment Mode. A teacher makes a test link or a 4-digit join code, posts it in Schoology, and picks how the test ends. When it's over, the student's work is saved as a locked PDF with a record of the session. Apple approved the Assessment Mode entitlement in November, and version 1.0 went out signed and notarized through Mosyle for a test-Mac pilot. In mid-November the Director of Technology rebuilt the app in Xcode for Mac and iPad with a separate teacher app. I brought his rebuild into the team's repo, fixed what it needed to lock down safely, and turned the remaining work into a tracked backlog for the team. When a classroom test showed teacher and student devices can't always find each other on the network, I made a relay on our district server the main way they connect, and that relay is now running.",
     stack: ["Swift", "SwiftUI + AppKit", "Apple Assessment Mode", "Ed25519 signing", "Mosyle MDM profiles", "Node (relay)"],
     impact: [
       "Test links are signed, so a student who edits a link to change how the test ends gets it refused",
@@ -1085,17 +1087,22 @@ const PROJECTS = [
       "Teacher alerts go through a small relay, built to run on the district server, that keeps nothing on disk, which avoids a network permission prompt on every student Mac",
       "Building proctor passwords and signing keys reach Macs through Mosyle profiles written by an IT command-line tool",
       "37 automated tests (24 in the app, 13 in the relay), including link tampering",
-      "Version 1.0 signed with a Developer ID, notarized by Apple, and delivered as a Mosyle package with its profiles"
+      "Version 1.0 signed with a Developer ID, notarized by Apple, and delivered as a Mosyle package with its profiles",
+      "Rebuild: a release script now produces two signed, notarized packages, one for student Macs and one for teacher Macs, so the teacher app never lands on a student machine",
+      "Rebuild: about 240 automated tests in the app plus the relay's own suite"
     ],
     lead: [
       "Split the rebuild into 33 issues across the two developers and me, with a pinned tracker for the order of work",
       "Pull requests go to the rebuild branch and only I merge; nine merged in the first two days, with 96 tests passing",
       "Made the app fail closed: if the lock can't start, the test doesn't",
-      "A developer's classroom test found Bonjour discovery fails across subnets on the same Wi-Fi; that became a design decision I own instead of a surprise at launch"
+      "A developer's classroom test found Bonjour discovery fails across subnets on the same Wi-Fi; that became a design decision I own instead of a surprise at launch",
+      "About 55 pull requests merged on the rebuild in its first ten days, most from the two developers",
+      "Decided hand-ins go through the relay instead of AirDrop, which students have turned off anyway"
     ],
     operations: [
       "Source: district GitHub org (private)",
-      "Version 1.0 test-Mac pilot through Mosyle; the rebuild is in development",
+      "Version 1.0 test-Mac pilot through Mosyle; the rebuild is in development and in demo with the Director",
+      "The rebuild's relay runs on the district Mac mini, reachable only on the district network",
       "The version 1 relay is dependency-free Node and holds everything in memory"
     ],
     media: []
@@ -1137,7 +1144,7 @@ const PROJECTS = [
     period: "2026",
     role: "Lead developer and project manager · iPad app and web side built by the two developers I lead",
     tagline: "Students scan paper work on a shared iPad and it shows up on their own MacBook as one PDF. Nothing is kept.",
-    summary: "Students with paper work to hand in walk up to a shared iPad. They open a page on their MacBook that shows a 4-digit code, type it on the iPad, scan their pages, and the PDF shows up on their MacBook to download. Nothing is stored after that. I wrote the full system design and the contract between the pieces, then split it into two tracks: one developer built the native iPad app, the other built the MacBook page and the server. Because the PDFs are student work, I moved hosting off the cloud and onto our own server on the district network before launch. The iPad app is submitted to Apple as a private app for our device management, and the first pilot is a high school library.",
+    summary: "Students with paper work to hand in walk up to a shared iPad. They open a page on their MacBook that shows a 4-digit code, type it on the iPad, scan their pages, and the PDF shows up on their MacBook to download. Nothing is stored after that. I wrote the full system design and the contract between the pieces, then split it into two tracks: one developer built the native iPad app, the other built the MacBook page and the server. Because the PDFs are student work, I moved hosting off the cloud and onto our own server on the district network before launch. The iPad app went through Apple's review as a private app for our device management. The server went live on our district server in November, and one of the developers is setting up the first pilot iPad in a high school classroom.",
     stack: ["SwiftUI", "VisionKit", "Node.js", "TypeScript", "Mosyle MDM", "App Store Connect (custom apps)", "Apache + Caddy"],
     impact: [
       "One PDF per scan, held in memory only, deleted once the student downloads it or within 30 minutes",
@@ -1151,12 +1158,38 @@ const PROJECTS = [
       "Broke the build into about 50 issues across two repos, with a pilot milestone, labels for blockers and decisions, and one pinned issue with the order of work",
       "Reviewed every pull request on both sides and merged them in order, retargeting stacked pull requests as each one landed",
       "Made the hosting call when the privacy picture changed: moved the server from Cloudflare to the district Mac mini, network-only, and re-planned the work the same day",
-      "Settled product questions on the issues: what happens to a rejected upload, when a closed tab counts as sent, and the bundle ID and address before the first App Store upload"
+      "Settled product questions on the issues: what happens to a rejected upload, when a closed tab counts as sent, and the bundle ID and address before the first App Store upload",
+      "Handed the pilot setup to a developer as one tracked issue with a checklist for each of us, so device setup and server steps happen in order"
     ],
     operations: [
       "Server runs on the district Mac mini as its own service account, reachable only on the district network",
-      "Deploy is a checklist the web developer wrote and I run",
+      "Deploy is a checklist the web developer wrote and I run; I deployed it in November",
+      "Students get a Scan link in the support menu on their district Macs, pushed through device management",
       "Kiosk iPads will be locked to the app through device management"
+    ],
+    media: []
+  },
+  {
+    id: "peer-tutoring",
+    name: "Peer Tutoring Match",
+    category: "district",
+    status: "build",
+    period: "2026",
+    role: "Built it from the Director's mockup",
+    tagline: "High school tutors and the students who want help sign up with their subjects and free periods, and the app pairs them.",
+    summary: "The high school runs a peer tutoring program where older students tutor high and middle schoolers. The Director of Technology mocked up how it should work, and I built it in a day in November. Tutors pick the subjects they can teach and their free periods; students pick what they need and when they're free. The app finds one tutor per subject and emails both, with the program teacher and coordinators copied. Coordinators see every match and who's still waiting, can match by hand, and have a week view of which tutors are open each period. It's the first district app students sign into with their Microsoft accounts, so I kept what it takes from that sign-in to the minimum and kept it on our own server.",
+    stack: ["Node.js", "SQLite (node:sqlite)", "Microsoft Entra ID", "Vanilla JS", "launchd"],
+    impact: [
+      "The matching rule is plain and testable: earliest shared free period, then the tutor with the fewest matches, then who signed up first",
+      "Nobody gets double-booked, on either side, and a cancelled pair is never matched again automatically",
+      "Roles come from Microsoft sign-in (student or coordinator), so a student can't make themselves a coordinator",
+      "Takes only name, email, and role from the sign-in",
+      "One outside dependency; 21 automated tests"
+    ],
+    operations: [
+      "Runs as its own service account on the district Mac mini, reachable only on the district network",
+      "Student data stays on that machine",
+      "Go-live is in progress: open program questions (middle vs high school sign-in, coordinators, the tutoring mailbox) are with the Director"
     ],
     media: []
   },
@@ -1779,7 +1812,7 @@ scheduleNextPoll(delay);`
     stack: ["HTML / CSS / JS (no build)", "Python", "CurseForge", "GitHub Pages"],
     impact: [
       "Class and leveling guides for all 56 race and class combinations, rendered from one data file",
-      "Addon installer: one command installs or updates the whole set and checks for missing addon dependencies",
+      "Addon installer: one command installs or updates the whole set and checks for missing addon dependencies; two more addons added in November",
       "Stylesheets and scripts are cache-busted, so a redesign never loads against a stale file",
       "Marked unofficial throughout; not affiliated with or endorsed by Blizzard Entertainment"
     ],
